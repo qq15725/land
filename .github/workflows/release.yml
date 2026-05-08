@@ -19,6 +19,9 @@ jobs:
   export:
     name: Export (${{ matrix.platform }})
     runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.6
+
     strategy:
       fail-fast: false
       matrix:
@@ -26,36 +29,32 @@ jobs:
           - platform: web
             preset: "Web"
             artifact: "land-web"
-            ext: "html"
             out_dir: "build/web"
           - platform: windows
             preset: "Windows Desktop"
             artifact: "land-windows"
-            ext: "exe"
             out_dir: "build/windows"
           - platform: macos
             preset: "macOS"
             artifact: "land-macos"
-            ext: "zip"
             out_dir: "build/macos"
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Godot ${{ env.GODOT_VERSION }}
-        uses: chickensoft-games/setup-godot@v2
-        with:
-          version: ${{ env.GODOT_VERSION }}
-          use-dotnet: false
-          include-templates: true
+      - name: Setup export templates
+        run: |
+          mkdir -p ~/.local/share/godot/export_templates/${{ env.GODOT_VERSION }}.stable
+          cp -r /root/.local/share/godot/export_templates/${{ env.GODOT_VERSION }}.stable/* \
+            ~/.local/share/godot/export_templates/${{ env.GODOT_VERSION }}.stable/
 
-      - name: Create export directories
+      - name: Create export directory
         run: mkdir -p ${{ matrix.out_dir }}
 
       - name: Export — ${{ matrix.platform }}
         run: |
           godot --headless --export-release "${{ matrix.preset }}" \
-            "${{ matrix.out_dir }}/${{ env.PROJECT_NAME }}.${{ matrix.ext }}"
+            "${{ matrix.out_dir }}/${{ env.PROJECT_NAME }}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
