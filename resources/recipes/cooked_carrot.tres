@@ -1,0 +1,19 @@
+[gd_resource type="Resource" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/recipe_resource.gd" id="1_rr"]
+[ext_resource type="Script" path="res://scripts/data/recipe_ingredient.gd" id="2_ri"]
+[ext_resource type="Resource" path="res://resources/items/carrot.tres" id="3_carrot"]
+[ext_resource type="Resource" path="res://resources/items/cooked_carrot.tres" id="4_cooked"]
+
+[sub_resource type="Resource" id="Ingredient_1"]
+script = ExtResource("2_ri")
+item = ExtResource("3_carrot")
+amount = 1
+
+[resource]
+script = ExtResource("1_rr")
+id = "cooked_carrot"
+output_item = ExtResource("4_cooked")
+output_amount = 1
+ingredients = [SubResource("Ingredient_1")]
+required_station = "cooking_pot"

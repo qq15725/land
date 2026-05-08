@@ -5,4 +5,4 @@ extends Resource
 @export var output_item: ItemResource
 @export var output_amount: int = 1
 @export var ingredients: Array[RecipeIngredient] = []
-@export var requires_workbench: bool = false
+@export var required_station: String = ""

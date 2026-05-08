@@ -45,33 +45,47 @@ func _build_layout() -> void:
 func setup(inventory: InventoryComponent) -> void:
 	_inventory = inventory
 	_inventory.changed.connect(_refresh)
+	_inventory.selection_changed.connect(func(_i): _refresh())
 	_refresh()
 
 func _refresh() -> void:
 	for child in _grid.get_children():
 		child.queue_free()
-	for slot in _inventory.slots:
-		_grid.add_child(_make_slot(slot))
+	for i in _inventory.slots.size():
+		_grid.add_child(_make_slot(i))
 
-func _make_slot(slot: Dictionary) -> Control:
-	var panel := Panel.new()
-	panel.custom_minimum_size = Vector2(48, 48)
+func _make_slot(index: int) -> Control:
+	var slot: Dictionary = _inventory.slots[index]
+	var btn := Button.new()
+	btn.custom_minimum_size = Vector2(48, 48)
+	btn.flat = true
+
 	var style := StyleBoxFlat.new()
 	style.set_corner_radius_all(3)
 	if slot.item != null:
 		style.bg_color = slot.item.color
-		panel.add_theme_stylebox_override("panel", style)
+	else:
+		style.bg_color = Color(0.15, 0.15, 0.15, 0.9)
+	if index == _inventory.selected_slot:
+		style.border_color = Color.WHITE
+		style.set_border_width_all(2)
+
+	btn.add_theme_stylebox_override("normal", style)
+	btn.add_theme_stylebox_override("hover", style)
+	btn.add_theme_stylebox_override("pressed", style)
+
+	if slot.item != null:
 		var lbl := Label.new()
 		lbl.text = "x%d" % slot.amount if slot.amount > 1 else ""
 		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		lbl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 		lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		lbl.add_theme_font_size_override("font_size", 9)
-		panel.add_child(lbl)
-	else:
-		style.bg_color = Color(0.15, 0.15, 0.15, 0.9)
-		panel.add_theme_stylebox_override("panel", style)
-	return panel
+		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		btn.add_child(lbl)
+
+	btn.pressed.connect(func(): _inventory.select_slot(index))
+	return btn
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("inventory"):

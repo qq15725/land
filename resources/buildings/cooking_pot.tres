@@ -1,0 +1,24 @@
+[gd_resource type="Resource" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/building_resource.gd" id="1_br"]
+[ext_resource type="Script" path="res://scripts/data/recipe_ingredient.gd" id="2_ri"]
+[ext_resource type="Resource" path="res://resources/items/stone.tres" id="3_stone"]
+[ext_resource type="Resource" path="res://resources/items/wood.tres" id="4_wood"]
+[ext_resource type="PackedScene" path="res://scenes/buildings/cooking_pot.tscn" id="5_scene"]
+
+[sub_resource type="Resource" id="Cost_1"]
+script = ExtResource("2_ri")
+item = ExtResource("3_stone")
+amount = 5
+
+[sub_resource type="Resource" id="Cost_2"]
+script = ExtResource("2_ri")
+item = ExtResource("4_wood")
+amount = 2
+
+[resource]
+script = ExtResource("1_br")
+id = "cooking_pot"
+display_name = "烹饪锅"
+scene = ExtResource("5_scene")
+cost = [SubResource("Cost_1"), SubResource("Cost_2")]

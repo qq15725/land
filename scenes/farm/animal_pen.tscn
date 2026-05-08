@@ -1,0 +1,39 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scenes/farm/animal_pen.gd" id="1_ap"]
+[ext_resource type="Resource" path="res://resources/animals/chicken.tres" id="2_chicken"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(70, 50)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 55.0
+
+[node name="AnimalPen" type="StaticBody2D"]
+script = ExtResource("1_ap")
+animal_data = ExtResource("2_chicken")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_1")
+
+[node name="Fence" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-35, -32, 35, -32, 35, 18, -35, 18)
+color = Color(0.5, 0.32, 0.12, 1)
+
+[node name="Ground" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-30, -26, 30, -26, 30, 12, -30, 12)
+color = Color(0.62, 0.52, 0.3, 1)
+
+[node name="InteractArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractArea"]
+shape = SubResource("CircleShape2D_1")
+
+[node name="HintLabel" type="Label" parent="."]
+offset_left = -35.0
+offset_top = -50.0
+offset_right = 35.0
+offset_bottom = -33.0
+text = ""
+theme_override_font_sizes/font_size = 11
+horizontal_alignment = 1

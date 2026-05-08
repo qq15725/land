@@ -1,0 +1,10 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_resource.gd" id="1_ir"]
+
+[resource]
+script = ExtResource("1_ir")
+id = "wheat"
+display_name = "小麦"
+max_stack = 20
+color = Color(0.95, 0.88, 0.4, 1)

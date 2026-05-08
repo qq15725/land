@@ -1,0 +1,37 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scenes/buildings/cooking_pot.gd" id="1_cp"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 20.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 50.0
+
+[node name="CookingPot" type="StaticBody2D"]
+script = ExtResource("1_cp")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_1")
+
+[node name="Body" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(0, -22, 14, -18, 20, -8, 20, 5, 14, 14, 0, 17, -14, 14, -20, 5, -20, -8, -14, -18)
+color = Color(0.22, 0.22, 0.22, 1)
+
+[node name="Rim" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-22, -24, 22, -24, 22, -19, -22, -19)
+color = Color(0.3, 0.3, 0.3, 1)
+
+[node name="InteractArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractArea"]
+shape = SubResource("CircleShape2D_2")
+
+[node name="HintLabel" type="Label" parent="."]
+offset_left = -40.0
+offset_top = -42.0
+offset_right = 40.0
+offset_bottom = -25.0
+text = "[E] 使用烹饪锅"
+theme_override_font_sizes/font_size = 11
+horizontal_alignment = 1

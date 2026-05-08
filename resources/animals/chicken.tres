@@ -1,0 +1,16 @@
+[gd_resource type="Resource" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/animal_resource.gd" id="1_ar"]
+[ext_resource type="Resource" path="res://resources/items/animal_feed.tres" id="2_feed"]
+[ext_resource type="Resource" path="res://resources/items/chicken_egg.tres" id="3_produce"]
+
+[resource]
+script = ExtResource("1_ar")
+id = "chicken"
+display_name = "鸡"
+feed_item = ExtResource("2_feed")
+produce_item = ExtResource("3_produce")
+produce_amount = 1
+produce_time = 30.0
+wander_radius = 60.0
+color = Color(0.95, 0.92, 0.85, 1)

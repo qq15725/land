@@ -2,6 +2,7 @@ extends Control
 
 var _health_bar: ProgressBar
 var _mode_label: Label
+var _selected_label: Label
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -32,14 +33,24 @@ func _ready() -> void:
 	_health_bar.add_theme_stylebox_override("fill", fill)
 	hp_row.add_child(_health_bar)
 
+	_selected_label = Label.new()
+	_selected_label.text = ""
+	_selected_label.add_theme_font_size_override("font_size", 12)
+	vbox.add_child(_selected_label)
+
 	_mode_label = Label.new()
 	_mode_label.text = ""
 	_mode_label.add_theme_font_size_override("font_size", 12)
 	vbox.add_child(_mode_label)
 
-func setup(health: HealthComponent) -> void:
+func setup(health: HealthComponent, inventory: InventoryComponent) -> void:
 	_health_bar.max_value = health.max_health
 	_health_bar.value = health.current_health
 	health.health_changed.connect(func(cur, _m): _health_bar.value = cur)
 	BuildingSystem.build_mode_entered.connect(func(_b): _mode_label.text = "[建造模式]  左键放置  右键/ESC取消")
 	BuildingSystem.build_mode_exited.connect(func(): _mode_label.text = "")
+	inventory.selection_changed.connect(func(_i): _on_selection_changed(inventory))
+
+func _on_selection_changed(inventory: InventoryComponent) -> void:
+	var item := inventory.get_selected_item()
+	_selected_label.text = "[%s]" % item.display_name if item else ""

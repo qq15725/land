@@ -21,6 +21,8 @@ func _physics_process(_delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("interact"):
 		_try_interact()
+	elif event.is_action_pressed("use_item"):
+		_use_selected_item()
 
 func _try_interact() -> void:
 	var areas := interaction_area.get_overlapping_areas()
@@ -36,6 +38,14 @@ func _try_interact() -> void:
 	var parent := closest.get_parent()
 	if parent.has_method("interact"):
 		parent.interact(self)
+
+func _use_selected_item() -> void:
+	var item := inventory.get_selected_item()
+	if not item:
+		return
+	if item.heal_amount > 0.0 and health.current_health < health.max_health:
+		health.heal(item.heal_amount)
+		inventory.remove_item(item, 1)
 
 func _on_died() -> void:
 	visible = false

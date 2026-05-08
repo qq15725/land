@@ -2,7 +2,7 @@ extends PanelContainer
 
 var _inventory: InventoryComponent
 var _recipe_list: VBoxContainer
-var _at_workbench: bool = false
+var _current_station: String = ""
 
 func _ready() -> void:
 	custom_minimum_size = Vector2(320, 420)
@@ -50,8 +50,8 @@ func setup(inventory: InventoryComponent) -> void:
 	_inventory = inventory
 	_inventory.changed.connect(func(): if visible: _refresh())
 
-func _on_open_crafting(at_workbench: bool) -> void:
-	_at_workbench = at_workbench
+func _on_open_crafting(station: String) -> void:
+	_current_station = station
 	_refresh()
 	show()
 
@@ -62,7 +62,7 @@ func _refresh() -> void:
 		_add_recipe_entry(recipe)
 
 func _add_recipe_entry(recipe: RecipeResource) -> void:
-	var accessible := not recipe.requires_workbench or _at_workbench
+	var accessible := recipe.required_station == "" or recipe.required_station == _current_station
 	var craftable := accessible and CraftingSystem.can_craft(recipe, _inventory)
 
 	var row := HBoxContainer.new()
@@ -86,13 +86,19 @@ func _add_recipe_entry(recipe: RecipeResource) -> void:
 	btn.custom_minimum_size = Vector2(72, 0)
 	btn.disabled = not craftable
 	if not accessible:
-		btn.text = "需工作台"
+		btn.text = "需要：" + _station_name(recipe.required_station)
 	else:
 		btn.text = "合成"
 		btn.pressed.connect(func(): _on_craft(recipe))
 	row.add_child(btn)
 
 	_recipe_list.add_child(HSeparator.new())
+
+func _station_name(station: String) -> String:
+	match station:
+		"workbench": return "工作台"
+		"cooking_pot": return "烹饪锅"
+		_: return station
 
 func _format_ingredients(ingredients: Array[RecipeIngredient]) -> String:
 	var parts: PackedStringArray = []
@@ -109,7 +115,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if visible:
 			hide()
 		else:
-			_on_open_crafting(false)
+			_on_open_crafting("")
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("ui_cancel") and visible:
 		hide()

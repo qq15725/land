@@ -7,3 +7,4 @@ extends Resource
 @export var max_stack: int = 64
 @export var description: String = ""
 @export var color: Color = Color.WHITE
+@export var heal_amount: float = 0.0

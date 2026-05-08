@@ -1,0 +1,10 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_resource.gd" id="1_ir"]
+
+[resource]
+script = ExtResource("1_ir")
+id = "animal_feed"
+display_name = "饲料"
+max_stack = 30
+color = Color(0.72, 0.6, 0.28, 1)

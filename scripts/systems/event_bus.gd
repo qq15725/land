@@ -5,5 +5,5 @@ signal player_damaged(amount: float)
 signal player_died
 signal resource_depleted(node: Node)
 signal resource_respawned(node: Node)
-signal open_crafting(at_workbench: bool)
+signal open_crafting(station: String)
 signal open_storage(storage: Node)

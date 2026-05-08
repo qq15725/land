@@ -30,7 +30,7 @@ func _setup_ui() -> void:
 	add_child(hud_layer)
 	var hud := HUDScene.instantiate()
 	hud_layer.add_child(hud)
-	hud.setup(player.health)
+	hud.setup(player.health, player.inventory)
 
 	var ui_layer := CanvasLayer.new()
 	ui_layer.layer = 10
@@ -90,6 +90,8 @@ func _on_building_placed(building: BuildingResource, pos: Vector2) -> void:
 	var node := building.scene.instantiate() as Node2D
 	node.global_position = pos
 	y_sort_layer.add_child(node)
+	if node.has_method("on_placed"):
+		node.on_placed()
 
 func _scatter_resources() -> void:
 	var rng := RandomNumberGenerator.new()

@@ -2,10 +2,12 @@ class_name InventoryComponent
 extends Node
 
 signal changed
+signal selection_changed(slot_index: int)
 
 @export var slot_count: int = 20
 
 var slots: Array[Dictionary] = []
+var selected_slot: int = -1
 
 func _ready() -> void:
 	slots.resize(slot_count)
@@ -54,6 +56,18 @@ func has_item(item: ItemResource, amount: int = 1) -> bool:
 		if slot.item == item:
 			total += slot.amount
 	return total >= amount
+
+func select_slot(index: int) -> void:
+	if index == selected_slot:
+		selected_slot = -1
+	else:
+		selected_slot = index
+	selection_changed.emit(selected_slot)
+
+func get_selected_item() -> ItemResource:
+	if selected_slot < 0 or selected_slot >= slots.size():
+		return null
+	return slots[selected_slot].item
 
 func get_contents() -> String:
 	var parts: PackedStringArray = []
