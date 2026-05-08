@@ -17,10 +17,10 @@ func load_save(slot: int, world: Node2D) -> bool:
 	if not FileAccess.file_exists(path):
 		return false
 	var file := FileAccess.open(path, FileAccess.READ)
-	var result := JSON.parse_string(file.get_as_text())
+	var result: Variant = JSON.parse_string(file.get_as_text())
 	if result == null:
 		return false
-	_apply(result, world)
+	_apply(result as Dictionary, world)
 	return true
 
 func slot_exists(slot: int) -> bool:
@@ -31,13 +31,13 @@ func get_slot_info(slot: int) -> Dictionary:
 	if not FileAccess.file_exists(path):
 		return {}
 	var file := FileAccess.open(path, FileAccess.READ)
-	var result := JSON.parse_string(file.get_as_text())
+	var result: Variant = JSON.parse_string(file.get_as_text())
 	if result == null:
 		return {}
 	return {
-		"day": result.get("day", 1),
-		"phase": result.get("phase", "白天"),
-		"saved_at": result.get("saved_at", ""),
+		"day": (result as Dictionary).get("day", 1),
+		"phase": (result as Dictionary).get("phase", "白天"),
+		"saved_at": (result as Dictionary).get("saved_at", ""),
 	}
 
 func delete_slot(slot: int) -> void:
