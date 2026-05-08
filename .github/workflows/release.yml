@@ -30,14 +30,17 @@ jobs:
             preset: "Web"
             artifact: "land-web"
             out_dir: "build/web"
+            out_file: "index.html"
           - platform: windows
             preset: "Windows Desktop"
             artifact: "land-windows"
             out_dir: "build/windows"
+            out_file: "land.exe"
           - platform: macos
             preset: "macOS"
             artifact: "land-macos"
             out_dir: "build/macos"
+            out_file: "land.zip"
 
     steps:
       - uses: actions/checkout@v4
@@ -54,7 +57,7 @@ jobs:
       - name: Export — ${{ matrix.platform }}
         run: |
           godot --headless --export-release "${{ matrix.preset }}" \
-            "${{ matrix.out_dir }}/${{ env.PROJECT_NAME }}"
+            "${{ matrix.out_dir }}/${{ matrix.out_file }}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
