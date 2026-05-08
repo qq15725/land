@@ -5,12 +5,12 @@ var _grid: GridContainer
 
 func _ready() -> void:
 	custom_minimum_size = Vector2(290, 340)
-	anchor_left = 1.0
-	anchor_right = 1.0
+	anchor_left = 0.5
+	anchor_right = 0.5
 	anchor_top = 0.5
 	anchor_bottom = 0.5
-	offset_right = -20
-	offset_left = -310
+	offset_left = -145
+	offset_right = 145
 	offset_top = -170
 	offset_bottom = 170
 	visible = false
