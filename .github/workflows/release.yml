@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "版本号（如 v1.0.0）"
+        required: true
+        default: "v0.0.0-dev"
 
 env:
   GODOT_VERSION: "4.6"
@@ -82,5 +88,6 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.event.inputs.version || github.ref_name }}
           files: artifacts/*.zip
           generate_release_notes: true
