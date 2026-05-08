@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://tradeui001"]
+
+[ext_resource type="Script" path="res://scenes/ui/trade_ui.gd" id="1_tu"]
+
+[node name="TradeUI" type="PanelContainer"]
+script = ExtResource("1_tu")

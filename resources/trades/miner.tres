@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="MerchantResource" load_steps=12 format=3 uid="uid://merchant_miner"]
+
+[ext_resource type="Script" path="res://scripts/data/merchant_resource.gd" id="1_mr"]
+[ext_resource type="Script" path="res://scripts/data/trade_entry.gd" id="2_te"]
+[ext_resource type="Resource" path="res://resources/items/stone.tres" id="3_stone"]
+[ext_resource type="Resource" path="res://resources/items/rare_seed.tres" id="4_rseed"]
+[ext_resource type="Resource" path="res://resources/items/wood.tres" id="5_wood"]
+[ext_resource type="Resource" path="res://resources/items/wooden_plank.tres" id="6_plank"]
+[ext_resource type="Resource" path="res://resources/items/blueprint.tres" id="7_bp"]
+
+[sub_resource type="Resource" id="TradeEntry_1"]
+script = ExtResource("2_te")
+give_item = ExtResource("3_stone")
+give_amount = 15
+receive_item = ExtResource("4_rseed")
+receive_amount = 1
+
+[sub_resource type="Resource" id="TradeEntry_2"]
+script = ExtResource("2_te")
+give_item = ExtResource("5_wood")
+give_amount = 20
+receive_item = ExtResource("7_bp")
+receive_amount = 2
+
+[sub_resource type="Resource" id="TradeEntry_3"]
+script = ExtResource("2_te")
+give_item = ExtResource("6_plank")
+give_amount = 6
+receive_item = ExtResource("4_rseed")
+receive_amount = 3
+
+[resource]
+script = ExtResource("1_mr")
+id = "miner"
+display_name = "矿商"
+color = Color(0.7, 0.5, 0.3, 1)
+visit_interval = 240.0
+stay_duration = 120.0
+trades = [SubResource("TradeEntry_1"), SubResource("TradeEntry_2"), SubResource("TradeEntry_3")]

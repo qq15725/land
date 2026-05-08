@@ -8,6 +8,7 @@ const InventoryUIScene := preload("res://scenes/ui/inventory_ui.tscn")
 const CraftingUIScene := preload("res://scenes/ui/crafting_ui.tscn")
 const BuildMenuUIScene := preload("res://scenes/ui/build_menu_ui.tscn")
 const StorageUIScene := preload("res://scenes/ui/storage_ui.tscn")
+const TradeUIScene := preload("res://scenes/ui/trade_ui.tscn")
 
 const RESOURCE_COUNT := 40
 const SPAWN_RADIUS := 600.0
@@ -68,6 +69,10 @@ func _setup_ui() -> void:
 	var storage_ui := StorageUIScene.instantiate()
 	ui_layer.add_child(storage_ui)
 	storage_ui.setup(player.inventory)
+
+	var trade_ui := TradeUIScene.instantiate()
+	ui_layer.add_child(trade_ui)
+	trade_ui.setup(player.inventory)
 
 func _process(_delta: float) -> void:
 	if _build_preview:

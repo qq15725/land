@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="MerchantResource" load_steps=14 format=3 uid="uid://merchant_wanderer"]
+
+[ext_resource type="Script" path="res://scripts/data/merchant_resource.gd" id="1_mr"]
+[ext_resource type="Script" path="res://scripts/data/trade_entry.gd" id="2_te"]
+[ext_resource type="Resource" path="res://resources/items/carrot.tres" id="3_carrot"]
+[ext_resource type="Resource" path="res://resources/items/rare_seed.tres" id="4_rseed"]
+[ext_resource type="Resource" path="res://resources/items/wheat.tres" id="5_wheat"]
+[ext_resource type="Resource" path="res://resources/items/blueprint.tres" id="6_bp"]
+[ext_resource type="Resource" path="res://resources/items/chicken_egg.tres" id="7_egg"]
+[ext_resource type="Resource" path="res://resources/items/wood.tres" id="8_wood"]
+
+[sub_resource type="Resource" id="TradeEntry_1"]
+script = ExtResource("2_te")
+give_item = ExtResource("3_carrot")
+give_amount = 5
+receive_item = ExtResource("4_rseed")
+receive_amount = 1
+
+[sub_resource type="Resource" id="TradeEntry_2"]
+script = ExtResource("2_te")
+give_item = ExtResource("5_wheat")
+give_amount = 8
+receive_item = ExtResource("6_bp")
+receive_amount = 1
+
+[sub_resource type="Resource" id="TradeEntry_3"]
+script = ExtResource("2_te")
+give_item = ExtResource("7_egg")
+give_amount = 3
+receive_item = ExtResource("4_rseed")
+receive_amount = 2
+
+[sub_resource type="Resource" id="TradeEntry_4"]
+script = ExtResource("2_te")
+give_item = ExtResource("8_wood")
+give_amount = 10
+receive_item = ExtResource("6_bp")
+receive_amount = 1
+
+[resource]
+script = ExtResource("1_mr")
+id = "wanderer"
+display_name = "行商"
+color = Color(0.4, 0.6, 0.9, 1)
+visit_interval = 180.0
+stay_duration = 90.0
+trades = [SubResource("TradeEntry_1"), SubResource("TradeEntry_2"), SubResource("TradeEntry_3"), SubResource("TradeEntry_4")]

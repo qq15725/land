@@ -24,6 +24,7 @@ ItemDatabase="*res://scripts/systems/item_database.gd"
 CraftingSystem="*res://scripts/systems/crafting_system.gd"
 BuildingSystem="*res://scripts/systems/building_system.gd"
 TimeSystem="*res://scripts/systems/time_system.gd"
+TradeSystem="*res://scripts/systems/trade_system.gd"
 
 [input]
 

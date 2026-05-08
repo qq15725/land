@@ -1,0 +1,38 @@
+[gd_scene load_steps=5 format=3 uid="uid://tradingpost01"]
+
+[ext_resource type="Script" path="res://scenes/buildings/trading_post.gd" id="1_tp"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(48, 30)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 55.0
+
+[node name="TradingPost" type="StaticBody2D"]
+script = ExtResource("1_tp")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -15)
+shape = SubResource("RectangleShape2D_1")
+
+[node name="Base" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-24, -32, 24, -32, 24, 0, -24, 0)
+color = Color(0.55, 0.45, 0.25, 1)
+
+[node name="Sign" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-10, -46, 10, -46, 10, -32, -10, -32)
+color = Color(0.8, 0.6, 0.2, 1)
+
+[node name="InteractArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractArea"]
+shape = SubResource("CircleShape2D_1")
+
+[node name="HintLabel" type="Label" parent="."]
+offset_left = -50.0
+offset_top = -62.0
+offset_right = 50.0
+offset_bottom = -46.0
+text = "[E] 激活贸易站"
+theme_override_font_sizes/font_size = 11
+horizontal_alignment = 1
