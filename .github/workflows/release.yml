@@ -1,0 +1,86 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+env:
+  GODOT_VERSION: "4.6"
+  PROJECT_NAME: "land"
+
+jobs:
+  export:
+    name: Export (${{ matrix.platform }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: web
+            preset: "Web"
+            artifact: "land-web"
+            ext: "html"
+            out_dir: "build/web"
+          - platform: windows
+            preset: "Windows Desktop"
+            artifact: "land-windows"
+            ext: "exe"
+            out_dir: "build/windows"
+          - platform: macos
+            preset: "macOS"
+            artifact: "land-macos"
+            ext: "zip"
+            out_dir: "build/macos"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Godot ${{ env.GODOT_VERSION }}
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: ${{ env.GODOT_VERSION }}
+          use-dotnet: false
+          include-templates: true
+
+      - name: Create export directories
+        run: mkdir -p ${{ matrix.out_dir }}
+
+      - name: Export — ${{ matrix.platform }}
+        run: |
+          godot --headless --export-release "${{ matrix.preset }}" \
+            "${{ matrix.out_dir }}/${{ env.PROJECT_NAME }}.${{ matrix.ext }}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.out_dir }}/
+
+  release:
+    name: Create GitHub Release
+    needs: export
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+
+      - name: Zip each platform
+        run: |
+          cd artifacts
+          for dir in */; do
+            zip -r "${dir%/}.zip" "$dir"
+          done
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*.zip
+          generate_release_notes: true
