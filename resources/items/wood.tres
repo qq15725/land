@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://wood0001"]
+
+[ext_resource type="Script" path="res://scripts/data/item_resource.gd" id="1_ir"]
+
+[resource]
+script = ExtResource("1_ir")
+id = "wood"
+display_name = "木材"
+max_stack = 99
+description = "普通木材，用于建造和合成"
+color = Color(0.6, 0.4, 0.2, 1)

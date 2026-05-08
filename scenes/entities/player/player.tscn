@@ -1,0 +1,36 @@
+[gd_scene load_steps=7 format=3 uid="uid://player0001"]
+
+[ext_resource type="Script" path="res://scenes/entities/player/player.gd" id="1_pl"]
+[ext_resource type="Script" path="res://scripts/components/inventory_component.gd" id="2_inv"]
+[ext_resource type="Script" path="res://scripts/components/health_component.gd" id="3_hp"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(14, 20)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 45.0
+
+[node name="Player" type="CharacterBody2D"]
+script = ExtResource("1_pl")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -10)
+shape = SubResource("RectangleShape2D_1")
+
+[node name="Visual" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-7, -22, 7, -22, 7, 0, -7, 0)
+color = Color(0.9, 0.85, 0.7, 1)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(2.0, 2.0)
+
+[node name="InteractionArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea"]
+shape = SubResource("CircleShape2D_1")
+
+[node name="InventoryComponent" type="Node" parent="."]
+script = ExtResource("2_inv")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("3_hp")

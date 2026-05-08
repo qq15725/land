@@ -1,0 +1,7 @@
+extends Node
+
+signal item_picked_up(item: ItemResource, amount: int)
+signal player_damaged(amount: float)
+signal player_died
+signal resource_depleted(node: Node)
+signal resource_respawned(node: Node)

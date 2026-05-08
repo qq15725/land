@@ -1,0 +1,42 @@
+[gd_scene load_steps=6 format=3 uid="uid://treenode0001"]
+
+[ext_resource type="Script" path="res://scenes/world/resource_nodes/tree_node.gd" id="1_tn"]
+[ext_resource type="Resource" path="res://resources/items/wood.tres" id="2_wood"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(12, 20)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 45.0
+
+[node name="TreeNode" type="StaticBody2D"]
+script = ExtResource("1_tn")
+item = ExtResource("2_wood")
+drop_amount = 3
+respawn_time = 30.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -10)
+shape = SubResource("RectangleShape2D_1")
+
+[node name="Trunk" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-5, -20, 5, -20, 5, 0, -5, 0)
+color = Color(0.5, 0.3, 0.1, 1)
+
+[node name="Canopy" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(0, -65, 20, -45, 18, -20, 0, -12, -18, -20, -20, -45)
+color = Color(0.15, 0.55, 0.1, 1)
+
+[node name="InteractArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractArea"]
+shape = SubResource("CircleShape2D_1")
+
+[node name="HintLabel" type="Label" parent="."]
+offset_left = -25.0
+offset_top = -82.0
+offset_right = 25.0
+offset_bottom = -65.0
+text = "[E] 采集"
+theme_override_font_sizes/font_size = 11
+horizontal_alignment = 1

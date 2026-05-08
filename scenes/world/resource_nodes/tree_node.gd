@@ -1,0 +1,2 @@
+class_name TreeNode
+extends ResourceNode
