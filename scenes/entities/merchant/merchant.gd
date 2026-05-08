@@ -3,7 +3,7 @@ extends CharacterBody2D
 
 signal departed
 
-@onready var visual: Polygon2D = $Visual
+@onready var visual: Sprite2D = $Visual
 @onready var interact_area: Area2D = $InteractArea
 @onready var hint_label: Label = $HintLabel
 
@@ -23,11 +23,7 @@ func setup(merchant_data: MerchantResource, post_pos: Vector2) -> void:
 	var offset := Vector2(randf_range(-24.0, 24.0), randf_range(-24.0, 24.0))
 	_target_pos += offset
 	global_position = post_pos + Vector2(randf_range(-200.0, 200.0), randf_range(80.0, 160.0))
-	if is_node_ready():
-		visual.color = data.color
-	else:
-		await ready
-		visual.color = data.color
+	pass
 
 func _physics_process(delta: float) -> void:
 	if not _arrived:

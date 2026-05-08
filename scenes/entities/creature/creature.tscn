@@ -19,9 +19,7 @@ script = ExtResource("1_cr")
 position = Vector2(0, -9)
 shape = SubResource("RectangleShape2D_1")
 
-[node name="Visual" type="Polygon2D" parent="."]
-polygon = PackedVector2Array(-7, -18, 7, -18, 7, 0, -7, 0)
-color = Color(0.6, 0.2, 0.2, 1)
+[node name="Visual" type="Sprite2D" parent="."]
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("2_hp")

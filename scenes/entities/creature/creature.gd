@@ -6,7 +6,7 @@ const DropItemScene := preload("res://scenes/entities/drop_item/drop_item.tscn")
 @export var data: CreatureResource
 
 @onready var health: HealthComponent = $HealthComponent
-@onready var visual: Polygon2D = $Visual
+@onready var visual: Sprite2D = $Visual
 @onready var detection_area: Area2D = $DetectionArea
 @onready var detection_shape: CollisionShape2D = $DetectionArea/CollisionShape2D
 @onready var attack_area: Area2D = $AttackArea
@@ -26,7 +26,10 @@ func _ready() -> void:
 		return
 	health.max_health = data.max_health
 	health.current_health = data.max_health
-	visual.color = data.color
+	if data.texture:
+		visual.texture = data.texture
+		visual.scale = Vector2.ONE * data.sprite_scale
+		visual.position.y = -(data.texture.get_height() * data.sprite_scale) / 2.0
 
 	var det_circle := detection_shape.shape as CircleShape2D
 	if det_circle:
@@ -99,7 +102,7 @@ func _pick_wander_target() -> void:
 
 func _update_facing() -> void:
 	if velocity.x != 0.0:
-		visual.scale.x = sign(velocity.x)
+		visual.scale.x = sign(velocity.x) * absf(visual.scale.x)
 
 func _flash_attack() -> void:
 	visual.modulate = Color(2.0, 0.5, 0.5)

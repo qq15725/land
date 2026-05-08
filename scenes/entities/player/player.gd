@@ -10,11 +10,15 @@ const KNOCKBACK_FORCE := 180.0
 @onready var inventory: InventoryComponent = $InventoryComponent
 @onready var health: HealthComponent = $HealthComponent
 @onready var interaction_area: Area2D = $InteractionArea
-@onready var visual: Polygon2D = $Visual
+@onready var visual: Sprite2D = $Visual
 @onready var attack_area: Area2D = $AttackArea
 
 var _attack_timer: float = 0.0
 var _is_dead: bool = false
+var _click_target: Vector2 = Vector2.ZERO
+var _click_moving: bool = false
+
+const CLICK_STOP_DIST := 6.0
 
 func _ready() -> void:
 	health.died.connect(_on_died)
@@ -24,16 +28,31 @@ func _physics_process(delta: float) -> void:
 	if _is_dead:
 		return
 	_attack_timer = maxf(0.0, _attack_timer - delta)
-	var dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	velocity = dir * SPEED
+	var key_dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	var move_dir: Vector2
+	if key_dir.length() > 0.0:
+		_click_moving = false
+		move_dir = key_dir
+	elif _click_moving:
+		var to_target := _click_target - global_position
+		if to_target.length() <= CLICK_STOP_DIST:
+			_click_moving = false
+			move_dir = Vector2.ZERO
+		else:
+			move_dir = to_target.normalized()
+	velocity = move_dir * SPEED
 	move_and_slide()
-	if dir.x != 0.0:
-		visual.scale.x = sign(dir.x)
+	if move_dir.x != 0.0:
+		visual.scale.x = sign(move_dir.x) * absf(visual.scale.x)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if _is_dead:
 		return
-	if event.is_action_pressed("interact"):
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+		_click_target = get_global_mouse_position()
+		_click_moving = true
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("interact"):
 		_try_interact()
 	elif event.is_action_pressed("use_item"):
 		_use_selected_item()

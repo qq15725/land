@@ -6,7 +6,7 @@ const SPEED := 35.0
 
 @export var data: AnimalResource = null
 
-@onready var visual: Polygon2D = $Visual
+@onready var visual: Sprite2D = $Visual
 @onready var hint_label: Label = $HintLabel
 @onready var interact_area: Area2D = $InteractArea
 
@@ -23,7 +23,6 @@ func _ready() -> void:
 	interact_area.body_entered.connect(func(b): if b is Player: hint_label.show())
 	interact_area.body_exited.connect(func(b): if b is Player: hint_label.hide())
 	if data:
-		visual.color = data.color
 		hint_label.text = "[E] 喂食"
 
 func _physics_process(delta: float) -> void:
@@ -34,7 +33,7 @@ func _physics_process(delta: float) -> void:
 	var dir := _wander_target - global_position
 	if dir.length() > 8.0:
 		velocity = dir.normalized() * SPEED
-		visual.scale.x = sign(velocity.x) if velocity.x != 0.0 else visual.scale.x
+		visual.scale.x = sign(velocity.x) * absf(visual.scale.x) if velocity.x != 0.0 else visual.scale.x
 	else:
 		velocity = Vector2.ZERO
 	move_and_slide()

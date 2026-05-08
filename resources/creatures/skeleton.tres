@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="CreatureResource" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="CreatureResource" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/data/creature_resource.gd" id="1_cr"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/skeleton.png" id="2_tex"]
 
 [resource]
 script = ExtResource("1_cr")
@@ -13,5 +14,6 @@ attack_range = 30.0
 attack_cooldown = 1.0
 detection_radius = 180.0
 wander_radius = 250.0
-color = Color(0.85, 0.85, 0.75, 1)
+texture = ExtResource("2_tex")
+sprite_scale = 0.07
 drop_table = [{"item_id": "wood", "min": 1, "max": 3, "chance": 0.7}, {"item_id": "stone", "min": 1, "max": 2, "chance": 0.5}]

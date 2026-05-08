@@ -1,8 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://player0001"]
+[gd_scene load_steps=9 format=3 uid="uid://player0001"]
 
 [ext_resource type="Script" path="res://scenes/entities/player/player.gd" id="1_pl"]
 [ext_resource type="Script" path="res://scripts/components/inventory_component.gd" id="2_inv"]
 [ext_resource type="Script" path="res://scripts/components/health_component.gd" id="3_hp"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/player.png" id="4_tex"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(14, 20)
@@ -20,9 +21,10 @@ script = ExtResource("1_pl")
 position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_1")
 
-[node name="Visual" type="Polygon2D" parent="."]
-polygon = PackedVector2Array(-7, -22, 7, -22, 7, 0, -7, 0)
-color = Color(0.9, 0.85, 0.7, 1)
+[node name="Visual" type="Sprite2D" parent="."]
+position = Vector2(0, -16)
+scale = Vector2(0.07, 0.07)
+texture = ExtResource("4_tex")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(2.0, 2.0)
