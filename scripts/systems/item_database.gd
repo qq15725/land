@@ -42,3 +42,10 @@ func get_crop_for_seed(item: ItemResource) -> CropResource:
 		if c and c.seed_item == item:
 			return c
 	return null
+
+func get_crop_by_id(id: String) -> CropResource:
+	for crop in _crops:
+		var c := crop as CropResource
+		if c and c.id == id:
+			return c
+	return null

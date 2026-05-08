@@ -14,6 +14,9 @@ func _ready() -> void:
 func take_damage(amount: float) -> void:
 	current_health = maxf(0.0, current_health - amount)
 	health_changed.emit(current_health, max_health)
+	var owner_node := get_parent()
+	if owner_node is Node2D:
+		HitParticles.spawn(owner_node.get_parent(), (owner_node as Node2D).global_position, Color(0.9, 0.1, 0.1))
 	if current_health == 0.0:
 		died.emit()
 

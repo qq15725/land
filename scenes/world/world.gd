@@ -9,6 +9,7 @@ const CraftingUIScene := preload("res://scenes/ui/crafting_ui.tscn")
 const BuildMenuUIScene := preload("res://scenes/ui/build_menu_ui.tscn")
 const StorageUIScene := preload("res://scenes/ui/storage_ui.tscn")
 const TradeUIScene := preload("res://scenes/ui/trade_ui.tscn")
+const PauseMenuScene := preload("res://scenes/ui/pause_menu.tscn")
 
 const RESOURCE_COUNT := 40
 const SPAWN_RADIUS := 600.0
@@ -22,13 +23,17 @@ const CREATURE_MIN_DIST := 200.0
 var _build_preview: Node2D = null
 var _hud: Control = null
 var _day_overlay: ColorRect = null
+var _pause_menu: Control = null
 
 var _slime_data: CreatureResource = preload("res://resources/creatures/slime.tres")
 var _skeleton_data: CreatureResource = preload("res://resources/creatures/skeleton.tres")
 
 func _ready() -> void:
+	add_to_group("world")
 	_setup_ui()
 	_scatter_resources()
+	if SaveSystem.slot_exists(GameManager.current_save_slot):
+		SaveSystem.load_save(GameManager.current_save_slot, self)
 	BuildingSystem.build_mode_entered.connect(_on_build_mode_entered)
 	BuildingSystem.build_mode_exited.connect(_on_build_mode_exited)
 	BuildingSystem.building_placed.connect(_on_building_placed)
@@ -74,6 +79,9 @@ func _setup_ui() -> void:
 	ui_layer.add_child(trade_ui)
 	trade_ui.setup(player.inventory)
 
+	_pause_menu = PauseMenuScene.instantiate()
+	ui_layer.add_child(_pause_menu)
+
 func _process(_delta: float) -> void:
 	if _build_preview:
 		_build_preview.global_position = get_global_mouse_position()
@@ -94,6 +102,11 @@ func _update_day_overlay() -> void:
 		_day_overlay.color = Color(0.0, 0.0, 0.0, 0.0)
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel") and not BuildingSystem.is_building:
+		if _pause_menu and not _pause_menu.visible:
+			_pause_menu.open()
+			get_viewport().set_input_as_handled()
+			return
 	if not BuildingSystem.is_building:
 		return
 	if event is InputEventMouseButton:

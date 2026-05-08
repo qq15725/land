@@ -13,7 +13,8 @@ signal respawned
 
 const DropItemScene := preload("res://scenes/entities/drop_item/drop_item.tscn")
 
-var is_depleted := false
+var depleted_flag := false
+var _regen_elapsed: float = 0.0
 
 func _ready() -> void:
 	hint_label.hide()
@@ -21,24 +22,39 @@ func _ready() -> void:
 	interact_area.body_exited.connect(_on_body_exited)
 
 func interact(player: Player) -> void:
-	if is_depleted or item == null:
+	if depleted_flag or item == null:
 		return
 	var leftover := player.inventory.add_item(item, drop_amount)
 	if leftover > 0:
 		_spawn_drops(leftover)
+	HitParticles.spawn(get_parent(), global_position, item.color)
 	_deplete()
 
 func _deplete() -> void:
-	is_depleted = true
+	depleted_flag = true
+	_regen_elapsed = 0.0
 	hint_label.hide()
 	modulate = Color(0.5, 0.5, 0.5)
 	depleted.emit()
 	get_tree().create_timer(respawn_time).timeout.connect(_respawn)
 
 func _respawn() -> void:
-	is_depleted = false
+	depleted_flag = false
+	_regen_elapsed = 0.0
 	modulate = Color.WHITE
 	respawned.emit()
+
+func is_depleted() -> bool:
+	return depleted_flag
+
+func get_regen_timer() -> float:
+	return _regen_elapsed
+
+func restore_from_save(elapsed: float) -> void:
+	depleted_flag = true
+	modulate = Color(0.5, 0.5, 0.5)
+	var remaining := maxf(respawn_time - elapsed, 0.1)
+	get_tree().create_timer(remaining).timeout.connect(_respawn)
 
 func _spawn_drops(amount: int) -> void:
 	var drop: DropItem = DropItemScene.instantiate()
@@ -47,7 +63,7 @@ func _spawn_drops(amount: int) -> void:
 	drop.setup(item, amount)
 
 func _on_body_entered(body: Node2D) -> void:
-	if body is Player and not is_depleted:
+	if body is Player and not depleted_flag:
 		hint_label.show()
 
 func _on_body_exited(body: Node2D) -> void:

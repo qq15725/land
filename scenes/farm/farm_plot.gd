@@ -42,6 +42,7 @@ func interact(player: Player) -> void:
 			pass
 		State.READY:
 			player.inventory.add_item(_current_crop.output_item, _current_crop.output_amount)
+			HitParticles.spawn(get_parent(), global_position, Color(1.0, 0.85, 0.1))
 			_current_crop = null
 			_state = State.EMPTY
 			visual.color = Color(0.45, 0.3, 0.15)
@@ -71,3 +72,24 @@ func _on_body_entered(body: Node2D) -> void:
 func _on_body_exited(body: Node2D) -> void:
 	if body is Player:
 		hint_label.hide()
+
+func get_save_state() -> Dictionary:
+	return {
+		"state": _state,
+		"crop_id": _current_crop.id if _current_crop else "",
+		"grow_timer": _grow_timer,
+	}
+
+func load_save_state(data: Dictionary) -> void:
+	var s: int = data.get("state", State.EMPTY)
+	var crop_id: String = data.get("crop_id", "")
+	_grow_timer = data.get("grow_timer", 0.0)
+	_current_crop = ItemDatabase.get_crop_by_id(crop_id) if crop_id != "" else null
+	_state = s
+	match _state:
+		State.EMPTY:
+			visual.color = Color(0.45, 0.3, 0.15)
+		State.GROWING:
+			visual.color = Color(0.3, 0.55, 0.25)
+		State.READY:
+			visual.color = Color(1.0, 0.85, 0.1)

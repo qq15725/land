@@ -11,10 +11,10 @@ config_version=5
 [application]
 
 config/name="Land"
-run/main_scene="uid://world0001"
+run/main_scene="uid://mainmenu001"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
-config/run/main_scene="res://scenes/world/world.tscn"
+config/run/main_scene="res://scenes/ui/main_menu.tscn"
 
 [autoload]
 
@@ -25,6 +25,7 @@ CraftingSystem="*res://scripts/systems/crafting_system.gd"
 BuildingSystem="*res://scripts/systems/building_system.gd"
 TimeSystem="*res://scripts/systems/time_system.gd"
 TradeSystem="*res://scripts/systems/trade_system.gd"
+SaveSystem="*res://scripts/systems/save_system.gd"
 
 [input]
 
