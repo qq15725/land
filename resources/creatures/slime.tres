@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CreatureResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/creature_resource.gd" id="1_cr"]
+
+[resource]
+script = ExtResource("1_cr")
+id = "slime"
+display_name = "史莱姆"
+max_health = 25.0
+move_speed = 55.0
+attack_damage = 6.0
+attack_range = 26.0
+attack_cooldown = 1.5
+detection_radius = 130.0
+wander_radius = 180.0
+color = Color(0.2, 0.7, 0.3, 1)
+drop_table = [{"item_id": "stone", "min": 1, "max": 2, "chance": 0.8}]

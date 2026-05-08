@@ -3,6 +3,7 @@ extends Control
 var _health_bar: ProgressBar
 var _mode_label: Label
 var _selected_label: Label
+var _time_label: Label
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -33,6 +34,11 @@ func _ready() -> void:
 	_health_bar.add_theme_stylebox_override("fill", fill)
 	hp_row.add_child(_health_bar)
 
+	_time_label = Label.new()
+	_time_label.text = "第1天  白天"
+	_time_label.add_theme_font_size_override("font_size", 12)
+	vbox.add_child(_time_label)
+
 	_selected_label = Label.new()
 	_selected_label.text = ""
 	_selected_label.add_theme_font_size_override("font_size", 12)
@@ -42,6 +48,10 @@ func _ready() -> void:
 	_mode_label.text = ""
 	_mode_label.add_theme_font_size_override("font_size", 12)
 	vbox.add_child(_mode_label)
+
+func _process(_delta: float) -> void:
+	var phase_text := "夜晚" if TimeSystem.is_night() else "白天"
+	_time_label.text = "第%d天  %s" % [TimeSystem.current_day, phase_text]
 
 func setup(health: HealthComponent, inventory: InventoryComponent) -> void:
 	_health_bar.max_value = health.max_health
