@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/build_menu_ui.gd" id="1_bm"]
+
+[node name="BuildMenuUI" type="PanelContainer"]
+script = ExtResource("1_bm")

@@ -1,0 +1,43 @@
+[gd_scene load_steps=6 format=3 uid="uid://storagechest01"]
+
+[ext_resource type="Script" path="res://scenes/buildings/storage_chest.gd" id="1_sc"]
+[ext_resource type="Script" path="res://scripts/components/inventory_component.gd" id="2_inv"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(40, 25)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 50.0
+
+[node name="StorageChest" type="StaticBody2D"]
+script = ExtResource("1_sc")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -12)
+shape = SubResource("RectangleShape2D_1")
+
+[node name="Lid" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-20, -30, 20, -30, 20, -22, -20, -22)
+color = Color(0.5, 0.32, 0.1, 1)
+
+[node name="Body" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-20, -22, 20, -22, 20, 0, -20, 0)
+color = Color(0.62, 0.42, 0.15, 1)
+
+[node name="InteractArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractArea"]
+shape = SubResource("CircleShape2D_1")
+
+[node name="HintLabel" type="Label" parent="."]
+offset_left = -40.0
+offset_top = -46.0
+offset_right = 40.0
+offset_bottom = -29.0
+text = "[E] 打开储物箱"
+theme_override_font_sizes/font_size = 11
+horizontal_alignment = 1
+
+[node name="InventoryComponent" type="Node" parent="."]
+script = ExtResource("2_inv")
+slot_count = 20

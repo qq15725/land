@@ -1,0 +1,11 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_resource.gd" id="1_ir"]
+
+[resource]
+script = ExtResource("1_ir")
+id = "wooden_plank"
+display_name = "木板"
+max_stack = 99
+description = "加工过的木材，用途更广"
+color = Color(0.75, 0.55, 0.25, 1)

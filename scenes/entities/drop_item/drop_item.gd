@@ -20,7 +20,7 @@ func _on_body_entered(body: Node2D) -> void:
 	if not body is Player:
 		return
 	var player := body as Player
-	var leftover := player.inventory.add_item(item, amount)
+	var leftover: int = player.inventory.add_item(item, amount)
 	if leftover == 0:
 		queue_free()
 	else:

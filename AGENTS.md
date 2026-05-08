@@ -44,9 +44,9 @@ land/
 │   ├── creatures/      # 怪物数据
 │   └── trades/         # 商人交易表
 └── assets/
-    ├── sprites/
-    ├── audio/
-    └── fonts/
+	├── sprites/
+	├── audio/
+	└── fonts/
 ```
 
 ## 全局系统（Autoload）
