@@ -8,7 +8,7 @@ const KNOCKBACK_FORCE := 180.0
 
 const SPRITE_PATH := "res://assets/sprites/characters/player.png"
 const FRAME_W := 256
-const FRAME_H := 256
+const FRAME_H := 384
 const FRAME_COLS := 4
 const ANIM_FPS := 8.0
 

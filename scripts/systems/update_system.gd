@@ -40,7 +40,7 @@ func _on_check_done(_result: int, code: int, _headers: PackedStringArray, body: 
 	_check_req = null
 	if code != 200:
 		return
-	var json := JSON.parse_string(body.get_string_from_utf8())
+	var json: Variant = JSON.parse_string(body.get_string_from_utf8())
 	if not json is Dictionary:
 		return
 	var tag: String = json.get("tag_name", "")

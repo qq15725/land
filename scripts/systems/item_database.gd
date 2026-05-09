@@ -208,7 +208,7 @@ func _read_json(path: String) -> Array:
 		push_error("JSON 文件不存在: " + path)
 		return []
 	var file := FileAccess.open(path, FileAccess.READ)
-	var result := JSON.parse_string(file.get_as_text())
+	var result: Variant = JSON.parse_string(file.get_as_text())
 	if result == null:
 		push_error("JSON 解析失败: " + path)
 		return []

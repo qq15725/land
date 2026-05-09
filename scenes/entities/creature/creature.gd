@@ -3,7 +3,7 @@ extends CharacterBody2D
 
 const DropItemScene := preload("res://scenes/entities/drop_item/drop_item.tscn")
 
-@export var data: CreatureData
+var data: CreatureData
 
 @onready var health: HealthComponent = $HealthComponent
 @onready var visual: Sprite2D = $Visual

@@ -96,7 +96,7 @@ func _handle_drag(event: InputEventScreenDrag) -> void:
 		return
 	var delta := event.position - _joy_center
 	var dist := delta.length()
-	var dir := delta / max(dist, 1.0)
+	var dir: Vector2 = delta / max(dist, 1.0)
 	var strength := clampf(dist / JOY_RADIUS, 0.0, 1.0)
 
 	_move_knob(_joy_center + dir * minf(dist, JOY_RADIUS))
