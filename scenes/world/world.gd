@@ -78,6 +78,9 @@ func _setup_ui() -> void:
 	_pause_menu = PauseMenuScene.instantiate()
 	ui_layer.add_child(_pause_menu)
 
+	var mobile_controls := load("res://scenes/ui/mobile_controls.gd").new()
+	add_child(mobile_controls)
+
 func _process(_delta: float) -> void:
 	if _build_preview:
 		_build_preview.global_position = get_global_mouse_position()

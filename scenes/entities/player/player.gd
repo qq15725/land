@@ -58,6 +58,15 @@ func _unhandled_input(event: InputEvent) -> void:
 		_use_selected_item()
 	elif event.is_action_pressed("attack"):
 		_try_attack()
+	elif OS.get_name() == "Android" and event is InputEventScreenTouch:
+		var touch := event as InputEventScreenTouch
+		if touch.pressed:
+			var half_w := get_viewport().get_visible_rect().size.x * 0.5
+			if touch.position.x >= half_w:
+				# 右半屏单点：转为点击移动目标
+				_click_target = get_canvas_transform().affine_inverse() * touch.position
+				_click_moving = true
+				get_viewport().set_input_as_handled()
 
 func _try_interact() -> void:
 	var areas := interaction_area.get_overlapping_areas()
