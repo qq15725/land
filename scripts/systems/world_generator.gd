@@ -13,17 +13,13 @@ const ATLAS_FARMLAND := Vector2i(2, 0)
 const ATLAS_STONE    := Vector2i(3, 0)
 
 
+const TILE_ATLAS_PATH := "res://assets/sprites/environment/ground_tiles.png"
+
 func create_tileset() -> TileSet:
 	var ts := TileSet.new()
 	ts.tile_size = Vector2i(16, 16)
-	var img := Image.create(64, 16, false, Image.FORMAT_RGBA8)
-	_fill(img,  0, Color(0.30, 0.60, 0.22))  # 草地
-	_fill(img, 16, Color(0.70, 0.58, 0.38))  # 小路
-	_fill(img, 32, Color(0.38, 0.22, 0.08))  # 耕地
-	_fill(img, 48, Color(0.52, 0.52, 0.55))  # 石地
-	var tex := ImageTexture.create_from_image(img)
 	var src := TileSetAtlasSource.new()
-	src.texture = tex
+	src.texture = _load_tile_texture()
 	src.texture_region_size = Vector2i(16, 16)
 	src.create_tile(Vector2i(0, 0))
 	src.create_tile(Vector2i(1, 0))
@@ -31,6 +27,22 @@ func create_tileset() -> TileSet:
 	src.create_tile(Vector2i(3, 0))
 	ts.add_source(src, SOURCE_ID)
 	return ts
+
+
+func _load_tile_texture() -> ImageTexture:
+	var img := Image.load_from_file(TILE_ATLAS_PATH)
+	if img:
+		return ImageTexture.create_from_image(img)
+	return _gen_fallback_texture()
+
+
+func _gen_fallback_texture() -> ImageTexture:
+	var img := Image.create(64, 16, false, Image.FORMAT_RGBA8)
+	_fill(img,  0, Color(0.30, 0.60, 0.22))
+	_fill(img, 16, Color(0.70, 0.58, 0.38))
+	_fill(img, 32, Color(0.38, 0.22, 0.08))
+	_fill(img, 48, Color(0.52, 0.52, 0.55))
+	return ImageTexture.create_from_image(img)
 
 
 func generate(tilemap: TileMap, seed_val: int) -> void:

@@ -28,6 +28,7 @@ TradeSystem="*res://scripts/systems/trade_system.gd"
 SaveSystem="*res://scripts/systems/save_system.gd"
 UpdateSystem="*res://scripts/systems/update_system.gd"
 WorldGenerator="*res://scripts/systems/world_generator.gd"
+UIStyle="*res://scripts/utils/ui_style.gd"
 
 [display]
 

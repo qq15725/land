@@ -6,6 +6,7 @@ var _trade_list: VBoxContainer
 var _title_label: Label
 
 func _ready() -> void:
+	super()
 	custom_minimum_size = Vector2(340, 420)
 	set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	visible = false

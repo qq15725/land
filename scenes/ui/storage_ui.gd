@@ -6,6 +6,7 @@ var _storage_grid: GridContainer
 var _player_grid: GridContainer
 
 func _ready() -> void:
+	super()
 	custom_minimum_size = Vector2(320, 480)
 	set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	visible = false
@@ -86,24 +87,33 @@ func _fill_grid(grid: GridContainer, inventory: InventoryComponent, is_storage: 
 
 func _make_slot_btn(slot: Dictionary, source: InventoryComponent, from_storage: bool) -> Control:
 	var btn := Button.new()
-	btn.custom_minimum_size = Vector2(46, 46)
-	btn.flat = true
+	btn.custom_minimum_size = Vector2(50, 50)
+
+	var slot_s := UIStyle.make_slot_style(false)
+	btn.add_theme_stylebox_override("normal",  slot_s)
+	btn.add_theme_stylebox_override("hover",   slot_s)
+	btn.add_theme_stylebox_override("pressed", slot_s)
 
 	if slot.item != null:
-		var style := StyleBoxFlat.new()
-		style.bg_color = slot.item.color
-		style.set_corner_radius_all(3)
-		btn.add_theme_stylebox_override("normal", style)
-		btn.add_theme_stylebox_override("hover", style)
+		var inner := ColorRect.new()
+		inner.color = slot.item.color
+		inner.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		inner.offset_left   = 9
+		inner.offset_right  = -9
+		inner.offset_top    = 9
+		inner.offset_bottom = -9
+		inner.mouse_filter  = Control.MOUSE_FILTER_IGNORE
+		btn.add_child(inner)
 
-		var lbl := Label.new()
-		lbl.text = "x%d" % slot.amount if slot.amount > 1 else ""
-		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		lbl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
-		lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		lbl.add_theme_font_size_override("font_size", 9)
-		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		btn.add_child(lbl)
+		if slot.amount > 1:
+			var lbl := Label.new()
+			lbl.text = "x%d" % slot.amount
+			lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			lbl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+			lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			lbl.add_theme_font_size_override("font_size", 9)
+			lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			btn.add_child(lbl)
 
 		var item: ItemData = slot.item
 		var amount: int = slot.amount
@@ -111,11 +121,6 @@ func _make_slot_btn(slot: Dictionary, source: InventoryComponent, from_storage: 
 			btn.pressed.connect(func(): _transfer(item, amount, _storage_inventory, _player_inventory))
 		else:
 			btn.pressed.connect(func(): _transfer(item, amount, _player_inventory, _storage_inventory))
-	else:
-		var style := StyleBoxFlat.new()
-		style.bg_color = Color(0.15, 0.15, 0.15, 0.9)
-		style.set_corner_radius_all(3)
-		btn.add_theme_stylebox_override("normal", style)
 
 	return btn
 

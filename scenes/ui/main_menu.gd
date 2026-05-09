@@ -6,6 +6,7 @@ var _update_dialog: Control = null
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	theme = UIStyle.theme
 	_build_layout()
 	_check_update()
 

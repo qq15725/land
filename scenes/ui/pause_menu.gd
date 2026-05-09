@@ -20,6 +20,7 @@ func _build_layout() -> void:
 	add_child(center)
 
 	var panel := PanelContainer.new()
+	panel.theme = UIStyle.theme
 	center.add_child(panel)
 
 	var margin := MarginContainer.new()

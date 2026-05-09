@@ -8,6 +8,7 @@ var _time_label: Label
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	theme = UIStyle.theme
 
 	var margin := MarginContainer.new()
 	margin.add_theme_constant_override("margin_left", 12)
@@ -27,11 +28,8 @@ func _ready() -> void:
 	hp_row.add_child(hp_icon)
 
 	_health_bar = ProgressBar.new()
-	_health_bar.custom_minimum_size = Vector2(140, 16)
+	_health_bar.custom_minimum_size = Vector2(140, 18)
 	_health_bar.show_percentage = false
-	var fill := StyleBoxFlat.new()
-	fill.bg_color = Color(0.8, 0.15, 0.15)
-	_health_bar.add_theme_stylebox_override("fill", fill)
 	hp_row.add_child(_health_bar)
 
 	_time_label = Label.new()

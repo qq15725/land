@@ -18,15 +18,15 @@ no extra objects, no cropped sprite, no inconsistent frame sizes
 
 ## 精灵表格式约定
 
-> 所有尺寸为**源文件尺寸**（4 倍高清），Godot 场景中一律以 `scale = Vector2(0.25, 0.25)` 缩回游戏世界坐标。
+> 所有尺寸为**源文件尺寸**（4 倍高清），Godot 场景缩放参考下表。**Camera2D zoom = 4.0**，格子 = 64×64 屏幕像素，对齐星露谷物语比例。
 
-| 类型 | 单帧源尺寸 | 游戏世界渲染尺寸 | 精灵表布局 | 动画说明 |
-|------|-----------|----------------|-----------|----------|
-| 角色 / 怪物 | 128×256 px | 32×64 px | 4列 × 4行 | 每行一个方向：下/上/左/右，每行4帧 |
-| 可破坏环境物件 | 视物件而定 | 视物件而定 | 1列 × 3行 | 行0正常，行1受损，行2枯竭 |
-| 静态环境物件 | 视物件而定 | 视物件而定 | 单帧静态 | 无动画 |
-| 建筑 | 192×192 / 256×256 等 | 48×48 / 64×64 等 | 单帧静态 | 无动画 |
-| 物品图标 | 64×64 px | 16×16 px | grid 排列 | 无动画 |
+| 类型 | 单帧源尺寸 | 场景 scale | 游戏世界渲染尺寸 | 屏幕像素（zoom×4） | 精灵表布局 | 动画说明 |
+|------|-----------|-----------|----------------|------------------|-----------|----------|
+| 角色 / 怪物 | 128×256 px | 0.125 | 16×32 px（1×2 格） | 64×128 px | 4列 × 4行 | 每行一个方向：下/上/左/右，每行4帧 |
+| 可破坏环境物件 | 视物件而定 | 0.25 | 原尺寸 ÷ 4 | 原尺寸 | 1列 × 3行 | 行0正常，行1受损，行2枯竭 |
+| 静态环境物件 | 视物件而定 | 0.25 | 原尺寸 ÷ 4 | 原尺寸 | 单帧静态 | 无动画 |
+| 建筑 | 192×192 / 256×256 等 | 0.25 | 48×48 / 64×64 px | 192×192 / 256×256 px | 单帧静态 | 无动画 |
+| 物品图标 | 64×64 px | — | 16×16 px（UI） | — | grid 排列 | 无动画 |
 
 **文件命名规范**（与 JSON 中 `sprite` 字段对应）：
 ```
@@ -41,7 +41,7 @@ assets/sprites/items/{id}.png          # 物品图标（整张图标表）
 ## 角色与生物（帧动画精灵表）
 
 **源文件**：单帧 128×256 px，精灵表 **512×1024 px**（4列 × 4行），透明背景，PNG 导出。
-**游戏内**：AnimatedSprite2D `scale = Vector2(0.25, 0.25)`，渲染为 32×64 px 世界坐标。
+**游戏内**：AnimatedSprite2D `scale = Vector2(0.125, 0.125)`，渲染为 **16×32 px 世界坐标**（1格宽×2格高），屏幕显示 64×128 px（Camera zoom=4.0）。
 
 ### 行走动画布局
 
@@ -107,10 +107,62 @@ Minecraft pixel art, game asset, no background, clean sprite sheet grid
 
 ---
 
+## 地砖（TileMap Atlas）
+
+TileMap 的地面贴图，**无透明背景**，纯色填满每格。所有瓦片必须可无缝平铺（seamless tile）。
+**文件**：`assets/sprites/environment/ground_tiles.png`，一张横向 atlas，每格 **16×16 px**，游戏内 1 格 = 16×16 px 世界坐标（不缩放）。
+
+### Atlas 布局
+
+| 列 | Atlas 坐标 | id | 描述 |
+|----|-----------|-----|------|
+| 0 | (0, 0) | `grass` | 草地，中绿底色，随机深浅噪点，偶有亮绿草叶像素 |
+| 1 | (1, 0) | `path` | 小路，沙棕底色，散落深色小石子像素 |
+| 2 | (2, 0) | `farmland` | 耕地，深棕底色，水平垄沟纹路（每 4 行交替深浅） |
+| 3 | (3, 0) | `stone_ground` | 石地，中灰底色，浅灰/深灰噪点，点缀裂缝像素线 |
+
+总尺寸：**64×16 px**（4 列 × 1 行）
+
+> 如需扩展（沙地、雪地、沼泽等），在 atlas 右侧追加列，并在 `world_generator.gd` 中添加对应 `ATLAS_*` 常量与 `create_tile()` 调用。
+
+### 提示词模板
+
+```
+Minecraft-style pixel art tile sheet, NO transparent background, opaque fill,
+seamlessly tileable texture, top-down flat view, hard square pixel edges,
+flat 2-3 tone color fills, no gradients, no outlines, no borders between tiles.
+
+Canvas size: 64x16 pixels. 4 tiles in a single horizontal row, each tile 16x16 pixels.
+Strict grid layout, no padding, no spacing between tiles.
+
+Tile 0 (x0–15):   grass ground — medium green base, darker/lighter green pixel noise variation,
+                  occasional bright green single-pixel grass blade details.
+Tile 1 (x16–31):  dirt path — sandy tan base, scattered 1–2px dark pebble pixels,
+                  slight warm variation noise.
+Tile 2 (x32–47):  farmland / tilled soil — dark brown base, subtle horizontal pixel furrow lines
+                  every 3–4 rows alternating darker/slightly lighter.
+Tile 3 (x48–63):  stone ground — mid grey base, lighter and darker grey pixel noise,
+                  thin 1px dark crack pixel lines scattered.
+
+Minecraft pixel art, seamless game tile atlas, flat ground texture, no background scenery
+```
+
+### 当前状态
+
+| 文件 | 尺寸 | 状态 |
+|------|------|------|
+| `assets/sprites/environment/ground_tiles.png` | 64×16 | 🔧 程序化占位（Python 生成，需替换真实美术） |
+
+---
+
 ## 环境物件
 
 透明背景，PNG 导出，pivot 在底边中心。可采集/可破坏物件使用 1列 × 3行精灵表；装饰物件使用单帧静态图。
-**游戏内**：Sprite2D `scale = Vector2(0.25, 0.25)`，渲染为原尺寸 ÷ 4 的世界坐标大小。
+**游戏内**：Sprite2D `scale = Vector2(0.25, 0.25)`，渲染为原尺寸 ÷ 4 的世界坐标大小，屏幕显示为世界坐标 × 4（Camera zoom=4.0）。
+
+**典型比例参考（对齐星露谷物语）：**
+- 树（128×192 源）→ 32×48 世界 → 128×192 屏幕 = 2格宽 × 3格高 ✓
+- 石头（128×96 源）→ 32×24 世界 → 128×96 屏幕 = 2格宽 × 1.5格高 ✓
 
 ### 提示词模板（可破坏物件）
 
@@ -164,7 +216,7 @@ Minecraft pixel art, game asset, transparent background
 ## 建筑（静态精灵）
 
 2.5D 斜视角，pivot 在底边中心，透明背景，PNG 导出。所有建筑由方块堆叠构成，每个面用 2-3 色平涂区分亮面/暗面。
-**游戏内**：Sprite2D `scale = Vector2(0.25, 0.25)`，渲染为原尺寸 ÷ 4 的世界坐标大小。
+**游戏内**：Sprite2D `scale = Vector2(0.25, 0.25)`，渲染为原尺寸 ÷ 4 的世界坐标大小，屏幕显示为世界坐标 × 4（Camera zoom=4.0）。
 
 | 类型 | 源文件尺寸 | 游戏内渲染 | 示例 |
 |------|----------|-----------|------|

@@ -147,3 +147,29 @@ GrowthComponent       # 作物/动物生长状态
 ## 提交规范
 
 - git commit 信息不加 `Co-Authored-By`
+
+## 美术资产比例同步规则
+
+**任何时候修改了以下任一项，必须同步更新 `docs/art-prompts.md` 中对应的比例字段：**
+
+- 角色 / 怪物 / NPC 的 `AnimatedSprite2D.scale`
+- 环境物件 / 建筑的 `Sprite2D.scale`
+- 玩家 `Camera2D.zoom`
+
+**原因**：`docs/art-prompts.md` 是美术资产生成的唯一参考文档。文档与代码不一致时，AI 生成的新资产会因比例错误无法直接用于游戏。
+
+### 当前基准
+
+| 参数 | 值 | 说明 |
+|------|-----|------|
+| Camera2D zoom | 4.0 | 每格 64px，可见约 20 格宽 |
+| 角色 / 怪物 scale | 0.125 | 128×256 frame → 16×32 世界单位 = 1×2 格 |
+| 环境物件 scale | 0.25 | 原尺寸 ÷ 4 世界单位 |
+| 建筑 scale | 0.25 | 原尺寸 ÷ 4 世界单位 |
+
+### 更新方式
+
+修改 `.tscn` 中的 scale/zoom 后，在 `docs/art-prompts.md` 的"精灵表格式约定"表和对应章节中同步更新：
+- `scene scale` 列
+- `游戏世界渲染尺寸` 列
+- `屏幕像素` 列（= 世界尺寸 × zoom）

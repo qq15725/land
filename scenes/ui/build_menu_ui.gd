@@ -4,6 +4,7 @@ var _inventory: InventoryComponent
 var _list: VBoxContainer
 
 func _ready() -> void:
+	super()
 	custom_minimum_size = Vector2(280, 360)
 	set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	visible = false

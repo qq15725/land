@@ -5,6 +5,7 @@ var _recipe_list: VBoxContainer
 var _current_station: String = ""
 
 func _ready() -> void:
+	super()
 	custom_minimum_size = Vector2(320, 420)
 	set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	visible = false

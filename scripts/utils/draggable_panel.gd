@@ -6,6 +6,9 @@ const DRAG_REGION_HEIGHT := 36
 var _dragging := false
 var _drag_offset := Vector2.ZERO
 
+func _ready() -> void:
+	theme = UIStyle.theme
+
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton

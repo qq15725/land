@@ -47,17 +47,65 @@ def outline_rect(draw, rect, light, dark):
     px(draw, (x1, y0, x1, y1), dark)
 
 
-def iso_block(draw, x, y, w, h, top, left, right, detail="grass"):
-    top_h = max(5, h // 4)
-    textured_rect(draw, (x, y, x + w - 1, y + top_h - 1), top, ["#9ee21c", "#6fbd12", "#c3ef32"], 4, x + y)
-    textured_rect(draw, (x, y + top_h, x + w // 2 - 1, y + h - 1), left, ["#8a5a29", "#5a3519", "#2f8a1e"], 5, x)
-    textured_rect(draw, (x + w // 2, y + top_h, x + w - 1, y + h - 1), right, ["#6a3f1f", "#3f2716", "#23721b"], 5, y)
-    outline_rect(draw, (x, y, x + w - 1, y + h - 1), "#d4f35a", "#2f220f")
-    if detail == "stone":
-        speckles(draw, (x + 1, y + 1, x + w - 2, y + h - 2), ["#c6c8c8", "#777b7c", "#56595b"], 4, x)
+def poly(draw, points, fill):
+    draw.polygon(points, fill=fill)
+
+
+def iso_cube(draw, cx, top_y, w, d, h, top, left, right, edge="#244018", seed=0, detail="grass"):
+    hw = w // 2
+    hd = d // 2
+    top_pts = [(cx, top_y), (cx + hw, top_y + hd), (cx, top_y + d), (cx - hw, top_y + hd)]
+    left_pts = [(cx - hw, top_y + hd), (cx, top_y + d), (cx, top_y + d + h), (cx - hw, top_y + hd + h)]
+    right_pts = [(cx + hw, top_y + hd), (cx, top_y + d), (cx, top_y + d + h), (cx + hw, top_y + hd + h)]
+    poly(draw, left_pts, left)
+    poly(draw, right_pts, right)
+    poly(draw, top_pts, top)
+    draw.line(top_pts + [top_pts[0]], fill=edge, width=1)
+    draw.line([left_pts[0], left_pts[3], left_pts[2]], fill=edge, width=1)
+    draw.line([right_pts[0], right_pts[3], right_pts[2]], fill=edge, width=1)
+
+    min_x = cx - hw + 1
+    max_x = cx + hw - 1
+    min_y = top_y + 1
+    max_y = top_y + d + h - 1
+    if detail == "grass":
+        colors = ["#b6ef24", "#77c414", "#31931f", "#d6f64a"]
+    elif detail == "leaf":
+        colors = ["#59ca2e", "#159323", "#0a6819", "#9be039"]
+    elif detail == "stone":
+        colors = ["#c8cbca", "#8b9091", "#5f6465", "#e0e0dc"]
     elif detail == "wood":
-        for yy in range(y + top_h + 3, y + h - 2, 5):
-            px(draw, (x + 2, yy, x + w - 3, yy + 1), "#5b351b")
+        colors = ["#b87934", "#6e421f", "#3f2412", "#d29a4a"]
+    elif detail == "soil":
+        colors = ["#93602e", "#57321d", "#2f1e13", "#b47a3a"]
+    elif detail == "sand":
+        colors = ["#ffe39a", "#d9b85d", "#b98f3b", "#fff0b8"]
+    elif detail == "water":
+        colors = ["#35a8ee", "#0879c9", "#0b5fa4", "#79d7ff"]
+    else:
+        colors = ["#ffffff"]
+    for y in range(min_y, max_y, 4):
+        for x in range(min_x + ((y + seed) % 4), max_x + 1, 4):
+            idx = (x * 7 + y * 3 + seed) % len(colors)
+            px(draw, (x, y, x + 1, y + 1), colors[idx])
+
+
+def iso_column(draw, cx, base_y, w, d, h, palette, seed=0, detail="grass"):
+    top_y = base_y - d - h
+    iso_cube(
+        draw,
+        cx,
+        top_y,
+        w,
+        d,
+        h,
+        palette["top"],
+        palette["left"],
+        palette["right"],
+        palette.get("edge", "#244018"),
+        seed,
+        detail,
+    )
 
 
 def frame_rect(origin, rect):
@@ -159,17 +207,31 @@ def character_sheet(path, subject):
 
 
 def draw_tree_state(draw, oy, damage):
-    textured_rect(draw, (12, oy + 20, 20, oy + 47), "#7c4b21", ["#a86f31", "#4d2e16"], 4, oy)
-    px(draw, (14, oy + 20, 16, oy + 47), "#a56b30")
-    textured_rect(draw, (4, oy + 9, 27, oy + 27), "#15912d", ["#52c82f", "#09691e"], 3, oy)
-    textured_rect(draw, (8, oy + 1, 23, oy + 15), "#48b61f", ["#a0e721", "#1c7d1c"], 3, oy + 2)
-    textured_rect(draw, (13, oy + 7, 30, oy + 21), "#217f21", ["#53bf30", "#0e5f17"], 3, oy + 5)
+    wood = {"top": "#b97831", "left": "#7a451f", "right": "#573116", "edge": "#3b2412"}
+    leaf = {"top": "#46b51d", "left": "#158021", "right": "#0b5f18", "edge": "#073f13"}
+    leaf_light = {"top": "#8fcf18", "left": "#3f9b19", "right": "#1d7514", "edge": "#345d0d"}
+    leaf_dark = {"top": "#218f21", "left": "#116d1b", "right": "#064e14", "edge": "#063a10"}
+
+    iso_column(draw, 16, oy + 47, 10, 6, 27, wood, oy, "wood")
+    px(draw, (13, oy + 24, 15, oy + 45), "#c58a3e")
+    px(draw, (18, oy + 25, 19, oy + 46), "#4a2a14")
+
+    if damage < 2:
+        iso_cube(draw, 10, oy + 17, 18, 10, 10, leaf_dark["top"], leaf_dark["left"], leaf_dark["right"], leaf_dark["edge"], oy, "leaf")
+        iso_cube(draw, 22, oy + 17, 18, 10, 10, leaf["top"], leaf["left"], leaf["right"], leaf["edge"], oy + 1, "leaf")
+        iso_cube(draw, 16, oy + 10, 20, 11, 11, leaf_light["top"], leaf_light["left"], leaf_light["right"], leaf_light["edge"], oy + 2, "leaf")
+        iso_cube(draw, 17, oy + 2, 16, 9, 9, leaf["top"], leaf["left"], leaf["right"], leaf["edge"], oy + 3, "leaf")
+        iso_cube(draw, 6, oy + 25, 13, 8, 7, leaf["top"], leaf["left"], leaf["right"], leaf["edge"], oy + 4, "leaf")
+        iso_cube(draw, 26, oy + 25, 13, 8, 7, leaf_dark["top"], leaf_dark["left"], leaf_dark["right"], leaf_dark["edge"], oy + 5, "leaf")
+    else:
+        iso_cube(draw, 13, oy + 20, 15, 9, 7, "#6f8f1d", "#4d6619", "#344d13", "#28390f", oy, "leaf")
+        iso_cube(draw, 22, oy + 19, 13, 8, 6, "#5d751b", "#3f5516", "#2c3e12", "#24320f", oy + 1, "leaf")
+
     if damage:
-        px(draw, (13, oy + 28, 16, oy + 31), "#2d1d10")
-        px(draw, (18, oy + 34, 20, oy + 38), "#2d1d10")
+        px(draw, (13, oy + 30, 16, oy + 34), "#2d1d10")
+        px(draw, (18, oy + 37, 20, oy + 41), "#2d1d10")
     if damage == 2:
-        px(draw, (4, oy + 1, 13, oy + 11), (0, 0, 0, 0))
-        px(draw, (23, oy + 13, 30, oy + 22), (0, 0, 0, 0))
+        px(draw, (3, oy + 1, 9, oy + 8), (0, 0, 0, 0))
 
 
 def breakable_environment(path, size, kind):
@@ -181,18 +243,21 @@ def breakable_environment(path, size, kind):
         if kind == "tree":
             draw_tree_state(draw, oy, row)
         elif kind == "stone":
-            textured_rect(draw, (4, oy + 9, 25, oy + 23), "#6f7475", ["#959b9c", "#45494b"], 4, oy)
-            textured_rect(draw, (8, oy + 4, 29, oy + 17), "#9ea3a2", ["#c8cbca", "#696e70"], 4, oy + 3)
-            px(draw, (10, oy + 5, 23, oy + 8), "#cfd2cf")
+            stone = {"top": "#aaaead", "left": "#777d7e", "right": "#565b5d", "edge": "#3e4243"}
+            stone_dark = {"top": "#858a8b", "left": "#626667", "right": "#464a4b", "edge": "#333637"}
+            iso_column(draw, 15, oy + 23, 18, 9, 10, stone, oy, "stone")
+            iso_column(draw, 23, oy + 18, 13, 7, 9, stone_dark, oy + 2, "stone")
+            iso_column(draw, 9, oy + 20, 10, 6, 7, stone_dark, oy + 4, "stone")
             if row:
                 px(draw, (13, oy + 10, 16, oy + 12), "#3d4045")
                 px(draw, (20, oy + 13, 24, oy + 15), "#3d4045")
             if row == 2:
-                px(draw, (5, oy + 8, 11, oy + 12), (0, 0, 0, 0))
-                px(draw, (24, oy + 17, 29, oy + 23), (0, 0, 0, 0))
+                px(draw, (5, oy + 8, 12, oy + 14), (0, 0, 0, 0))
+                px(draw, (23, oy + 13, 29, oy + 21), (0, 0, 0, 0))
         elif kind == "berry_bush":
-            textured_rect(draw, (3, oy + 10, 28, oy + 31), "#248d31", ["#50c740", "#0e5f1d"], 3, oy)
-            textured_rect(draw, (6, oy + 5, 24, oy + 20), "#43aa38", ["#8ada3a", "#197326"], 3, oy + 2)
+            bush = {"top": "#45b72b", "left": "#1d8727", "right": "#0f681e", "edge": "#0a4a16"}
+            iso_column(draw, 16, oy + 31, 24, 12, 12, bush, oy, "leaf")
+            iso_column(draw, 16, oy + 22, 17, 9, 7, bush, oy + 3, "leaf")
             for x, y in [(9, 13), (18, 10), (22, 21), (13, 23)]:
                 px(draw, (x, oy + y, x + 2, oy + y + 2), "#e54237")
             if row:
@@ -208,18 +273,21 @@ def static_environment(path, size, kind):
     img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     if kind == "grass":
-        textured_rect(draw, (1, 8, 15, 15), "#49b526", ["#9ade2a", "#257e1d"], 3, 4)
+        grass = {"top": "#79c817", "left": "#3f8f1d", "right": "#2a6917", "edge": "#285014"}
+        iso_column(draw, 8, 15, 14, 7, 5, grass, 4, "grass")
         px(draw, (3, 4, 5, 13), "#8ed831")
         px(draw, (8, 2, 10, 14), "#6fc926")
         px(draw, (12, 5, 14, 15), "#2f8d20")
     elif kind == "dead_tree":
-        textured_rect(draw, (9, 14, 16, 47), "#706b5d", ["#99937f", "#473f35"], 4, 8)
-        px(draw, (12, 14, 14, 47), "#9b927a")
-        px(draw, (4, 23, 11, 27), "#696252")
-        px(draw, (15, 18, 22, 22), "#5a5348")
+        wood = {"top": "#8d8060", "left": "#62533e", "right": "#45392d", "edge": "#332a22"}
+        iso_column(draw, 13, 47, 8, 5, 30, wood, 8, "wood")
+        px(draw, (4, 23, 12, 27), "#665842")
+        px(draw, (15, 18, 23, 22), "#544839")
     elif kind == "mushroom":
-        textured_rect(draw, (6, 11, 10, 23), "#eee2c8", ["#fff4db", "#bfae91"], 4, 2)
-        textured_rect(draw, (2, 5, 14, 12), "#c73732", ["#ef5d4c", "#8f1f1f"], 3, 1)
+        stem = {"top": "#fff4db", "left": "#e0d2b6", "right": "#bba98c", "edge": "#8f7f66"}
+        cap = {"top": "#d53a32", "left": "#a22727", "right": "#761c1c", "edge": "#531414"}
+        iso_column(draw, 8, 23, 6, 4, 9, stem, 2, "sand")
+        iso_column(draw, 8, 13, 14, 8, 5, cap, 1, "soil")
         px(draw, (5, 6, 6, 7), "#f2d6c8")
         px(draw, (10, 8, 11, 9), "#f2d6c8")
     save_scaled(img, path)
@@ -230,25 +298,32 @@ def building(path, size, kind):
     img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     if kind == "workbench":
-        iso_block(draw, 7, 13, 34, 32, "#c98b35", "#8a5629", "#633919", "wood")
+        wood = {"top": "#c98b35", "left": "#8a5629", "right": "#633919", "edge": "#3c2412"}
+        iso_column(draw, 24, 44, 32, 18, 15, wood, 1, "wood")
+        px(draw, (9, 27, 39, 29), "#5f3518")
+        px(draw, (24, 27, 24, 43), "#d19548")
         for x in [13, 24, 33]:
             px(draw, (x, 16, x + 2, 20), "#4e3018")
     elif kind == "storage_chest":
-        iso_block(draw, 7, 16, 34, 28, "#be7a35", "#8a4e24", "#5d3319", "wood")
+        chest = {"top": "#be7a35", "left": "#8a4e24", "right": "#5d3319", "edge": "#332010"}
+        iso_column(draw, 24, 43, 34, 18, 14, chest, 3, "wood")
         px(draw, (9, 29, 39, 32), "#4d2b15")
         px(draw, (22, 27, 26, 35), "#d9c46b")
     elif kind == "cooking_pot":
-        iso_block(draw, 8, 13, 32, 32, "#9b9f9d", "#666b6b", "#45494b", "stone")
+        stone = {"top": "#9b9f9d", "left": "#666b6b", "right": "#45494b", "edge": "#303435"}
+        iso_column(draw, 24, 45, 32, 16, 17, stone, 5, "stone")
         px(draw, (13, 29, 35, 41), "#303235")
         textured_rect(draw, (18, 31, 30, 40), "#f08a1a", ["#ffd35a", "#b64217"], 3, 5)
     elif kind == "farm_plot":
-        textured_rect(draw, (5, 15, 43, 43), "#5a331f", ["#8b5a2b", "#2e1d14"], 4, 9)
-        px(draw, (5, 15, 43, 23), "#7a4a2b")
-        for y in [22, 28, 34, 40]:
-            px(draw, (8, y, 40, y + 1), "#24160e")
+        soil = {"top": "#754823", "left": "#523018", "right": "#3a2314", "edge": "#24160e"}
+        iso_column(draw, 24, 43, 38, 19, 6, soil, 9, "soil")
+        for y in [24, 29, 34]:
+            px(draw, (10, y, 38, y + 1), "#2b1a10")
     elif kind == "trading_post":
-        iso_block(draw, 10, 22, 44, 38, "#b97832", "#845021", "#5b3518", "wood")
-        textured_rect(draw, (7, 14, 57, 25), "#c1843a", ["#e5ad52", "#724419"], 4, 5)
+        wood = {"top": "#b97832", "left": "#845021", "right": "#5b3518", "edge": "#35200f"}
+        roof = {"top": "#c1843a", "left": "#8f5826", "right": "#653819", "edge": "#3c2412"}
+        iso_column(draw, 32, 60, 44, 22, 24, wood, 5, "wood")
+        iso_column(draw, 32, 29, 52, 24, 10, roof, 8, "wood")
         px(draw, (12, 8, 52, 16), "#70401f")
         for x, color in [(18, "#d84a3a"), (26, "#f2c14e"), (34, "#3a82d8"), (42, "#55b95d")]:
             px(draw, (x, 30, x + 5, 39), color)
@@ -294,6 +369,49 @@ def item_icons(path):
             px(draw, (ox + 5, oy + 6, ox + 11, oy + 7), "#9b6b48")
             px(draw, (ox + 5, oy + 9, ox + 10, oy + 10), "#9b6b48")
     save_scaled(img, path)
+
+
+def tile_noise_color(base, variants, x, y, seed):
+    idx = (x * 37 + y * 19 + seed * 11) % (len(variants) + 3)
+    if idx < len(variants):
+        return variants[idx]
+    return base
+
+
+def draw_tile(draw, ox, base, variants, seed):
+    for y in range(16):
+        for x in range(16):
+            color = tile_noise_color(base, variants, x, y, seed)
+            px(draw, (ox + x, y, ox + x, y), color)
+
+
+def draw_ground_tiles(path):
+    img = Image.new("RGB", (64, 16), "#000000")
+    draw = ImageDraw.Draw(img)
+
+    draw_tile(draw, 0, "#67b51d", ["#83cd22", "#4d981b", "#9bdd2c", "#347b18"], 1)
+    for x, y in [(2, 5), (6, 11), (11, 3), (13, 9)]:
+        px(draw, (x, y, x, y + 2), "#b8ee37")
+        px(draw, (x + 1, y + 1, x + 1, y + 2), "#3b8d18")
+
+    draw_tile(draw, 16, "#d2ad63", ["#f0ce7e", "#b98b42", "#e1bd6d", "#9f7536"], 2)
+    for x, y in [(18, 4), (23, 11), (27, 6), (30, 13)]:
+        px(draw, (x, y, x + 1, y), "#8a6330")
+    px(draw, (20, 8, 25, 8), "#e7c477")
+    px(draw, (26, 2, 30, 2), "#ba8840")
+
+    draw_tile(draw, 32, "#5a321c", ["#754421", "#3a2215", "#8a572c", "#2b1a11"], 3)
+    for y in [3, 7, 11, 15]:
+        px(draw, (32, y, 47, y), "#2b1a10")
+    for y in [5, 9, 13]:
+        px(draw, (33, y, 46, y), "#7d4b27")
+
+    draw_tile(draw, 48, "#8d9291", ["#b4b8b6", "#686e70", "#cdd0cc", "#54595b"], 4)
+    for line in [((50, 4), (54, 4), (54, 6)), ((58, 10), (62, 10)), ((51, 13), (55, 12))]:
+        pts = [(x, y) for x, y in line]
+        draw.line(pts, fill="#45494a", width=1)
+
+    img.save(path)
 
 
 def ui_sheet(path):
@@ -366,6 +484,7 @@ def main():
     ]:
         building(f"assets/sprites/buildings/{name}.png", size, name)
     item_icons("assets/sprites/items/icons.png")
+    draw_ground_tiles("assets/sprites/environment/ground_tiles.png")
     ui_sheet("assets/sprites/ui/ui_sheet.png")
 
 
