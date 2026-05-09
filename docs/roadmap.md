@@ -92,9 +92,44 @@
 
 ---
 
+### Phase 6 · 数据抽象化与美术接入
+> 目标：所有实体类型从 JSON 批量加载，接入像素风美术资源，淘汰逐文件的 .tres 方式
+
+#### 数据层重构
+- [ ] 定义通用 GDScript 数据类（`ItemData` / `CreatureData` / `ResourceNodeData` / `BuildingData` / `CropData` / `AnimalData`），不继承 Resource，字段间引用改为 `id` 字符串
+- [ ] 编写 JSON 数据文件（`data/items.json` / `creatures.json` / `resource_nodes.json` / `buildings.json` / `crops.json` / `animals.json` / `recipes.json` / `trades.json`）
+- [ ] `ItemDatabase` 重写：加载全部 JSON → 解析为数据对象 → 统一按 `id` 查询；所有跨类引用（如配方里的 item_id）在全部加载完后集中解析
+- [ ] `RecipeIngredient` / `TradeEntry` 改为用 `item_id` 字符串，不再持有对象引用
+- [ ] `BuildingSystem` / `CraftingSystem` / `TradeSystem` 适配新数据类
+- [ ] 移除旧 `.tres` 数据文件及对应 Resource 基类
+
+#### 通用场景
+- [ ] 删除 `tree_node.tscn` / `stone_node.gd` 等空壳场景，统一用一个 `resource_node.tscn`；world.gd 按 JSON 配置动态实例化资源节点
+- [ ] world.gd 夜晚刷怪改为从 JSON 读取怪物列表（移除 `_slime_data` / `_skeleton_data` 硬编码 preload），按权重随机生成
+- [ ] `animal_pen` 的动物种类改由 `BuildingData` 字段决定，不再用场景 `@export`
+- [ ] `drop_item` 视觉从颜色方块（`Polygon2D`）改为 `Sprite2D` 显示物品图标
+- [ ] 物品图标动态加载（路径写在 JSON，`load()` 在运行时载入）
+
+#### 美术资源接入
+- [ ] player / creature / merchant / animal 的 `Sprite2D` 换成 `AnimatedSprite2D`，配置 `SpriteFrames`（4方向 × 4帧行走）
+- [ ] 怪物 `creature.gd` 移除 `sprite_scale` 字段，改为统一尺寸精灵表
+- [ ] 资源节点换成 `AnimatedSprite2D`（3帧：正常 / 受击 / 破坏），破坏帧播完后淡出
+- [ ] 建筑接入静态 `Sprite2D`（48×48）
+- [ ] 物品图标精灵表接入，`drop_item` 和背包格子按图标坐标切割显示
+- [ ] 所有精灵路径写在 JSON 的 `sprite` 字段，运行时 `load()`
+
+#### UI 优化
+- [x] `DraggablePanel` 基类（背包 / 合成 / 储物箱 / 交易 / 建造面板均可拖拽）
+- [ ] 像素风 UI 皮肤：面板 9-patch 背景、按钮三态、物品格子（参考 `docs/art-prompts.md`）
+- [ ] 像素风字体接入（替换 Godot 默认字体，全局 Theme 统一设置）
+- [ ] HUD 美化：图片血量条（背景 + 填充）、昼夜图标、当前物品框
+- [ ] 面板细节对齐：标题栏拖拽区域视觉提示（cursor 变化）、关闭按钮样式统一
+
+---
+
 ## 当前进度
 
-**当前阶段**：Phase 5 完成，核心 Demo 可玩
+**当前阶段**：Phase 5 完成，进入 Phase 6
 
 **最近完成**：Phase 5 — 存档/主菜单/暂停/粒子效果
 
@@ -102,6 +137,6 @@
 
 ## 搁置 / 后续考虑
 
-- 村落系统（真实 NPC 村落、好感度、任务线）—— Phase 4 之后扩展
+- 村落系统（真实 NPC 村落、好感度、任务线）—— Phase 6 之后扩展
 - 多人联机
 - MOD 支持

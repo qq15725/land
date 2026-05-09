@@ -1,4 +1,4 @@
-extends PanelContainer
+extends DraggablePanel
 
 var _player_inventory: InventoryComponent
 var _merchant_data: MerchantResource

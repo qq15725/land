@@ -135,6 +135,7 @@ GrowthComponent       # 作物/动物生长状态
 ## 文档
 
 - [`docs/roadmap.md`](docs/roadmap.md) — 开发阶段规划与待办事项，按 Phase 划分，开工前更新进度
+- [`docs/art-prompts.md`](docs/art-prompts.md) — 美术资源生成提示词，含角色、环境、建筑、物品图标，Stardew Valley 风格
 
 ## 开发约定
 

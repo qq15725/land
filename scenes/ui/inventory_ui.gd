@@ -1,4 +1,4 @@
-extends PanelContainer
+extends DraggablePanel
 
 var _inventory: InventoryComponent
 var _grid: GridContainer
