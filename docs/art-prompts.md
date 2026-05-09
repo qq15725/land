@@ -1,14 +1,21 @@
 # 美术提示词
 
-推荐工具：Leonardo.AI（Pixel Art 模型）或 Scenario.gg
+## 推荐生成工具
+
+| 工具 | 特点 | 适合场景 |
+|------|------|----------|
+| **ChatGPT**（gpt-image-1） | 理解自然语言描述，支持精确布局控制 | 精灵表、图标、UI |
+| **Midjourney** | 画面质量高，风格稳定 | 概念图、环境物件 |
+| **Leonardo.AI**（Pixel Art 模型） | 专为像素风优化 | 各类像素风素材 |
+| **Scenario.gg** | 支持风格一致性训练 | 需要批量保持统一风格 |
+
+> ChatGPT gpt-image-1 **不支持负面提示词**，把不想要的描述直接写进正向提示词（如 `no background`, `transparent background`, `no text`）。其他工具如 Midjourney / Leonardo 支持负面提示词，可在对应平台的 Negative Prompt 栏单独填写。
 
 ## 整体风格基调
 
 温暖乡村生活模拟 RPG 像素风：明亮温暖的配色，柔和的像素轮廓，阳光乡村氛围。可以参考经典农场经营游戏的舒适感，但避免直接复制具体游戏角色、建筑或 UI。
 
-### 通用生成约束
-
-所有提示词都建议追加以下约束，减少不能直接导入 Godot 的结果：
+### 通用约束（追加到每条提示词末尾）
 
 ```
 pixel-perfect sprite, transparent background, clean hard pixel edges,
@@ -18,7 +25,9 @@ no background scene, no cast shadow on background, no text, no watermark, no log
 no extra objects, no cropped sprite, no inconsistent frame sizes
 ```
 
-负面提示词：
+### 负面提示词（仅适用于支持该功能的平台）
+
+> Midjourney 用 `--no`，Leonardo / Stable Diffusion 填入 Negative Prompt 栏，ChatGPT 忽略此栏。
 
 ```
 dark fantasy, gothic, horror, gritty, realistic, cinematic lighting,
