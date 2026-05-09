@@ -1,5 +1,7 @@
 extends Node
 
+const VERSION := "v0.1.0"
+
 enum State { PLAYING, PAUSED, DEAD }
 
 var state: State = State.PLAYING

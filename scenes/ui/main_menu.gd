@@ -2,9 +2,16 @@ extends Control
 
 const WorldScene := preload("res://scenes/world/world.tscn")
 
+var _update_dialog: Control = null
+
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_build_layout()
+	_check_update()
+
+func _check_update() -> void:
+	UpdateSystem.update_available.connect(_on_update_available)
+	UpdateSystem.check()
 
 func _build_layout() -> void:
 	var bg := ColorRect.new()
@@ -60,6 +67,12 @@ func _make_slot_button(slot: int) -> Button:
 		btn.text = "存档 %d  （空）" % (slot + 1)
 	btn.pressed.connect(func(): _start_game(slot))
 	return btn
+
+func _on_update_available(version: String, changelog: String) -> void:
+	if _update_dialog == null:
+		_update_dialog = load("res://scenes/ui/update_dialog.gd").new()
+		add_child(_update_dialog)
+	_update_dialog.show_update(version, changelog)
 
 func _start_game(slot: int) -> void:
 	GameManager.current_save_slot = slot
