@@ -106,8 +106,8 @@ func _smooth(map: Array) -> Array:
 					continue
 				var cg := 0
 				var cs := 0
-				for dy in [-1, 0, 1]:
-					for dx in [-1, 0, 1]:
+				for dy in range(-1, 2):
+					for dx in range(-1, 2):
 						if dx == 0 and dy == 0:
 							continue
 						var nx := x + dx
