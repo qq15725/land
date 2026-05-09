@@ -1,7 +1,6 @@
-[gd_scene load_steps=6 format=3 uid="uid://merchant001"]
+[gd_scene load_steps=5 format=3 uid="uid://merchant001"]
 
 [ext_resource type="Script" path="res://scenes/entities/merchant/merchant.gd" id="1_mc"]
-[ext_resource type="Texture2D" path="res://assets/sprites/characters/merchant.png" id="2_tex"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(14, 20)
@@ -16,10 +15,9 @@ script = ExtResource("1_mc")
 position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_1")
 
-[node name="Visual" type="Sprite2D" parent="."]
-position = Vector2(0, -18)
-scale = Vector2(0.07, 0.07)
-texture = ExtResource("2_tex")
+[node name="Visual" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -32)
+scale = Vector2(0.25, 0.25)
 
 [node name="InteractArea" type="Area2D" parent="."]
 

@@ -19,7 +19,9 @@ script = ExtResource("1_cr")
 position = Vector2(0, -9)
 shape = SubResource("RectangleShape2D_1")
 
-[node name="Visual" type="Sprite2D" parent="."]
+[node name="Visual" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -32)
+scale = Vector2(0.25, 0.25)
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("2_hp")

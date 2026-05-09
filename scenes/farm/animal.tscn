@@ -15,8 +15,8 @@ script = ExtResource("1_an")
 shape = SubResource("CircleShape2D_1")
 
 [node name="Visual" type="AnimatedSprite2D" parent="."]
-position = Vector2(0, -7)
-scale = Vector2(0.18, 0.18)
+position = Vector2(0, -32)
+scale = Vector2(0.25, 0.25)
 
 [node name="InteractArea" type="Area2D" parent="."]
 

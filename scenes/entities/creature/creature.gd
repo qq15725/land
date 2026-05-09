@@ -6,7 +6,7 @@ const DropItemScene := preload("res://scenes/entities/drop_item/drop_item.tscn")
 var data: CreatureData
 
 @onready var health: HealthComponent = $HealthComponent
-@onready var visual: Sprite2D = $Visual
+@onready var visual: AnimatedSprite2D = $Visual
 @onready var detection_area: Area2D = $DetectionArea
 @onready var detection_shape: CollisionShape2D = $DetectionArea/CollisionShape2D
 @onready var attack_area: Area2D = $AttackArea
@@ -26,12 +26,7 @@ func _ready() -> void:
 		return
 	health.max_health = data.max_health
 	health.current_health = data.max_health
-	if not data.sprite_path.is_empty():
-		var tex := load(data.sprite_path) as Texture2D
-		if tex:
-			visual.texture = tex
-			visual.scale = Vector2.ONE * data.sprite_scale
-			visual.position.y = -(tex.get_height() * data.sprite_scale) / 2.0
+	_setup_sprite_frames()
 
 	var det_circle := detection_shape.shape as CircleShape2D
 	if det_circle:
@@ -102,9 +97,42 @@ func _pick_wander_target() -> void:
 	_wander_target = _spawn_pos + Vector2(cos(angle), sin(angle)) * dist
 	_wander_timer = randf_range(3.0, 7.0)
 
+func _setup_sprite_frames() -> void:
+	if not data or data.sprite_path.is_empty():
+		return
+	var tex := load(data.sprite_path) as Texture2D
+	if tex == null:
+		return
+	var fw := tex.get_width() / 4
+	var fh := tex.get_height() / 4
+	var frames := SpriteFrames.new()
+	if frames.has_animation("default"):
+		frames.remove_animation("default")
+	for entry in [["walk_down", 0], ["walk_up", 1], ["walk_left", 2], ["walk_right", 3]]:
+		var anim_name: String = entry[0]
+		var row: int = entry[1]
+		frames.add_animation(anim_name)
+		frames.set_animation_speed(anim_name, 6.0)
+		frames.set_animation_loop(anim_name, true)
+		for col in 4:
+			var atlas := AtlasTexture.new()
+			atlas.atlas = tex
+			atlas.region = Rect2(col * fw, row * fh, fw, fh)
+			frames.add_frame(anim_name, atlas)
+	visual.sprite_frames = frames
+	visual.play("walk_down")
+
+
 func _update_facing() -> void:
-	if velocity.x != 0.0:
-		visual.scale.x = sign(velocity.x) * absf(visual.scale.x)
+	if velocity.length() < 1.0:
+		return
+	var anim: String
+	if abs(velocity.x) >= abs(velocity.y):
+		anim = "walk_right" if velocity.x > 0 else "walk_left"
+	else:
+		anim = "walk_down" if velocity.y > 0 else "walk_up"
+	if visual.animation != anim or not visual.is_playing():
+		visual.play(anim)
 
 func _flash_attack() -> void:
 	visual.modulate = Color(2.0, 0.5, 0.5)

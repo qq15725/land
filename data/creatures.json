@@ -10,7 +10,6 @@
     "attack_cooldown": 1.5,
     "detection_radius": 130.0,
     "wander_radius": 180.0,
-    "sprite_scale": 0.07,
     "drop_table": [
       {"item_id": "stone", "min": 1, "max": 2, "chance": 0.8}
     ]
@@ -26,7 +25,6 @@
     "attack_cooldown": 1.0,
     "detection_radius": 180.0,
     "wander_radius": 250.0,
-    "sprite_scale": 0.07,
     "drop_table": [
       {"item_id": "wood", "min": 1, "max": 3, "chance": 0.7},
       {"item_id": "stone", "min": 1, "max": 2, "chance": 0.5}

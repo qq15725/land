@@ -18,15 +18,15 @@ no extra objects, no cropped sprite, no inconsistent frame sizes
 
 ## 精灵表格式约定
 
-> 所有资源统一格式，方便 JSON 数据系统按路径加载并在 Godot `AnimatedSprite2D` 中切割。
+> 所有尺寸为**源文件尺寸**（4 倍高清），Godot 场景中一律以 `scale = Vector2(0.25, 0.25)` 缩回游戏世界坐标。
 
-| 类型 | 单帧尺寸 | 精灵表布局 | 动画说明 |
-|------|----------|-----------|----------|
-| 角色 / 怪物 | 32×64 px | 4列 × 4行 | 每行一个方向：下/上/左/右，每行4帧 |
-| 可破坏环境物件 | 视物件而定 | 1列 × 3行 | 第1帧正常，第2帧受击，第3帧破坏消失 |
-| 静态环境物件 | 视物件而定 | 单帧静态 | 无动画 |
-| 建筑 | 48×48 / 64×64 / 96×96 等 | 单帧静态 | 无动画 |
-| 物品图标 | 16×16 px | grid 排列 | 无动画 |
+| 类型 | 单帧源尺寸 | 游戏世界渲染尺寸 | 精灵表布局 | 动画说明 |
+|------|-----------|----------------|-----------|----------|
+| 角色 / 怪物 | 128×256 px | 32×64 px | 4列 × 4行 | 每行一个方向：下/上/左/右，每行4帧 |
+| 可破坏环境物件 | 视物件而定 | 视物件而定 | 1列 × 3行 | 行0正常，行1受损，行2枯竭 |
+| 静态环境物件 | 视物件而定 | 视物件而定 | 单帧静态 | 无动画 |
+| 建筑 | 192×192 / 256×256 等 | 48×48 / 64×64 等 | 单帧静态 | 无动画 |
+| 物品图标 | 64×64 px | 16×16 px | grid 排列 | 无动画 |
 
 **文件命名规范**（与 JSON 中 `sprite` 字段对应）：
 ```
@@ -40,7 +40,8 @@ assets/sprites/items/{id}.png          # 物品图标（整张图标表）
 
 ## 角色与生物（帧动画精灵表）
 
-单帧 32×64 px，精灵表 128×256 px（4列 × 4行），透明背景，PNG 导出。
+**源文件**：单帧 128×256 px，精灵表 **512×1024 px**（4列 × 4行），透明背景，PNG 导出。
+**游戏内**：AnimatedSprite2D `scale = Vector2(0.25, 0.25)`，渲染为 32×64 px 世界坐标。
 
 ### 行走动画布局
 
@@ -61,7 +62,7 @@ Minecraft-inspired pixel art sprite sheet, transparent background,
 rectangular body parts, flat block-face shading, bold hard pixel edges,
 bright cheerful colors, simple flat tones with 2-3 shades per area, no curves.
 
-Sprite sheet layout: 4 columns × 4 rows, each cell 32x64 pixels, total 128x256.
+Sprite sheet layout: 4 columns × 4 rows, each cell 128x256 pixels, total 512x1024.
 Strict grid layout, no padding between cells, no spacing between cells.
 Row 0: walk down (4 frames), Row 1: walk up (4 frames),
 Row 2: walk left (4 frames), Row 3: walk right (4 frames).
@@ -82,7 +83,7 @@ Minecraft-inspired pixel art sprite sheet, transparent background,
 all body parts are rectangular or square blocks, flat color fills,
 2-3 tone shading per block face, hard pixel edges, no curves, no smooth shapes.
 
-Sprite sheet layout: 4 columns × 4 rows, each cell 32x64 pixels, total 128x256.
+Sprite sheet layout: 4 columns × 4 rows, each cell 128x256 pixels, total 512x1024.
 Strict grid layout, no padding between cells, no spacing between cells.
 Row 0: walk/move down (4 frames), Row 1: walk/move up (4 frames),
 Row 2: walk/move left (4 frames), Row 3: walk/move right (4 frames).
@@ -96,19 +97,20 @@ Minecraft pixel art, game asset, no background, clean sprite sheet grid
 
 ### 当前需要的角色列表
 
-| id | 描述 | 文件路径 |
-|----|------|----------|
-| `player` | blocky farmer, square head, blue overall pants, brown shirt, simple pixel face | `assets/sprites/characters/player.png` |
-| `merchant` | blocky traveling merchant, wide flat hat, long coat, rectangular backpack | `assets/sprites/characters/merchant.png` |
-| `slime` | green cube slime, square body, pixel dot eyes, bouncy block movement | `assets/sprites/characters/slime.png` |
-| `skeleton` | white rectangular skeleton, block skull head, stick-like limbs made of thin rectangles | `assets/sprites/characters/skeleton.png` |
-| `chicken` | small white blocky chicken, square body, rectangular beak, stubby block legs | `assets/sprites/characters/chicken.png` |
+| id | 描述 | 源文件尺寸 | 文件路径 | 状态 |
+|----|------|-----------|----------|------|
+| `player` | blocky farmer, square head, blue overall pants, brown shirt, simple pixel face | 512×1024 | `assets/sprites/characters/player.png` | ✅ 已接入 |
+| `merchant` | blocky traveling merchant, wide flat hat, long coat, rectangular backpack | 512×1024 | `assets/sprites/characters/merchant.png` | ✅ 已接入 |
+| `slime` | green cube slime, square body, pixel dot eyes, bouncy block movement | 512×1024 | `assets/sprites/characters/slime.png` | ✅ 已接入 |
+| `skeleton` | white rectangular skeleton, block skull head, stick-like limbs made of thin rectangles | 512×1024 | `assets/sprites/characters/skeleton.png` | ✅ 已接入 |
+| `chicken` | small white blocky chicken, square body, rectangular beak, stubby block legs | 512×1024 | `assets/sprites/characters/chicken.png` | ✅ 已接入 |
 
 ---
 
 ## 环境物件
 
 透明背景，PNG 导出，pivot 在底边中心。可采集/可破坏物件使用 1列 × 3行精灵表；装饰物件使用单帧静态图。
+**游戏内**：Sprite2D `scale = Vector2(0.25, 0.25)`，渲染为原尺寸 ÷ 4 的世界坐标大小。
 
 ### 提示词模板（可破坏物件）
 
@@ -125,7 +127,7 @@ Row 1: damaged state (cracks drawn as dark pixel lines, chunks missing, slightly
 Row 2: nearly destroyed (only a few loose blocks remain, fragments scattered).
 All rows same canvas size, object base aligned to bottom center in every row.
 
-Subject: {在此填写物件描述，尺寸，如 "oak log block with green leaf cube on top (32x48)"}
+Subject: {在此填写物件描述，尺寸，如 "oak log block with green leaf cube on top (128x192)"}
 
 Minecraft pixel art, game asset, transparent background
 ```
@@ -139,33 +141,36 @@ shapes made entirely of square pixel blocks, flat color fills, hard edges.
 Single static game asset, {宽度}x{高度} pixels.
 Object centered on canvas, base aligned to bottom center.
 
-Subject: {在此填写物件描述，尺寸，如 "small square grass block patch (16x16)"}
+Subject: {在此填写物件描述，尺寸，如 "small square grass block patch (64x64)"}
 
 Minecraft pixel art, game asset, transparent background
 ```
 
 ### 当前需要的环境物件列表
 
-| id | 描述 | 单帧尺寸 | 文件路径 |
-|----|------|----------|----------|
-| `tree` | oak log block trunk topped with square green leaf cube | 32×48 | `assets/sprites/environment/tree.png` |
-| `stone` | grey stone block cluster with pixel crack lines | 32×24 | `assets/sprites/environment/stone.png` |
-| `grass` | flat green grass block patch（静态装饰物件） | 16×16 | `assets/sprites/environment/grass.png` |
-| `berry_bush` | small green block bush with red square berry pixels | 32×32 | `assets/sprites/environment/berry_bush.png` |
-| `dead_tree` | bare grey log block, thin rectangular branch sticks（静态装饰物件） | 24×48 | `assets/sprites/environment/dead_tree.png` |
-| `mushroom` | red square cap block on short white stem block（静态装饰物件） | 16×24 | `assets/sprites/environment/mushroom.png` |
+> 可破坏物件精灵表：1列 × 3行，行0=完好，行1=受损，行2=枯竭。代码目前只显示行0，枯竭状态用灰色 modulate 表示。
+
+| id | 描述 | 单帧源尺寸 | 世界渲染 | 文件路径 | 状态 |
+|----|------|-----------|---------|----------|------|
+| `tree` | oak log block trunk topped with square green leaf cube | 128×192 | 32×48 | `assets/sprites/environment/tree.png` | ✅ 已接入 |
+| `stone` | grey stone block cluster with pixel crack lines | 128×96 | 32×24 | `assets/sprites/environment/stone.png` | ✅ 已接入 |
+| `grass` | flat green grass block patch（静态装饰物件） | 64×64 | 16×16 | `assets/sprites/environment/grass.png` | ⏳ 待接入 |
+| `berry_bush` | small green block bush with red square berry pixels | 128×128 | 32×32 | `assets/sprites/environment/berry_bush.png` | ⏳ 待接入 |
+| `dead_tree` | bare grey log block, thin rectangular branch sticks（静态装饰物件） | 96×192 | 24×48 | `assets/sprites/environment/dead_tree.png` | ⏳ 待接入 |
+| `mushroom` | red square cap block on short white stem block（静态装饰物件） | 64×96 | 16×24 | `assets/sprites/environment/mushroom.png` | ⏳ 待接入 |
 
 ---
 
 ## 建筑（静态精灵）
 
 2.5D 斜视角，pivot 在底边中心，透明背景，PNG 导出。所有建筑由方块堆叠构成，每个面用 2-3 色平涂区分亮面/暗面。
+**游戏内**：Sprite2D `scale = Vector2(0.25, 0.25)`，渲染为原尺寸 ÷ 4 的世界坐标大小。
 
-| 类型 | 建议尺寸 | 示例 |
-|------|----------|------|
-| 小型家具/设施 | 48×48 px | 工作台、箱子、烹饪锅 |
-| 中型建筑 | 64×64 px | 贸易摊、围栏门、小棚屋 |
-| 大型建筑 | 96×96 px 或 96×128 px | 房屋、仓库、畜棚 |
+| 类型 | 源文件尺寸 | 游戏内渲染 | 示例 |
+|------|----------|-----------|------|
+| 小型家具/设施 | 192×192 px | 48×48 px | 工作台、箱子、烹饪锅 |
+| 中型建筑 | 256×256 px | 64×64 px | 贸易摊、围栏门、小棚屋 |
+| 大型建筑 | 384×384 / 384×512 px | 96×96 / 96×128 px | 房屋、仓库、畜棚 |
 
 ### 提示词模板
 
@@ -177,33 +182,35 @@ hard square pixel edges, no curves, no rounded corners.
 Single static building asset, {宽度}x{高度} pixels.
 Building centered on canvas, base aligned to bottom center, readable block silhouette.
 
-Subject: {在此填写建筑描述和尺寸，如 "wooden crafting table block, oak plank texture top, 48x48"}
+Subject: {在此填写建筑描述和尺寸，如 "wooden crafting table block, oak plank texture top, 192x192"}
 
 Minecraft pixel art, game asset, no background
 ```
 
 ### 当前需要的建筑列表
 
-| id | 描述 | 尺寸 | 文件路径 |
-|----|------|------|----------|
-| `workbench` | wooden crafting table block, oak plank texture on top, tool icons as pixel squares | 48×48 | `assets/sprites/buildings/workbench.png` |
-| `storage_chest` | wooden chest block, brown oak planks, metal latch pixel line on front | 48×48 | `assets/sprites/buildings/storage_chest.png` |
-| `cooking_pot` | stone block furnace with orange fire pixel glow on front face | 48×48 | `assets/sprites/buildings/cooking_pot.png` |
-| `farm_plot` | flat farmland block, dark brown tilled soil with pixel row lines | 48×48 | `assets/sprites/buildings/farm_plot.png` |
-| `trading_post` | wooden block booth, plank walls, colorful pixel banner squares on front | 64×64 | `assets/sprites/buildings/trading_post.png` |
+| id | 描述 | 源文件尺寸 | 文件路径 | 状态 |
+|----|------|----------|----------|------|
+| `workbench` | wooden crafting table block, oak plank texture on top, tool icons as pixel squares | 192×192 | `assets/sprites/buildings/workbench.png` | ✅ 已接入 |
+| `storage_chest` | wooden chest block, brown oak planks, metal latch pixel line on front | 192×192 | `assets/sprites/buildings/storage_chest.png` | ✅ 已接入 |
+| `cooking_pot` | stone block furnace with orange fire pixel glow on front face | 192×192 | `assets/sprites/buildings/cooking_pot.png` | ✅ 已接入 |
+| `farm_plot` | flat farmland block, dark brown tilled soil with pixel row lines | 192×192 | `assets/sprites/buildings/farm_plot.png` | ✅ 已接入 |
+| `trading_post` | wooden block booth, plank walls, colorful pixel banner squares on front | 256×256 | `assets/sprites/buildings/trading_post.png` | ✅ 已接入 |
 
 ---
 
 ## 物品图标（图标表）
 
-每格 16×16 px，按 grid 排列在一张图上，正面平视，透明背景，PNG 导出。在 Godot 中按坐标切割单个图标。图标采用 Minecraft 物品栏风格：方块/物品正面视图，硬边缘，2-3 色平涂。
+每格 **64×64 px**，按 grid 排列在一张图上，正面平视，透明背景，PNG 导出。
+在 Godot 中按坐标切割单个图标（每格 64×64 → 显示为 16×16 px UI）。
+图标采用 Minecraft 物品栏风格：方块/物品正面视图，硬边缘，2-3 色平涂。
 
 ### 提示词模板
 
 ```
 Minecraft-style pixel art icon sheet, transparent background, flat front view,
 blocky item icons, hard square pixel edges, flat 2-3 tone color fills, no gradients.
-Grid layout, each icon 16x16 pixels, {N} columns × {M} rows.
+Grid layout, each icon 64x64 pixels, {N} columns × {M} rows.
 Strict grid layout, no padding between cells, no spacing between cells.
 Each icon is a simple recognizable block or item, Minecraft inventory icon style.
 
@@ -218,9 +225,9 @@ Minecraft pixel art, game asset icons, clean grid, no background
 ```
 Minecraft-style pixel art icon sheet, transparent background, flat front view,
 blocky item icons, hard square pixel edges, flat 2-3 tone color fills, no gradients.
-Grid layout, each icon 16x16 pixels, 4 columns × 2 rows.
-Canvas size 64x32 pixels. Strict grid layout, no padding, no spacing between cells.
-Each icon simple and readable at 16x16, Minecraft inventory icon style.
+Grid layout, each icon 64x64 pixels, 4 columns × 2 rows.
+Canvas size 256x128 pixels. Strict grid layout, no padding, no spacing between cells.
+Each icon simple and readable, Minecraft inventory icon style.
 
 Icons (left to right, top to bottom):
 1. brown wooden log block, oak wood grain pixel lines
@@ -256,17 +263,17 @@ Minecraft pixel art, game asset icons, clean grid, transparent background
 
 ### 格式约定
 
-| 元素 | 尺寸 | Godot 用途 |
-|------|------|-----------|
-| 面板背景（9-patch） | 32×32 px，角 8px | `PanelContainer` / `StyleBoxTexture` |
-| 按钮（3 状态横排） | 48×16 px × 3 | `Button` normal / hover / pressed |
-| 物品格子 | 20×20 px | 背包 / 储物箱格子背景 |
-| 血量条背景 | 96×12 px | `ProgressBar` under texture |
-| 血量条填充 | 96×12 px | `ProgressBar` fill texture |
-| 分隔线 | 16×4 px（可横向拉伸） | `HSeparator` |
-| 标题栏背景 | 32×16 px（可横向拉伸） | 面板顶部拖拽区域 |
-| 时间 / 昼夜图标 | 16×16 px × 2（太阳 + 月亮） | HUD 昼夜状态 |
-| 当前物品框 | 52×52 px | HUD 选中物品显示框 |
+| 元素 | 源文件尺寸 | Godot 用途 |
+|------|-----------|-----------|
+| 面板背景（9-patch） | 128×128 px，角 32px | `PanelContainer` / `StyleBoxTexture` |
+| 按钮（3 状态竖排） | 192×64 px × 3（共 192×192） | `Button` normal / hover / pressed |
+| 物品格子 | 80×80 px | 背包 / 储物箱格子背景 |
+| 血量条背景 | 384×48 px | `ProgressBar` under texture |
+| 血量条填充 | 384×48 px | `ProgressBar` fill texture |
+| 分隔线 | 64×16 px（可横向拉伸） | `HSeparator` |
+| 标题栏背景 | 128×64 px（可横向拉伸） | 面板顶部拖拽区域 |
+| 时间 / 昼夜图标 | 64×64 px × 2（太阳 + 月亮） | HUD 昼夜状态 |
+| 当前物品框 | 208×208 px | HUD 选中物品显示框 |
 
 文件路径：`assets/sprites/ui/ui_sheet.png`（统一一张图，各元素按行排列）
 
@@ -277,40 +284,40 @@ Minecraft-style pixel art UI sprite sheet, transparent background,
 blocky square UI elements, dark stone/grey panel texture, hard pixel edges,
 flat color fills, no gradients, no rounded corners, no soft outlines.
 
-Canvas size: 128x208 pixels.
+Canvas size: 512×832 pixels.
 All elements aligned to the top-left, pixel-perfect, clean hard edges.
 No labels, no text, no icons except the requested sun and moon.
-Each element on a separate row, 2px gap between rows:
+Each element on a separate row, 8px gap between rows:
 
-ROW 0 — Panel 9-patch (32x32 px):
-  dark grey stone block texture fill, slightly lighter grey square border 8px thick,
+ROW 0 — Panel 9-patch (128x128 px):
+  dark grey stone block texture fill, slightly lighter grey square border 32px thick,
   flat pixel grid texture, Minecraft inventory GUI style. Suitable for 9-slice scaling.
 
-ROW 1 — Button (3 states, each 48x16 px, placed side by side):
+ROW 1 — Button (3 states, each 192x64 px, stacked vertically, total 192x192):
   state 1 normal: medium grey stone slab, flat 2-tone shading, square border;
   state 2 hover: slightly lighter grey, subtle bright pixel outline;
-  state 3 pressed: darker grey, inset 1px pixel shadow on top and left.
+  state 3 pressed: darker grey, inset 4px pixel shadow on top and left.
 
-ROW 2 — Item slot (20x20 px):
-  dark grey square slot, 1px lighter grey inner border, recessed look,
+ROW 2 — Item slot (80x80 px):
+  dark grey square slot, 4px lighter grey inner border, recessed look,
   Minecraft inventory slot style.
 
-ROW 3 — Health bar background (96x12 px):
-  flat dark grey rectangle, square ends, 1px border.
-  Health bar fill (96x12 px, placed directly below):
-  bright red pixel fill, square ends, 1px lighter red highlight on top row of pixels.
+ROW 3 — Health bar background (384x48 px):
+  flat dark grey rectangle, square ends, 4px border.
+  Health bar fill (384x48 px, placed directly below):
+  bright red pixel fill, square ends, 4px lighter red highlight on top row of pixels.
 
-ROW 4 — Horizontal separator (16x4 px):
-  dark grey pixel line with 1px lighter grey highlight, clean square ends.
+ROW 4 — Horizontal separator (64x16 px):
+  dark grey pixel line with 4px lighter grey highlight, clean square ends.
 
-ROW 5 — Title bar background (32x16 px, horizontally tileable):
+ROW 5 — Title bar background (128x64 px, horizontally tileable):
   slightly darker grey stone than panel, square pixel texture, tileable horizontally.
 
-ROW 6 — HUD icons (16x16 px each, side by side):
+ROW 6 — HUD icons (64x64 px each, side by side, total 128x64):
   sun icon: blocky bright yellow square sun, pixel rays as short lines, Minecraft style;
   moon icon: white crescent made of pixel squares, dark grey background.
 
-ROW 7 — Current item frame (52x52 px):
+ROW 7 — Current item frame (208x208 px):
   dark grey square frame with lighter grey border, inner darker slot area,
   Minecraft hotbar selected slot style.
 
@@ -321,8 +328,8 @@ Minecraft pixel art UI, clean edges, consistent dark grey palette, transparent b
 
 | 元素 | 应用节点 | 方式 |
 |------|----------|------|
-| 面板背景 | `PanelContainer` | `StyleBoxTexture`，9-patch 边距 8px |
-| 按钮 | `Button` | `StyleBoxTexture`，分别对应 normal/hover/pressed |
+| 面板背景 | `PanelContainer` | `StyleBoxTexture`，9-patch 边距 32px |
+| 按钮 | `Button` | `StyleBoxTexture`，分别对应 normal/hover/pressed（每段 192×64 区域） |
 | 物品格子 | 背包 `Button` | `StyleBoxTexture`，`add_theme_stylebox_override` |
 | 血量条 | `ProgressBar` | `under` / `fill` 纹理属性 |
 | 分隔线 | `HSeparator` | `StyleBoxTexture` |

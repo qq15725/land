@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://storagechest01"]
+[gd_scene load_steps=7 format=3 uid="uid://storagechest01"]
 
 [ext_resource type="Script" path="res://scenes/buildings/storage_chest.gd" id="1_sc"]
 [ext_resource type="Script" path="res://scripts/components/inventory_component.gd" id="2_inv"]
+[ext_resource type="Texture2D" path="res://assets/sprites/buildings/storage_chest.png" id="3_tex"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(40, 25)
@@ -16,13 +17,10 @@ script = ExtResource("1_sc")
 position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_1")
 
-[node name="Lid" type="Polygon2D" parent="."]
-polygon = PackedVector2Array(-20, -30, 20, -30, 20, -22, -20, -22)
-color = Color(0.5, 0.32, 0.1, 1)
-
-[node name="Body" type="Polygon2D" parent="."]
-polygon = PackedVector2Array(-20, -22, 20, -22, 20, 0, -20, 0)
-color = Color(0.62, 0.42, 0.15, 1)
+[node name="Visual" type="Sprite2D" parent="."]
+position = Vector2(0, -24)
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("3_tex")
 
 [node name="InteractArea" type="Area2D" parent="."]
 
