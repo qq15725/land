@@ -41,6 +41,11 @@ jobs:
             artifact: "land-macos"
             out_dir: "build/macos"
             out_file: "land.zip"
+          - platform: android
+            preset: "Android"
+            artifact: "land-android"
+            out_dir: "build/android"
+            out_file: "land.apk"
 
     steps:
       - uses: actions/checkout@v4
@@ -50,6 +55,27 @@ jobs:
           mkdir -p ~/.local/share/godot/export_templates/${{ env.GODOT_VERSION }}.stable
           cp -r /root/.local/share/godot/export_templates/${{ env.GODOT_VERSION }}.stable/* \
             ~/.local/share/godot/export_templates/${{ env.GODOT_VERSION }}.stable/
+
+      - name: Setup Android SDK & debug keystore
+        if: matrix.platform == 'android'
+        run: |
+          ANDROID_SDK="${ANDROID_HOME:-/root/android/sdk}"
+          mkdir -p ~/.config/godot/keystores ~/.config/godot
+          keytool -genkey -v \
+            -keystore ~/.config/godot/keystores/debug.keystore \
+            -alias androiddebugkey \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass android -keypass android \
+            -dname "CN=Android Debug,O=Android,C=US"
+          cat > ~/.config/godot/editor_settings-4.tres << EOF
+[gd_resource type="EditorSettings" format=3]
+
+[resource]
+export/android/android_sdk_path = "${ANDROID_SDK}"
+export/android/debug_keystore = "${HOME}/.config/godot/keystores/debug.keystore"
+export/android/debug_keystore_user = "androiddebugkey"
+export/android/debug_keystore_pass = "android"
+EOF
 
       - name: Create export directory
         run: mkdir -p ${{ matrix.out_dir }}
