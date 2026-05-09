@@ -119,16 +119,23 @@ jobs:
         with:
           path: artifacts/
 
-      - name: Zip each platform
+      - name: Package artifacts
         run: |
           cd artifacts
           for dir in */; do
-            zip -r "${dir%/}.zip" "$dir"
+            name="${dir%/}"
+            if [ "$name" = "land-android" ]; then
+              cp "$dir/land.apk" "land-android.apk"
+            else
+              zip -r "${name}.zip" "$dir"
+            fi
           done
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.version || github.ref_name }}
-          files: artifacts/*.zip
+          files: |
+            artifacts/*.zip
+            artifacts/land-android.apk
           generate_release_notes: true

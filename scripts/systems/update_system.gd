@@ -7,7 +7,7 @@ const GITHUB_RELEASES := "https://github.com/qq15725/land/releases/latest"
 const ASSET_ZIP := {
 	"Windows": "land-windows.zip",
 	"macOS":   "land-macos.zip",
-	"Android": "land-android.zip",
+	"Android": "land-android.apk",
 }
 const EXE_IN_ZIP := {
 	"Windows": "land.exe",
