@@ -47,11 +47,13 @@ func delete_slot(slot: int) -> void:
 
 func _collect(world: Node2D) -> Dictionary:
 	var player: Player = world.get_node("YSortLayer/Player")
+	var ts: Variant = world.get("terrain_seed")
 	var data := {
 		"saved_at": Time.get_datetime_string_from_system(),
 		"day": TimeSystem.current_day,
 		"phase": "night" if TimeSystem.is_night() else "day",
 		"phase_elapsed": TimeSystem.phase_elapsed,
+		"terrain_seed": ts if ts is int else 0,
 		"player_pos": {"x": player.global_position.x, "y": player.global_position.y},
 		"player_hp": player.health.current_health,
 		"inventory": _save_inventory(player.inventory),
@@ -67,6 +69,14 @@ func _apply(data: Dictionary, world: Node2D) -> void:
 	TimeSystem.current_day = data.get("day", 1)
 	TimeSystem.phase_elapsed = data.get("phase_elapsed", 0.0)
 	TimeSystem.current_phase = TimeSystem.Phase.NIGHT if data.get("phase") == "night" else TimeSystem.Phase.DAY
+
+	var seed_val: int = data.get("terrain_seed", 0)
+	if seed_val == 0:
+		seed_val = randi()
+	world.set("terrain_seed", seed_val)
+	var tm := world.get_node_or_null("TerrainMap") as TileMap
+	if tm:
+		WorldGenerator.generate(tm, seed_val)
 
 	var pos: Dictionary = data.get("player_pos", {})
 	player.global_position = Vector2(pos.get("x", 0.0), pos.get("y", 0.0))

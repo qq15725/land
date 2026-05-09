@@ -23,18 +23,32 @@ var _hud: Control = null
 var _day_overlay: ColorRect = null
 var _pause_menu: Control = null
 
+var terrain_map: TileMap = null
+var terrain_seed: int = 0
+
 
 func _ready() -> void:
 	add_to_group("world")
+	_setup_terrain()
 	_setup_ui()
-	_scatter_resources()
 	if SaveSystem.slot_exists(GameManager.current_save_slot):
 		SaveSystem.load_save(GameManager.current_save_slot, self)
+	else:
+		terrain_seed = randi()
+		WorldGenerator.generate(terrain_map, terrain_seed)
+	_scatter_resources()
 	BuildingSystem.build_mode_entered.connect(_on_build_mode_entered)
 	BuildingSystem.build_mode_exited.connect(_on_build_mode_exited)
 	BuildingSystem.building_placed.connect(_on_building_placed)
 	TimeSystem.night_started.connect(_on_night_started)
 	TimeSystem.day_started.connect(_on_day_started)
+
+func _setup_terrain() -> void:
+	terrain_map = TileMap.new()
+	terrain_map.name = "TerrainMap"
+	terrain_map.tile_set = WorldGenerator.create_tileset()
+	add_child(terrain_map)
+	move_child(terrain_map, 0)
 
 func _setup_ui() -> void:
 	var hud_layer := CanvasLayer.new()
@@ -78,7 +92,7 @@ func _setup_ui() -> void:
 	_pause_menu = PauseMenuScene.instantiate()
 	ui_layer.add_child(_pause_menu)
 
-	var mobile_controls := load("res://scenes/ui/mobile_controls.gd").new()
+	var mobile_controls: Node = load("res://scenes/ui/mobile_controls.gd").new()
 	add_child(mobile_controls)
 
 func _process(_delta: float) -> void:
