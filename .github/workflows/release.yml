@@ -90,8 +90,13 @@ jobs:
 
       - name: Export — ${{ matrix.platform }}
         run: |
-          godot --headless --export-release "${{ matrix.preset }}" \
-            "${{ matrix.out_dir }}/${{ matrix.out_file }}"
+          if [ "${{ matrix.platform }}" = "android" ]; then
+            godot --headless --export-debug "${{ matrix.preset }}" \
+              "${{ matrix.out_dir }}/${{ matrix.out_file }}"
+          else
+            godot --headless --export-release "${{ matrix.preset }}" \
+              "${{ matrix.out_dir }}/${{ matrix.out_file }}"
+          fi
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

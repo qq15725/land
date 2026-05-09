@@ -1,7 +1,6 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scenes/farm/animal_pen.gd" id="1_ap"]
-[ext_resource type="Resource" path="res://resources/animals/chicken.tres" id="2_chicken"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(70, 50)
@@ -11,7 +10,6 @@ radius = 55.0
 
 [node name="AnimalPen" type="StaticBody2D"]
 script = ExtResource("1_ap")
-animal_data = ExtResource("2_chicken")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_1")
