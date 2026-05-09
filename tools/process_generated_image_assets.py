@@ -1,10 +1,14 @@
+import argparse
 from pathlib import Path
 from PIL import Image, ImageEnhance, ImageDraw
 
 
-ENV_ATLAS = Path("/Users/wxm/.codex/generated_images/019e0cfa-f5b3-74b3-81a0-80ebc031c437/ig_02b502c468532fc80169ff54e72cfc819187406312d79665b1.png")
-BUILDING_ATLAS = Path("/Users/wxm/.codex/generated_images/019e0cfa-f5b3-74b3-81a0-80ebc031c437/ig_02b502c468532fc80169ff55313a508191bfc1765056d6eca2.png")
-ITEM_ATLAS = Path("/Users/wxm/.codex/generated_images/019e0cfa-f5b3-74b3-81a0-80ebc031c437/ig_02b502c468532fc80169ff57d3b0bc81919006465064d0cd64.png")
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Process generated art atlases into project sprite assets.")
+    parser.add_argument("--env-atlas", required=True, type=Path, help="Generated environment atlas image.")
+    parser.add_argument("--building-atlas", required=True, type=Path, help="Generated building atlas image.")
+    parser.add_argument("--item-atlas", required=True, type=Path, help="Generated item icon atlas image.")
+    return parser.parse_args()
 
 
 def keyed_rgba(img: Image.Image) -> Image.Image:
@@ -119,9 +123,10 @@ def save_item_icons(path: str, atlas: Image.Image) -> None:
 
 
 def main() -> None:
-    env = Image.open(ENV_ATLAS)
-    buildings = Image.open(BUILDING_ATLAS)
-    items = Image.open(ITEM_ATLAS)
+    args = parse_args()
+    env = Image.open(args.env_atlas)
+    buildings = Image.open(args.building_atlas)
+    items = Image.open(args.item_atlas)
 
     Path("assets/sprites/environment").mkdir(parents=True, exist_ok=True)
     Path("assets/sprites/buildings").mkdir(parents=True, exist_ok=True)

@@ -1,19 +1,24 @@
 extends Node
 
-const MAP_HALF     := 100
-const MAP_SIZE     := MAP_HALF * 2
-const SOURCE_ID    := 0
-const WARP_STR     := 18.0  # 坐标扰动强度
-const PATH_RADIUS  := 1     # 路径笔刷半径（格）
-const SMOOTH_ITERS := 3     # CA 平滑迭代次数
+const MAP_HALF      := 100
+const MAP_SIZE      := MAP_HALF * 2
+const SOURCE_ID     := 0
+const WARP_STR      := 18.0
+const PATH_RADIUS   := 1
+const SMOOTH_ITERS  := 3
 
-const ATLAS_GRASS    := Vector2i(0, 0)
-const ATLAS_PATH     := Vector2i(1, 0)
-const ATLAS_FARMLAND := Vector2i(2, 0)
-const ATLAS_STONE    := Vector2i(3, 0)
+# 地砖类型（整数，存入 map 数组）
+const TILE_GRASS    := 0
+const TILE_PATH     := 1
+const TILE_FARMLAND := 2
+const TILE_STONE    := 3
+const TILE_TYPE_COUNT := 4
 
-
+# Atlas 列 = 地砖类型，Atlas 行 = 变体
+# 期望 ground_tiles.png 尺寸：64×64（4列×4行，每格16×16）
+const VARIANT_COUNT   := 4
 const TILE_ATLAS_PATH := "res://assets/sprites/environment/ground_tiles.png"
+
 
 func create_tileset() -> TileSet:
 	var ts := TileSet.new()
@@ -21,32 +26,14 @@ func create_tileset() -> TileSet:
 	var src := TileSetAtlasSource.new()
 	src.texture = _load_tile_texture()
 	src.texture_region_size = Vector2i(16, 16)
-	src.create_tile(Vector2i(0, 0))
-	src.create_tile(Vector2i(1, 0))
-	src.create_tile(Vector2i(2, 0))
-	src.create_tile(Vector2i(3, 0))
+	for col in TILE_TYPE_COUNT:
+		for row in VARIANT_COUNT:
+			src.create_tile(Vector2i(col, row))
 	ts.add_source(src, SOURCE_ID)
 	return ts
 
 
-func _load_tile_texture() -> ImageTexture:
-	var img := Image.load_from_file(TILE_ATLAS_PATH)
-	if img:
-		return ImageTexture.create_from_image(img)
-	return _gen_fallback_texture()
-
-
-func _gen_fallback_texture() -> ImageTexture:
-	var img := Image.create(64, 16, false, Image.FORMAT_RGBA8)
-	_fill(img,  0, Color(0.30, 0.60, 0.22))
-	_fill(img, 16, Color(0.70, 0.58, 0.38))
-	_fill(img, 32, Color(0.38, 0.22, 0.08))
-	_fill(img, 48, Color(0.52, 0.52, 0.55))
-	return ImageTexture.create_from_image(img)
-
-
 func generate(tilemap: TileMap, seed_val: int) -> void:
-	# 地形主噪声：FBm 5 倍频，低频大地形
 	var terrain := FastNoiseLite.new()
 	terrain.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
 	terrain.seed = seed_val
@@ -56,27 +43,23 @@ func generate(tilemap: TileMap, seed_val: int) -> void:
 	terrain.fractal_lacunarity = 2.0
 	terrain.fractal_gain = 0.5
 
-	# Domain Warping：两张噪声分别扰动 X/Y 坐标，让边界有机弯曲
 	var wx := _make_warp_noise(seed_val + 101)
 	var wy := _make_warp_noise(seed_val + 202)
 
-	# 耕地边界噪声：让出生点周边耕地轮廓不规则
 	var farm := FastNoiseLite.new()
 	farm.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
 	farm.seed = seed_val + 303
 	farm.frequency = 0.09
 
-	# Step 1：生成原始地形
-	var raw := _gen_raw(terrain, wx, wy, farm)
-	# Step 2：CA 平滑，消除孤立格、让同类地块成片
+	var raw      := _gen_raw(terrain, wx, wy, farm)
 	var smoothed := _smooth(raw)
-	# Step 3：路径点连接（CA 之后雕刻，不会被平滑填平）
 	_carve_paths(smoothed, seed_val)
 
 	tilemap.clear()
 	for y in range(-MAP_HALF, MAP_HALF):
 		for x in range(-MAP_HALF, MAP_HALF):
-			tilemap.set_cell(0, Vector2i(x, y), SOURCE_ID, smoothed[_idx(x, y)])
+			var tile_type: int = smoothed[_idx(x, y)]
+			tilemap.set_cell(0, Vector2i(x, y), SOURCE_ID, _pick_variant(tile_type, x, y))
 
 
 # --- 内部步骤 ---
@@ -88,33 +71,30 @@ func _gen_raw(terrain: FastNoiseLite, wx: FastNoiseLite, wy: FastNoiseLite, farm
 		for x in range(-MAP_HALF, MAP_HALF):
 			var fx := float(x)
 			var fy := float(y)
-			# 用 warp 噪声扰动坐标再采样，使地形边界弯曲自然
 			var sx := fx + wx.get_noise_2d(fx, fy) * WARP_STR
 			var sy := fy + wy.get_noise_2d(fx + 137.0, fy + 137.0) * WARP_STR
-			var n  := terrain.get_noise_2d(sx, sy)  # -1..1
+			var n  := terrain.get_noise_2d(sx, sy)
 
-			# 出生点附近耕地，边界由 farm 噪声扰动成有机形状
 			var farm_r := 10.0 + farm.get_noise_2d(fx, fy) * 4.0
-			var atlas: Vector2i
+			var tile: int
 			if Vector2(fx, fy).length() < farm_r:
-				atlas = ATLAS_FARMLAND
+				tile = TILE_FARMLAND
 			elif n > 0.28:
-				atlas = ATLAS_STONE
+				tile = TILE_STONE
 			else:
-				atlas = ATLAS_GRASS
-			map[_idx(x, y)] = atlas
+				tile = TILE_GRASS
+			map[_idx(x, y)] = tile
 	return map
 
 
 func _smooth(map: Array) -> Array:
-	# Cellular Automaton：多数邻居胜出（≥5/8），耕地不参与
 	var cur := map.duplicate()
 	var nxt := map.duplicate()
 	for _iter in SMOOTH_ITERS:
 		for y in range(-MAP_HALF, MAP_HALF):
 			for x in range(-MAP_HALF, MAP_HALF):
-				if cur[_idx(x, y)] == ATLAS_FARMLAND:
-					nxt[_idx(x, y)] = ATLAS_FARMLAND
+				if cur[_idx(x, y)] == TILE_FARMLAND:
+					nxt[_idx(x, y)] = TILE_FARMLAND
 					continue
 				var cg := 0
 				var cs := 0
@@ -126,15 +106,15 @@ func _smooth(map: Array) -> Array:
 						var ny := y + dy
 						if nx < -MAP_HALF or nx >= MAP_HALF or ny < -MAP_HALF or ny >= MAP_HALF:
 							continue
-						var t: Vector2i = cur[_idx(nx, ny)]
-						if t == ATLAS_STONE:
+						var t: int = cur[_idx(nx, ny)]
+						if t == TILE_STONE:
 							cs += 1
-						elif t == ATLAS_GRASS:
+						elif t == TILE_GRASS:
 							cg += 1
 				if cs >= 5:
-					nxt[_idx(x, y)] = ATLAS_STONE
+					nxt[_idx(x, y)] = TILE_STONE
 				elif cg >= 5:
-					nxt[_idx(x, y)] = ATLAS_GRASS
+					nxt[_idx(x, y)] = TILE_GRASS
 				else:
 					nxt[_idx(x, y)] = cur[_idx(x, y)]
 		cur = nxt.duplicate()
@@ -144,18 +124,13 @@ func _smooth(map: Array) -> Array:
 func _carve_paths(map: Array, seed_val: int) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_val
-
-	# 出生点 + 5 个分布在外圈的地标点（角度略随机，距离 35-75 格）
 	var landmarks: Array[Vector2i] = [Vector2i(0, 0)]
 	for i in 5:
 		var angle := float(i) / 5.0 * TAU + rng.randf_range(-0.25, 0.25)
 		var dist  := rng.randf_range(35.0, 75.0)
 		landmarks.append(Vector2i(roundi(cos(angle) * dist), roundi(sin(angle) * dist)))
-
-	# 出生点 → 各地标（放射路）
 	for i in range(1, landmarks.size()):
 		_draw_path(map, landmarks[0], landmarks[i])
-	# 相邻地标互联（环路）：1→2→3→4→5→1
 	for i in range(1, landmarks.size()):
 		_draw_path(map, landmarks[i], landmarks[i % (landmarks.size() - 1) + 1])
 
@@ -175,7 +150,16 @@ func _draw_path(map: Array, from: Vector2i, to: Vector2i) -> void:
 				var bx := px + dx
 				var by := py + dy
 				if bx >= -MAP_HALF and bx < MAP_HALF and by >= -MAP_HALF and by < MAP_HALF:
-					map[_idx(bx, by)] = ATLAS_PATH
+					map[_idx(bx, by)] = TILE_PATH
+
+
+# 位置哈希选变体行：同一位置固定结果，无明显格子/对角纹路
+func _pick_variant(tile_type: int, x: int, y: int) -> Vector2i:
+	var h := x * 374761393 + y * 668265263
+	h ^= h >> 13
+	h *= 1274126177
+	h ^= h >> 16
+	return Vector2i(tile_type, abs(h) % VARIANT_COUNT)
 
 
 func _make_warp_noise(seed_val: int) -> FastNoiseLite:
@@ -192,7 +176,32 @@ func _idx(x: int, y: int) -> int:
 	return (y + MAP_HALF) * MAP_SIZE + (x + MAP_HALF)
 
 
-func _fill(img: Image, offset_x: int, color: Color) -> void:
-	for y in 16:
-		for x in 16:
-			img.set_pixel(offset_x + x, y, color)
+func _load_tile_texture() -> ImageTexture:
+	var img := Image.load_from_file(TILE_ATLAS_PATH)
+	if img:
+		return ImageTexture.create_from_image(img)
+	return _gen_fallback_texture()
+
+
+# fallback：4列×4行，每列同色、每行稍微亮度不同
+func _gen_fallback_texture() -> ImageTexture:
+	var colors := [
+		Color(0.30, 0.60, 0.22),  # grass
+		Color(0.75, 0.60, 0.32),  # path
+		Color(0.32, 0.18, 0.06),  # farmland
+		Color(0.50, 0.50, 0.52),  # stone
+	]
+	var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
+	for col in 4:
+		for row in VARIANT_COUNT:
+			var base: Color = colors[col]
+			var brightness := 1.0 + (row - 1) * 0.08
+			var c := Color(
+				clampf(base.r * brightness, 0.0, 1.0),
+				clampf(base.g * brightness, 0.0, 1.0),
+				clampf(base.b * brightness, 0.0, 1.0)
+			)
+			for py in 16:
+				for px in 16:
+					img.set_pixel(col * 16 + px, row * 16 + py, c)
+	return ImageTexture.create_from_image(img)

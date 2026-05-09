@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ntv1ebhwbu41"
-path="res://.godot/imported/terrain_island_corruption_cutout_reference.png-4f30ae050fcb7b7b18d840072184b267.ctex"
+uid="uid://l5hos4ub8h8m"
+path="res://.godot/imported/terrain_island.png-f1cf813a5b6d72cda5333626240476ee.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://docs/terrain_island_corruption_cutout_reference.png"
-dest_files=["res://.godot/imported/terrain_island_corruption_cutout_reference.png-4f30ae050fcb7b7b18d840072184b267.ctex"]
+source_file="res://docs/references/terrain_island.png"
+dest_files=["res://.godot/imported/terrain_island.png-f1cf813a5b6d72cda5333626240476ee.ctex"]
 
 [params]
 

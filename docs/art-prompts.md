@@ -110,48 +110,80 @@ Minecraft pixel art, game asset, no background, clean sprite sheet grid
 ## 地砖（TileMap Atlas）
 
 TileMap 的地面贴图，**无透明背景**，纯色填满每格。所有瓦片必须可无缝平铺（seamless tile）。
-**文件**：`assets/sprites/environment/ground_tiles.png`，一张横向 atlas，每格 **16×16 px**，游戏内 1 格 = 16×16 px 世界坐标（不缩放）。
+美术参考：体素方块岛屿参考图（明亮 Minecraft 体素地形），取其**方块顶面材质语言**：高饱和草地方格噪点、沙地/小路的米黄色颗粒、深棕耕地垄沟、灰色岩石块状裂纹。Atlas 只画地表顶面纹理，不画整块岛屿、土层侧面、阴影厚度或场景物件。
+**文件**：`assets/sprites/environment/ground_tiles.png`，每格 **16×16 px**，游戏内 1 格 = 16×16 px 世界坐标（不缩放）。
 
 ### Atlas 布局
 
-| 列 | Atlas 坐标 | id | 描述 |
-|----|-----------|-----|------|
-| 0 | (0, 0) | `grass` | 草地，中绿底色，随机深浅噪点，偶有亮绿草叶像素 |
-| 1 | (1, 0) | `path` | 小路，沙棕底色，散落深色小石子像素 |
-| 2 | (2, 0) | `farmland` | 耕地，深棕底色，水平垄沟纹路（每 4 行交替深浅） |
-| 3 | (3, 0) | `stone_ground` | 石地，中灰底色，浅灰/深灰噪点，点缀裂缝像素线 |
+**总尺寸：64×64 px（4 列 × 4 行，每格 16×16 px）**
 
-总尺寸：**64×16 px**（4 列 × 1 行）
+- **列（col）= 地砖类型**，对应 `world_generator.gd` 中的 `TILE_*` 常量
+- **行（row）= 同类型的视觉变体 0–3**，渲染时由坐标哈希自动选择，产生自然多样性
 
-> 如需扩展（沙地、雪地、沼泽等），在 atlas 右侧追加列，并在 `world_generator.gd` 中添加对应 `ATLAS_*` 常量与 `create_tile()` 调用。
+| 列 | 类型 id | 名称 | 描述 |
+|----|---------|------|------|
+| 0 | `TILE_GRASS = 0` | 草地 | 参考图草地方块顶面：鲜亮黄绿底色，深绿/亮绿方格噪点，少量草叶像素 |
+| 1 | `TILE_PATH = 1` | 小路 | 参考图小路/沙岸顶面：米黄沙棕底色，颗粒状深浅像素，少量碎石点 |
+| 2 | `TILE_FARMLAND = 2` | 耕地 | 参考图农田顶面：深棕土壤，横向垄沟，垄沟间点缀作物根部暗像素 |
+| 3 | `TILE_STONE = 3` | 石地 | 参考图山岩顶面：中灰石块，浅灰高光块、深灰裂纹，块面边缘清晰 |
+
+| 行 | 变体说明 |
+|----|---------|
+| 0 | 标准版（最常见外观） |
+| 1 | 细节略偏亮 / 噪点位置不同 |
+| 2 | 细节略偏暗 / 噪点位置不同 |
+| 3 | 最有特色的变体（最多细节点缀，如额外小石子/草叶/裂纹） |
+
+> 同一列的 4 行变体**必须保持相同色系和辨识度**，区别仅在细节分布和亮度微调。渲染系统自动将相邻格子分配到不同变体，无需手动控制。
+>
+> 如需扩展新地砖（沙地、雪地、沼泽等），在 atlas 右侧追加列，并在 `world_generator.gd` 中新增 `TILE_*` 常量与 `create_tile()` 调用。
 
 ### 提示词模板
 
 ```
-Minecraft-style pixel art tile sheet, NO transparent background, opaque fill,
-seamlessly tileable texture, top-down flat view, hard square pixel edges,
+Minecraft-style voxel pixel art tile sheet, NO transparent background, opaque fill,
+seamlessly tileable top-face textures, top-down flat view extracted from an isometric
+voxel island style reference, hard square pixel edges, crisp blocky texture clusters,
 flat 2-3 tone color fills, no gradients, no outlines, no borders between tiles.
 
-Canvas size: 64x16 pixels. 4 tiles in a single horizontal row, each tile 16x16 pixels.
+Canvas size: 64x64 pixels. 4 columns x 4 rows, each cell 16x16 pixels.
 Strict grid layout, no padding, no spacing between tiles.
 
-Tile 0 (x0–15):   grass ground — medium green base, darker/lighter green pixel noise variation,
-                  occasional bright green single-pixel grass blade details.
-Tile 1 (x16–31):  dirt path — sandy tan base, scattered 1–2px dark pebble pixels,
-                  slight warm variation noise.
-Tile 2 (x32–47):  farmland / tilled soil — dark brown base, subtle horizontal pixel furrow lines
-                  every 3–4 rows alternating darker/slightly lighter.
-Tile 3 (x48–63):  stone ground — mid grey base, lighter and darker grey pixel noise,
-                  thin 1px dark crack pixel lines scattered.
+Reference style:
+  Bright Minecraft-like voxel terrain island, saturated grass block top faces,
+  beige sandy path blocks, dark tilled farm rows, grey stone block tops.
+  Use only the material texture language from the reference image.
+  Do NOT draw isometric blocks, dirt side faces, water, trees, crops, props, shadows,
+  cliffs, full terrain chunks, or perspective depth inside these 16x16 tiles.
 
-Minecraft pixel art, seamless game tile atlas, flat ground texture, no background scenery
+COLUMNS = tile types (left to right):
+  Col 0 (x0–15):   grass ground — bright lime/medium green top face, darker forest-green
+                   square noise, yellow-green highlight pixels, occasional 1px grass blades.
+  Col 1 (x16–31):  dirt path / sand path — warm beige sandy block top, tan and ochre
+                   pixel clusters, scattered 1–2px dark pebble pixels.
+  Col 2 (x32–47):  farmland / tilled soil — dark chocolate brown base, horizontal furrow
+                   bands every 3–4 rows, slightly raised lighter ridges and dark gaps.
+  Col 3 (x48–63):  stone ground — mid grey stone block top, light grey square highlights,
+                   dark grey cracks and chiseled block-like noise.
+
+ROWS = visual variants for each column (top to bottom):
+  Row 0 (y0–15):   standard / most common look.
+  Row 1 (y16–31):  slightly brighter, different noise pixel positions.
+  Row 2 (y32–47):  slightly darker, different noise pixel positions.
+  Row 3 (y48–63):  richest detail — extra grass blades / pebbles / cracks depending on type.
+
+All 4 variants per column share the same base color and must be instantly recognizable
+as the same tile type. Differences are subtle: pixel detail placement, brightness ±5–10%.
+
+Minecraft voxel pixel art, seamless game tile atlas, flat top-face ground textures,
+no background scenery, no side faces, no 3D terrain chunk
 ```
 
 ### 当前状态
 
 | 文件 | 尺寸 | 状态 |
 |------|------|------|
-| `assets/sprites/environment/ground_tiles.png` | 64×16 | 🔧 程序化占位（Python 生成，需替换真实美术） |
+| `assets/sprites/environment/ground_tiles.png` | 64×64 | ✅ 已按体素地形参考图更新 |
 
 ---
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dlinh0mh0dkk8"
-path="res://.godot/imported/terrain_island_cutout_reference.png-e9af73481fa2d8ca27695f5d1a25f9ae.ctex"
+uid="uid://cm1e4vbrihvvq"
+path="res://.godot/imported/terrain_island_night.png-0d1c57aaab7abb1431c0b5df459dd29a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://docs/terrain_island_cutout_reference.png"
-dest_files=["res://.godot/imported/terrain_island_cutout_reference.png-e9af73481fa2d8ca27695f5d1a25f9ae.ctex"]
+source_file="res://docs/references/terrain_island_night.png"
+dest_files=["res://.godot/imported/terrain_island_night.png-0d1c57aaab7abb1431c0b5df459dd29a.ctex"]
 
 [params]
 
