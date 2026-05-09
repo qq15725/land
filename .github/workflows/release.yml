@@ -60,6 +60,12 @@ jobs:
         if: matrix.platform == 'android'
         run: |
           ANDROID_SDK="${ANDROID_HOME:-/root/android/sdk}"
+          JAVA_SDK=$(dirname $(dirname $(readlink -f $(which java))))
+          echo "ANDROID_SDK=${ANDROID_SDK}"
+          echo "JAVA_SDK=${JAVA_SDK}"
+          # 安装匹配 Target SDK 33 的 build tools
+          yes | "${ANDROID_SDK}/cmdline-tools/latest/bin/sdkmanager" \
+            "build-tools;33.0.2" || true
           mkdir -p ~/.config/godot/keystores ~/.config/godot
           keytool -genkey -v \
             -keystore ~/.config/godot/keystores/debug.keystore \
@@ -72,6 +78,7 @@ jobs:
             echo ''
             echo '[resource]'
             echo "export/android/android_sdk_path = \"${ANDROID_SDK}\""
+            echo "export/android/java_sdk_path = \"${JAVA_SDK}\""
             echo "export/android/debug_keystore = \"${HOME}/.config/godot/keystores/debug.keystore\""
             echo 'export/android/debug_keystore_user = "androiddebugkey"'
             echo 'export/android/debug_keystore_pass = "android"'
