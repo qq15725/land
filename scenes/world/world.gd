@@ -1,7 +1,5 @@
 extends Node2D
 
-const TreeScene := preload("res://scenes/world/resource_nodes/tree_node.tscn")
-const StoneScene := preload("res://scenes/world/resource_nodes/stone_node.tscn")
 const CreatureScene := preload("res://scenes/entities/creature/creature.tscn")
 const HUDScene := preload("res://scenes/ui/hud.tscn")
 const InventoryUIScene := preload("res://scenes/ui/inventory_ui.tscn")
@@ -150,9 +148,24 @@ func _on_day_started(_day: int) -> void:
 func _scatter_resources() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
+	var node_types := ItemDatabase.get_all_resource_nodes()
+	if node_types.is_empty():
+		return
+	var total_weight := 0.0
+	for nd in node_types:
+		total_weight += nd.spawn_weight
 	for i in RESOURCE_COUNT:
-		var scene := TreeScene if rng.randf() > 0.35 else StoneScene
-		var node: ResourceNode = scene.instantiate()
+		var roll := rng.randf() * total_weight
+		var accumulated := 0.0
+		var chosen: ResourceNodeData = node_types[0]
+		for nd in node_types:
+			accumulated += nd.spawn_weight
+			if roll <= accumulated:
+				chosen = nd
+				break
+		if chosen.scene_path.is_empty():
+			continue
+		var node: ResourceNode = (load(chosen.scene_path) as PackedScene).instantiate()
 		node.position = _random_pos(rng, MIN_SPAWN_DIST, SPAWN_RADIUS)
 		y_sort_layer.add_child(node)
 

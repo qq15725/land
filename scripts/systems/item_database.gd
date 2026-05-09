@@ -123,11 +123,13 @@ func _load_resource_nodes() -> void:
 		var n := ResourceNodeData.new()
 		n.id = d.get("id", "")
 		n.display_name = d.get("display_name", "")
+		n.scene_path = d.get("scene_path", "")
 		n.sprite_path = d.get("sprite_path", "")
 		n.drop_item_id = d.get("drop_item_id", "")
 		n.drop_amount = d.get("drop_amount", 3)
 		n.respawn_time = d.get("respawn_time", 30.0)
 		n.tool_required = d.get("tool_required", "")
+		n.spawn_weight = d.get("spawn_weight", 1.0)
 		_resource_nodes.append(n)
 
 func _resolve_refs() -> void:
@@ -194,6 +196,12 @@ func get_all_merchants() -> Array:
 
 func get_all_resource_nodes() -> Array:
 	return _resource_nodes
+
+func get_resource_node(id: String) -> ResourceNodeData:
+	for n in _resource_nodes:
+		if n.id == id:
+			return n
+	return null
 
 func _read_json(path: String) -> Array:
 	if not FileAccess.file_exists(path):
