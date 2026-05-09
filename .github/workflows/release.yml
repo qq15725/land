@@ -76,6 +76,7 @@ jobs:
             echo 'export/android/debug_keystore_user = "androiddebugkey"'
             echo 'export/android/debug_keystore_pass = "android"'
           } > ~/.config/godot/editor_settings-4.tres
+          "${ANDROID_SDK}/platform-tools/adb" start-server || true
 
       - name: Create export directory
         run: mkdir -p ${{ matrix.out_dir }}
