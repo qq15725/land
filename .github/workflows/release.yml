@@ -67,15 +67,15 @@ jobs:
             -keyalg RSA -keysize 2048 -validity 10000 \
             -storepass android -keypass android \
             -dname "CN=Android Debug,O=Android,C=US"
-          cat > ~/.config/godot/editor_settings-4.tres << EOF
-[gd_resource type="EditorSettings" format=3]
-
-[resource]
-export/android/android_sdk_path = "${ANDROID_SDK}"
-export/android/debug_keystore = "${HOME}/.config/godot/keystores/debug.keystore"
-export/android/debug_keystore_user = "androiddebugkey"
-export/android/debug_keystore_pass = "android"
-EOF
+          {
+            echo '[gd_resource type="EditorSettings" format=3]'
+            echo ''
+            echo '[resource]'
+            echo "export/android/android_sdk_path = \"${ANDROID_SDK}\""
+            echo "export/android/debug_keystore = \"${HOME}/.config/godot/keystores/debug.keystore\""
+            echo 'export/android/debug_keystore_user = "androiddebugkey"'
+            echo 'export/android/debug_keystore_pass = "android"'
+          } > ~/.config/godot/editor_settings-4.tres
 
       - name: Create export directory
         run: mkdir -p ${{ matrix.out_dir }}
