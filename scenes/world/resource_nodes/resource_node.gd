@@ -4,7 +4,7 @@ extends StaticBody2D
 signal depleted
 signal respawned
 
-@export var item: ItemResource
+var item: ItemData
 @export var drop_amount: int = 3
 @export var respawn_time: float = 30.0
 
@@ -69,4 +69,3 @@ func _on_body_entered(body: Node2D) -> void:
 func _on_body_exited(body: Node2D) -> void:
 	if body is Player:
 		hint_label.hide()
-

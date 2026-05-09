@@ -25,8 +25,6 @@ var _hud: Control = null
 var _day_overlay: ColorRect = null
 var _pause_menu: Control = null
 
-var _slime_data: CreatureResource = preload("res://resources/creatures/slime.tres")
-var _skeleton_data: CreatureResource = preload("res://resources/creatures/skeleton.tres")
 
 func _ready() -> void:
 	add_to_group("world")
@@ -121,10 +119,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		BuildingSystem.exit_build_mode()
 		get_viewport().set_input_as_handled()
 
-func _on_build_mode_entered(building: BuildingResource) -> void:
-	if building.scene == null:
+func _on_build_mode_entered(building: BuildingData) -> void:
+	if building.scene_path.is_empty():
 		return
-	_build_preview = building.scene.instantiate()
+	_build_preview = (load(building.scene_path) as PackedScene).instantiate()
 	_build_preview.modulate = Color(0.4, 1.0, 0.4, 0.55)
 	for child in _build_preview.get_children():
 		if child is CollisionShape2D or child is CollisionObject2D:
@@ -136,12 +134,12 @@ func _on_build_mode_exited() -> void:
 		_build_preview.queue_free()
 		_build_preview = null
 
-func _on_building_placed(building: BuildingResource, pos: Vector2) -> void:
-	var node := building.scene.instantiate() as Node2D
+func _on_building_placed(building: BuildingData, pos: Vector2) -> void:
+	var node := (load(building.scene_path) as PackedScene).instantiate() as Node2D
 	node.global_position = pos
 	y_sort_layer.add_child(node)
 	if node.has_method("on_placed"):
-		node.on_placed()
+		node.on_placed(building)
 
 func _on_night_started(_day: int) -> void:
 	_spawn_night_creatures()
@@ -161,10 +159,13 @@ func _scatter_resources() -> void:
 func _spawn_night_creatures() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
+	var all_creatures := ItemDatabase.get_all_creatures()
+	if all_creatures.is_empty():
+		return
 	var count := rng.randi_range(3, 6)
 	for i in count:
 		var creature: Creature = CreatureScene.instantiate()
-		creature.data = _slime_data if rng.randf() > 0.4 else _skeleton_data
+		creature.data = all_creatures[rng.randi() % all_creatures.size()]
 		creature.position = _random_pos(rng, CREATURE_MIN_DIST, CREATURE_SPAWN_RADIUS)
 		y_sort_layer.add_child(creature)
 

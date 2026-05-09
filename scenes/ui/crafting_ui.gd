@@ -61,7 +61,7 @@ func _refresh() -> void:
 	for recipe in CraftingSystem.recipes:
 		_add_recipe_entry(recipe)
 
-func _add_recipe_entry(recipe: RecipeResource) -> void:
+func _add_recipe_entry(recipe: RecipeData) -> void:
 	var accessible := recipe.required_station == "" or recipe.required_station == _current_station
 	var craftable := accessible and CraftingSystem.can_craft(recipe, _inventory)
 
@@ -100,13 +100,13 @@ func _station_name(station: String) -> String:
 		"cooking_pot": return "烹饪锅"
 		_: return station
 
-func _format_ingredients(ingredients: Array[RecipeIngredient]) -> String:
+func _format_ingredients(ingredients: Array) -> String:
 	var parts: PackedStringArray = []
 	for ing in ingredients:
-		parts.append("%s ×%d" % [ing.item.display_name, ing.amount])
+		parts.append("%s ×%d" % [ing["item"].display_name, ing["amount"]])
 	return "需要：" + ", ".join(parts)
 
-func _on_craft(recipe: RecipeResource) -> void:
+func _on_craft(recipe: RecipeData) -> void:
 	if CraftingSystem.craft(recipe, _inventory):
 		_refresh()
 

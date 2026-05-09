@@ -1,7 +1,7 @@
 extends DraggablePanel
 
 var _player_inventory: InventoryComponent
-var _merchant_data: MerchantResource
+var _merchant_data: MerchantData
 var _trade_list: VBoxContainer
 var _title_label: Label
 
@@ -56,7 +56,7 @@ func _build_layout() -> void:
 func setup(_player_inv: InventoryComponent) -> void:
 	_player_inventory = _player_inv
 
-func _on_open_trade(merchant: MerchantResource, player_inv: InventoryComponent) -> void:
+func _on_open_trade(merchant: MerchantData, player_inv: InventoryComponent) -> void:
 	_merchant_data = merchant
 	_player_inventory = player_inv
 	_title_label.text = merchant.display_name
@@ -69,16 +69,16 @@ func _refresh() -> void:
 	if not _merchant_data:
 		return
 	for entry in _merchant_data.trades:
-		_trade_list.add_child(_make_trade_row(entry as TradeEntry))
+		_trade_list.add_child(_make_trade_row(entry))
 
-func _make_trade_row(entry: TradeEntry) -> Control:
+func _make_trade_row(entry: Dictionary) -> Control:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
 
-	var can_afford := _player_inventory.has_item(entry.give_item, entry.give_amount)
+	var can_afford := _player_inventory.has_item(entry["give_item"], entry["give_amount"])
 
 	var give_lbl := Label.new()
-	give_lbl.text = "%s ×%d" % [entry.give_item.display_name, entry.give_amount]
+	give_lbl.text = "%s ×%d" % [entry["give_item"].display_name, entry["give_amount"]]
 	give_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	give_lbl.add_theme_font_size_override("font_size", 13)
 	row.add_child(give_lbl)
@@ -88,7 +88,7 @@ func _make_trade_row(entry: TradeEntry) -> Control:
 	row.add_child(arrow)
 
 	var recv_lbl := Label.new()
-	recv_lbl.text = "%s ×%d" % [entry.receive_item.display_name, entry.receive_amount]
+	recv_lbl.text = "%s ×%d" % [entry["receive_item"].display_name, entry["receive_amount"]]
 	recv_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	recv_lbl.add_theme_font_size_override("font_size", 13)
 	row.add_child(recv_lbl)
@@ -104,13 +104,13 @@ func _make_trade_row(entry: TradeEntry) -> Control:
 
 	return row
 
-func _do_trade(entry: TradeEntry) -> void:
-	if not _player_inventory.has_item(entry.give_item, entry.give_amount):
+func _do_trade(entry: Dictionary) -> void:
+	if not _player_inventory.has_item(entry["give_item"], entry["give_amount"]):
 		return
-	var leftover := _player_inventory.add_item(entry.receive_item, entry.receive_amount)
+	var leftover := _player_inventory.add_item(entry["receive_item"], entry["receive_amount"])
 	if leftover > 0:
 		return  # 背包满，不扣除
-	_player_inventory.remove_item(entry.give_item, entry.give_amount)
+	_player_inventory.remove_item(entry["give_item"], entry["give_amount"])
 	_refresh()
 
 func _unhandled_input(event: InputEvent) -> void:

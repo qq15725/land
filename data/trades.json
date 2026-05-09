@@ -1,0 +1,27 @@
+[
+  {
+    "id": "wanderer",
+    "display_name": "行商",
+    "color": [0.4, 0.6, 0.9, 1.0],
+    "visit_interval": 180.0,
+    "stay_duration": 90.0,
+    "trades": [
+      {"give_item_id": "carrot", "give_amount": 5, "receive_item_id": "rare_seed", "receive_amount": 1},
+      {"give_item_id": "wheat", "give_amount": 8, "receive_item_id": "blueprint", "receive_amount": 1},
+      {"give_item_id": "chicken_egg", "give_amount": 3, "receive_item_id": "rare_seed", "receive_amount": 2},
+      {"give_item_id": "wood", "give_amount": 10, "receive_item_id": "blueprint", "receive_amount": 1}
+    ]
+  },
+  {
+    "id": "miner",
+    "display_name": "矿商",
+    "color": [0.7, 0.5, 0.3, 1.0],
+    "visit_interval": 240.0,
+    "stay_duration": 120.0,
+    "trades": [
+      {"give_item_id": "stone", "give_amount": 15, "receive_item_id": "rare_seed", "receive_amount": 1},
+      {"give_item_id": "wood", "give_amount": 20, "receive_item_id": "blueprint", "receive_amount": 2},
+      {"give_item_id": "wooden_plank", "give_amount": 6, "receive_item_id": "rare_seed", "receive_amount": 3}
+    ]
+  }
+]

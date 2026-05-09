@@ -105,7 +105,7 @@ func _make_slot_btn(slot: Dictionary, source: InventoryComponent, from_storage: 
 		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		btn.add_child(lbl)
 
-		var item: ItemResource = slot.item
+		var item: ItemData = slot.item
 		var amount: int = slot.amount
 		if from_storage:
 			btn.pressed.connect(func(): _transfer(item, amount, _storage_inventory, _player_inventory))
@@ -119,7 +119,7 @@ func _make_slot_btn(slot: Dictionary, source: InventoryComponent, from_storage: 
 
 	return btn
 
-func _transfer(item: ItemResource, amount: int, from: InventoryComponent, to: InventoryComponent) -> void:
+func _transfer(item: ItemData, amount: int, from: InventoryComponent, to: InventoryComponent) -> void:
 	var leftover := to.add_item(item, amount)
 	var transferred := amount - leftover
 	if transferred > 0:

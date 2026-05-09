@@ -1,0 +1,47 @@
+[
+  {
+    "id": "wooden_plank",
+    "output_item_id": "wooden_plank",
+    "output_amount": 2,
+    "ingredients": [
+      {"item_id": "wood", "amount": 3}
+    ],
+    "required_station": ""
+  },
+  {
+    "id": "carrot_seed",
+    "output_item_id": "carrot_seed",
+    "output_amount": 3,
+    "ingredients": [
+      {"item_id": "wood", "amount": 2}
+    ],
+    "required_station": ""
+  },
+  {
+    "id": "wheat_seed",
+    "output_item_id": "wheat_seed",
+    "output_amount": 3,
+    "ingredients": [
+      {"item_id": "wood", "amount": 2}
+    ],
+    "required_station": ""
+  },
+  {
+    "id": "animal_feed",
+    "output_item_id": "animal_feed",
+    "output_amount": 3,
+    "ingredients": [
+      {"item_id": "wheat", "amount": 2}
+    ],
+    "required_station": "workbench"
+  },
+  {
+    "id": "cooked_carrot",
+    "output_item_id": "cooked_carrot",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "carrot", "amount": 1}
+    ],
+    "required_station": "cooking_pot"
+  }
+]

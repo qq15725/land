@@ -53,7 +53,7 @@ func _refresh() -> void:
 	for building in BuildingSystem.get_all_buildings():
 		_add_building_entry(building)
 
-func _add_building_entry(building: BuildingResource) -> void:
+func _add_building_entry(building: BuildingData) -> void:
 	var can_afford := BuildingSystem.can_afford(building, _inventory)
 
 	var row := HBoxContainer.new()
@@ -81,13 +81,13 @@ func _add_building_entry(building: BuildingResource) -> void:
 
 	_list.add_child(HSeparator.new())
 
-func _format_cost(cost: Array[RecipeIngredient]) -> String:
+func _format_cost(cost: Array) -> String:
 	var parts: PackedStringArray = []
 	for c in cost:
-		parts.append("%s ×%d" % [c.item.display_name, c.amount])
+		parts.append("%s ×%d" % [c["item"].display_name, c["amount"]])
 	return "消耗：" + ", ".join(parts)
 
-func _on_place(building: BuildingResource) -> void:
+func _on_place(building: BuildingData) -> void:
 	hide()
 	BuildingSystem.enter_build_mode(building)
 

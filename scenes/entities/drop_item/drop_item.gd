@@ -1,7 +1,7 @@
 class_name DropItem
 extends Area2D
 
-var item: ItemResource
+var item: ItemData
 var amount: int = 1
 
 @onready var visual: Polygon2D = $Visual
@@ -10,7 +10,7 @@ var amount: int = 1
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 
-func setup(p_item: ItemResource, p_amount: int) -> void:
+func setup(p_item: ItemData, p_amount: int) -> void:
 	item = p_item
 	amount = p_amount
 	visual.color = item.color

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "carrot",
+    "display_name": "胡萝卜",
+    "seed_item_id": "carrot_seed",
+    "output_item_id": "carrot",
+    "output_amount": 3,
+    "growth_time": 20.0
+  },
+  {
+    "id": "wheat",
+    "display_name": "小麦",
+    "seed_item_id": "wheat_seed",
+    "output_item_id": "wheat",
+    "output_amount": 4,
+    "growth_time": 30.0
+  }
+]

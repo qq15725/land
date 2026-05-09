@@ -14,7 +14,7 @@ func _ready() -> void:
 	for i in slot_count:
 		slots[i] = {item = null, amount = 0}
 
-func add_item(item: ItemResource, amount: int = 1) -> int:
+func add_item(item: ItemData, amount: int = 1) -> int:
 	for slot in slots:
 		if slot.item == item and slot.amount < item.max_stack:
 			var space: int = item.max_stack - slot.amount
@@ -35,7 +35,7 @@ func add_item(item: ItemResource, amount: int = 1) -> int:
 				return 0
 	return amount
 
-func remove_item(item: ItemResource, amount: int = 1) -> bool:
+func remove_item(item: ItemData, amount: int = 1) -> bool:
 	if not has_item(item, amount):
 		return false
 	for slot in slots:
@@ -50,7 +50,7 @@ func remove_item(item: ItemResource, amount: int = 1) -> bool:
 				return true
 	return true
 
-func has_item(item: ItemResource, amount: int = 1) -> bool:
+func has_item(item: ItemData, amount: int = 1) -> bool:
 	var total := 0
 	for slot in slots:
 		if slot.item == item:
@@ -64,7 +64,7 @@ func select_slot(index: int) -> void:
 		selected_slot = index
 	selection_changed.emit(selected_slot)
 
-func get_selected_item() -> ItemResource:
+func get_selected_item() -> ItemData:
 	if selected_slot < 0 or selected_slot >= slots.size():
 		return null
 	return slots[selected_slot].item

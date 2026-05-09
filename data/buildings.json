@@ -1,0 +1,61 @@
+[
+  {
+    "id": "workbench",
+    "display_name": "工作台",
+    "scene_path": "res://scenes/buildings/workbench.tscn",
+    "cost": [
+      {"item_id": "wood", "amount": 5}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "storage_chest",
+    "display_name": "储物箱",
+    "scene_path": "res://scenes/buildings/storage_chest.tscn",
+    "cost": [
+      {"item_id": "wood", "amount": 4},
+      {"item_id": "wooden_plank", "amount": 2}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "cooking_pot",
+    "display_name": "烹饪锅",
+    "scene_path": "res://scenes/buildings/cooking_pot.tscn",
+    "cost": [
+      {"item_id": "stone", "amount": 5},
+      {"item_id": "wood", "amount": 2}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "farm_plot",
+    "display_name": "农田",
+    "scene_path": "res://scenes/farm/farm_plot.tscn",
+    "cost": [
+      {"item_id": "wood", "amount": 2},
+      {"item_id": "stone", "amount": 1}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "trading_post",
+    "display_name": "贸易站",
+    "scene_path": "res://scenes/buildings/trading_post.tscn",
+    "cost": [
+      {"item_id": "wood", "amount": 12},
+      {"item_id": "stone", "amount": 8}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "animal_pen",
+    "display_name": "鸡圈",
+    "scene_path": "res://scenes/farm/animal_pen.tscn",
+    "cost": [
+      {"item_id": "wood", "amount": 6},
+      {"item_id": "stone", "amount": 2}
+    ],
+    "animal_id": "chicken"
+  }
+]

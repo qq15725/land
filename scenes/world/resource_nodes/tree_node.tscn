@@ -1,7 +1,6 @@
-[gd_scene load_steps=6 format=3 uid="uid://treenode0001"]
+[gd_scene load_steps=5 format=3 uid="uid://treenode0001"]
 
 [ext_resource type="Script" path="res://scenes/world/resource_nodes/tree_node.gd" id="1_tn"]
-[ext_resource type="Resource" path="res://resources/items/wood.tres" id="2_wood"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(12, 20)
@@ -11,7 +10,6 @@ radius = 45.0
 
 [node name="TreeNode" type="StaticBody2D"]
 script = ExtResource("1_tn")
-item = ExtResource("2_wood")
 drop_amount = 3
 respawn_time = 30.0
 

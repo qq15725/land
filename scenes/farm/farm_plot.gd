@@ -8,7 +8,7 @@ enum State { EMPTY, GROWING, READY }
 @onready var interact_area: Area2D = $InteractArea
 
 var _state: State = State.EMPTY
-var _current_crop: CropResource = null
+var _current_crop: CropData = null
 var _grow_timer: float = 0.0
 
 func _ready() -> void:
@@ -48,7 +48,7 @@ func interact(player: Player) -> void:
 			visual.color = Color(0.45, 0.3, 0.15)
 			hint_label.text = "[E] 播种"
 
-func _find_plantable_seed(inventory: InventoryComponent) -> CropResource:
+func _find_plantable_seed(inventory: InventoryComponent) -> CropData:
 	for slot in inventory.slots:
 		if slot.item == null:
 			continue

@@ -1,0 +1,13 @@
+[
+  {
+    "id": "chicken",
+    "display_name": "鸡",
+    "sprite_path": "",
+    "feed_item_id": "animal_feed",
+    "produce_item_id": "chicken_egg",
+    "produce_amount": 1,
+    "produce_time": 30.0,
+    "wander_radius": 60.0,
+    "color": [0.95, 0.92, 0.85, 1.0]
+  }
+]

@@ -7,7 +7,7 @@ signal departed
 @onready var interact_area: Area2D = $InteractArea
 @onready var hint_label: Label = $HintLabel
 
-var data: MerchantResource
+var data: MerchantData
 var _target_pos: Vector2 = Vector2.ZERO
 var _arrived: bool = false
 var _stay_timer: float = 0.0
@@ -17,7 +17,7 @@ func _ready() -> void:
 	interact_area.body_entered.connect(func(b): if b is Player: hint_label.show())
 	interact_area.body_exited.connect(func(b): if b is Player: hint_label.hide())
 
-func setup(merchant_data: MerchantResource, post_pos: Vector2) -> void:
+func setup(merchant_data: MerchantData, post_pos: Vector2) -> void:
 	data = merchant_data
 	_target_pos = post_pos
 	var offset := Vector2(randf_range(-24.0, 24.0), randf_range(-24.0, 24.0))

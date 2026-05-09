@@ -4,7 +4,7 @@ extends CharacterBody2D
 const DropItemScene := preload("res://scenes/entities/drop_item/drop_item.tscn")
 const SPEED := 35.0
 
-@export var data: AnimalResource = null
+var data: AnimalData = null
 
 @onready var visual: Sprite2D = $Visual
 @onready var hint_label: Label = $HintLabel

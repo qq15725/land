@@ -3,7 +3,7 @@ extends CharacterBody2D
 
 const DropItemScene := preload("res://scenes/entities/drop_item/drop_item.tscn")
 
-@export var data: CreatureResource
+@export var data: CreatureData
 
 @onready var health: HealthComponent = $HealthComponent
 @onready var visual: Sprite2D = $Visual
@@ -26,10 +26,12 @@ func _ready() -> void:
 		return
 	health.max_health = data.max_health
 	health.current_health = data.max_health
-	if data.texture:
-		visual.texture = data.texture
-		visual.scale = Vector2.ONE * data.sprite_scale
-		visual.position.y = -(data.texture.get_height() * data.sprite_scale) / 2.0
+	if not data.sprite_path.is_empty():
+		var tex := load(data.sprite_path) as Texture2D
+		if tex:
+			visual.texture = tex
+			visual.scale = Vector2.ONE * data.sprite_scale
+			visual.position.y = -(tex.get_height() * data.sprite_scale) / 2.0
 
 	var det_circle := detection_shape.shape as CircleShape2D
 	if det_circle:
