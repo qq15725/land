@@ -25,6 +25,8 @@ var _pause_menu: Control = null
 
 var terrain_map: TileMap = null
 var terrain_seed: int = 0
+var map_markers: Dictionary = {}   # "next_0"/"next_1"/"next_2"/"prev" → Vector2i
+var current_map_id: String = ""    # 当前地图 id，如 "0"、"0-1"
 
 
 func _ready() -> void:
@@ -34,8 +36,7 @@ func _ready() -> void:
 	if SaveSystem.slot_exists(GameManager.current_save_slot):
 		SaveSystem.load_save(GameManager.current_save_slot, self)
 	else:
-		terrain_seed = randi()
-		WorldGenerator.generate(terrain_map, terrain_seed)
+		_load_map("0")
 	_scatter_resources()
 	BuildingSystem.build_mode_entered.connect(_on_build_mode_entered)
 	BuildingSystem.build_mode_exited.connect(_on_build_mode_exited)
@@ -43,10 +44,28 @@ func _ready() -> void:
 	TimeSystem.night_started.connect(_on_night_started)
 	TimeSystem.day_started.connect(_on_day_started)
 
+func _load_map(map_id: String) -> void:
+	current_map_id = map_id
+	if GameManager.world_type == "preset":
+		var img_path := "res://assets/maps/" + map_id + ".png"
+		if FileAccess.file_exists(img_path):
+			map_markers = WorldGenerator.generate_from_image(terrain_map, img_path)
+		else:
+			push_error("预设地图不存在: " + img_path + "，回退到程序化生成")
+			_gen_random()
+	else:
+		_gen_random()
+
+func _gen_random() -> void:
+	terrain_seed = randi()
+	WorldGenerator.generate(terrain_map, terrain_seed)
+
+
 func _setup_terrain() -> void:
 	terrain_map = TileMap.new()
 	terrain_map.name = "TerrainMap"
 	terrain_map.tile_set = WorldGenerator.create_tileset()
+	terrain_map.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	add_child(terrain_map)
 	move_child(terrain_map, 0)
 

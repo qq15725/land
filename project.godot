@@ -11,10 +11,9 @@ config_version=5
 [application]
 
 config/name="Land"
-run/main_scene="uid://world0001"
+run/main_scene="uid://mainmenu001"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
-config/run/main_scene="res://scenes/ui/main_menu.tscn"
 
 [autoload]
 

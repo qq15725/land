@@ -107,83 +107,267 @@ Minecraft pixel art, game asset, no background, clean sprite sheet grid
 
 ---
 
-## 地砖（TileMap Atlas）
+## 地砖（TileMap Terrain Autotile）
 
-TileMap 的地面贴图，**无透明背景**，纯色填满每格。所有瓦片必须可无缝平铺（seamless tile）。
-美术参考：体素方块岛屿参考图（明亮 Minecraft 体素地形），取其**方块顶面材质语言**：高饱和草地方格噪点、沙地/小路的米黄色颗粒、深棕耕地垄沟、灰色岩石块状裂纹。Atlas 只画地表顶面纹理，不画整块岛屿、土层侧面、阴影厚度或场景物件。
-**文件**：`assets/sprites/environment/ground_tiles.png`，每格 **16×16 px**，游戏内 1 格 = 16×16 px 世界坐标（不缩放）。
+> **核心机制**：使用 Godot 4 **Terrain（自动地形）系统**，根据相邻格子的地砖类型自动选择正确的边缘/角落过渡图块。这就是星露谷物语草地边缘有机融入小路、耕地有清晰界限的原理。
+
+**文件**：`assets/sprites/environment/ground_tiles.png`，每格 **64×64 px 源图块**，游戏内 1 格 = 16×16 px 世界坐标（`texture_region_size=64`，zoom=4 时屏幕 64px 1:1 采样，无放大模糊）。
+
+---
+
+### 美术参考
+
+**主参考**：`docs/references/terrain_island.png`（体素方块岛屿俯视图）
+
+从参考图中提取的**顶面材质语言**（只取顶面纹理，不画侧面/阴影/场景物件）：
+
+| 地砖 | 参考图顶面特征 | 关键色值 |
+|------|--------------|---------|
+| 草地 | 鲜亮中绿，深绿方形噪点簇，亮黄绿高光像素，少量草叶 | 底 `#4A8A28`，暗簇 `#336618`，高光 `#6BB030` |
+| 小路 | 沙米黄，颗粒状深浅像素，零散 1–2px 深色碎石点 | 底 `#C8A060`，暗粒 `#A07840`，碎石 `#705030` |
+| 耕地 | 深巧克力棕，横向垄沟每 3–4px 一道，垄脊亮、垄沟暗 | 底 `#4A2810`，垄脊 `#5E3418`，垄沟 `#381A08` |
+| 石地 | 中灰方块面，浅灰高光块、深灰不规则裂纹 | 底 `#787878`，高光 `#989898`，裂纹 `#585858` |
+| 暴露边缘色 | 方块侧面/土壤色（图中草地侧面的温棕） | `#7A5030` |
+
+> 参考图使用等角投影，**只取顶面 2D 纹理语言**，忽略图中的侧面、阴影厚度、水体、树木、作物等场景物件。
+
+---
+
+### 系统原理
+
+Godot 4 Terrain 使用"**相邻位掩码（peering bits）**"匹配：每个格子检查上下左右 4 个相邻格，若相邻格是**同类地砖**则该方向 bit=1，否则 bit=0，共 4bit = 16 种组合。系统自动从 atlas 中选出对应的图块。
+
+```
+相邻掩码编码（Top=8 Right=4 Bottom=2 Left=1，值 0–15）：
+
+  bit3 Top    bit2 Right    bit1 Bottom    bit0 Left
+  ----         ------        -------        -----
+  "1" = 该方向相邻格是同类地砖（连通，内部纹理延伸）
+  "0" = 该方向相邻格是不同地砖（暴露边缘，绘制过渡效果）
+```
+
+每种地砖需要 **16 张图块**（掩码 0–15），分 1 行排列：
+
+```
+掩码: 0    1    2    3    4    5    6    7    8    9    10   11   12   13   14   15
+连通: 无   L    B    BL   R    LR   BR   BLR  T    TL   TB   TBL  TR   TLR  TBR  TLBR
+视觉: 孤立 左连 下连 下左 右连 横条 右下 ⊤旋转 上连 上左 竖条 ⊣旋转 上右 ⊤   ⊢   全内部
+```
+
+---
 
 ### Atlas 布局
 
-**总尺寸：64×64 px（4 列 × 4 行，每格 16×16 px）**
+**总尺寸：1024×256 px（16 列 × 4 行，每格 64×64 px）**
 
-- **列（col）= 地砖类型**，对应 `world_generator.gd` 中的 `TILE_*` 常量
-- **行（row）= 同类型的视觉变体 0–3**，渲染时由坐标哈希自动选择，产生自然多样性
+- **列（col 0–15）= 相邻掩码值**（0 = 完全孤立，15 = 四面全连通/内部）
+- **行（row）= 地砖类型**
 
-| 列 | 类型 id | 名称 | 描述 |
-|----|---------|------|------|
-| 0 | `TILE_GRASS = 0` | 草地 | 参考图草地方块顶面：鲜亮黄绿底色，深绿/亮绿方格噪点，少量草叶像素 |
-| 1 | `TILE_PATH = 1` | 小路 | 参考图小路/沙岸顶面：米黄沙棕底色，颗粒状深浅像素，少量碎石点 |
-| 2 | `TILE_FARMLAND = 2` | 耕地 | 参考图农田顶面：深棕土壤，横向垄沟，垄沟间点缀作物根部暗像素 |
-| 3 | `TILE_STONE = 3` | 石地 | 参考图山岩顶面：中灰石块，浅灰高光块、深灰裂纹，块面边缘清晰 |
+| 行 | 类型 id | 名称 | 底色参考 |
+|----|---------|------|---------|
+| 0 | `TILE_GRASS = 0` | 草地 | 鲜亮中绿 `#4A8A28`，深绿噪点 `#336618`，高光 `#6BB030` |
+| 1 | `TILE_PATH = 1` | 小路 | 沙米黄 `#C8A060`，暗粒 `#A07840`，碎石点 `#705030` |
+| 2 | `TILE_FARMLAND = 2` | 耕地 | 深棕 `#4A2810`，垄脊 `#5E3418`，垄沟 `#381A08` |
+| 3 | `TILE_STONE = 3` | 石地 | 中灰 `#787878`，高光 `#989898`，裂纹 `#585858` |
 
-| 行 | 变体说明 |
-|----|---------|
-| 0 | 标准版（最常见外观） |
-| 1 | 细节略偏亮 / 噪点位置不同 |
-| 2 | 细节略偏暗 / 噪点位置不同 |
-| 3 | 最有特色的变体（最多细节点缀，如额外小石子/草叶/裂纹） |
+---
 
-> 同一列的 4 行变体**必须保持相同色系和辨识度**，区别仅在细节分布和亮度微调。渲染系统自动将相邻格子分配到不同变体，无需手动控制。
->
-> 如需扩展新地砖（沙地、雪地、沼泽等），在 atlas 右侧追加列，并在 `world_generator.gd` 中新增 `TILE_*` 常量与 `create_tile()` 调用。
+### 各图块视觉规则
 
-### 提示词模板
+**关键规则：每个图块由两部分组成**
+- **连通侧**（bit=1）：用该地砖的内部纹理延伸到边缘，与相邻同类图块无缝衔接
+- **暴露侧**（bit=0）：绘制过渡边缘效果，最外 2–3px 渐变为暴露边缘色 `#7A5030`（参考图方块侧面暖棕）
 
 ```
-Minecraft-style voxel pixel art tile sheet, NO transparent background, opaque fill,
-seamlessly tileable top-face textures, top-down flat view extracted from an isometric
-voxel island style reference, hard square pixel edges, crisp blocky texture clusters,
-flat 2-3 tone color fills, no gradients, no outlines, no borders between tiles.
+掩码 15（TLBR 全连通）= 纯内部图块：
+  四边全部延伸内部纹理，完全平铺，无任何边缘效果。这是面积最大区域显示的图块。
 
-Canvas size: 64x64 pixels. 4 columns x 4 rows, each cell 16x16 pixels.
-Strict grid layout, no padding, no spacing between tiles.
+掩码 0（无连通）= 孤立图块（四面暴露）：
+  中心区域为内部纹理，四周 3px 渐变为暴露边缘色。
+  草地孤立块四周有细小草尖向外探出。
 
-Reference style:
-  Bright Minecraft-like voxel terrain island, saturated grass block top faces,
-  beige sandy path blocks, dark tilled farm rows, grey stone block tops.
-  Use only the material texture language from the reference image.
-  Do NOT draw isometric blocks, dirt side faces, water, trees, crops, props, shadows,
-  cliffs, full terrain chunks, or perspective depth inside these 16x16 tiles.
+掩码 5（LR 左右连通，上下暴露）= 横向条带中段：
+  左右边缘无缝延伸，上下边缘绘制过渡。
+  草地的上下边缘有参差不齐的草尖轮廓。
 
-COLUMNS = tile types (left to right):
-  Col 0 (x0–15):   grass ground — bright lime/medium green top face, darker forest-green
-                   square noise, yellow-green highlight pixels, occasional 1px grass blades.
-  Col 1 (x16–31):  dirt path / sand path — warm beige sandy block top, tan and ochre
-                   pixel clusters, scattered 1–2px dark pebble pixels.
-  Col 2 (x32–47):  farmland / tilled soil — dark chocolate brown base, horizontal furrow
-                   bands every 3–4 rows, slightly raised lighter ridges and dark gaps.
-  Col 3 (x48–63):  stone ground — mid grey stone block top, light grey square highlights,
-                   dark grey cracks and chiseled block-like noise.
-
-ROWS = visual variants for each column (top to bottom):
-  Row 0 (y0–15):   standard / most common look.
-  Row 1 (y16–31):  slightly brighter, different noise pixel positions.
-  Row 2 (y32–47):  slightly darker, different noise pixel positions.
-  Row 3 (y48–63):  richest detail — extra grass blades / pebbles / cracks depending on type.
-
-All 4 variants per column share the same base color and must be instantly recognizable
-as the same tile type. Differences are subtle: pixel detail placement, brightness ±5–10%.
-
-Minecraft voxel pixel art, seamless game tile atlas, flat top-face ground textures,
-no background scenery, no side faces, no 3D terrain chunk
+掩码 10（TB 上下连通，左右暴露）= 纵向条带中段：
+  上下无缝，左右绘制过渡。
 ```
+
+**各地砖暴露边缘的具体样式：**
+
+| 地砖 | 暴露边缘样式 |
+|------|------------|
+| 草地 | 边缘 2–3px 草色变薄，最外 2px 为暖棕 `#7A5030`；1px 草尖不规则向外探出，轮廓参差 |
+| 小路 | 边缘 2px 略浅偏干（`#D4B070`），轮廓较规整，偶有 1px 碎石粒探出 |
+| 耕地 | 垄沟在暴露侧截断，最外 1px 暗棕 `#381A08`，轮廓整齐（人工开垦感） |
+| 石地 | 裂纹向边缘延伸后截断，最外 2px 深灰 `#585858`，边缘略呈碎裂锯齿 |
+
+---
+
+### 图块绘制参考（以草地行为例）
+
+```
+col 0  (0000): 孤立草地，四边全过渡，中心草色，周边 3px 暖棕
+col 1  (0001): 左接草，右/上/下三边过渡
+col 2  (0010): 下接草，上/左/右三边过渡
+col 3  (0011): 下左接草，上/右两边过渡（右上角圆弧草尖）
+col 4  (0100): 右接草，左/上/下三边过渡
+col 5  (0101): 左右接草（横条中段，上下有草尖轮廓）
+col 6  (0110): 右下接草（左上角过渡）
+col 7  (0111): 左右下接草（仅上边过渡，草尖向上探出）
+col 8  (1000): 上接草，下/左/右三边过渡
+col 9  (1001): 上左接草（右下角过渡）
+col 10 (1010): 上下接草（竖条中段，左右有草尖）
+col 11 (1011): 上左下接草（仅右边过渡）
+col 12 (1100): 上右接草（左下角过渡）
+col 13 (1101): 上右左接草（仅下边过渡）
+col 14 (1110): 上右下接草（仅左边过渡）
+col 15 (1111): 全连通内部，纯草地纹理，无任何过渡
+```
+
+---
+
+### 提示词（分行生成，每次生成一行 1024×64 px）
+
+> **生成前必读——最常见的错误：**
+> - ❌ 等角/斜视角方块（每格下半部分出现暗色侧面） → 整行作废
+> - ❌ 16 列图块全部相同，没有边缘过渡差异 → 需要重新生成
+> - ❌ 画了树/草丛/水/作物/场景物件 → 整行作废
+> - ✅ 正确：每格整个 64×64 区域都是纯粹的地面顶面纹理，**像从正上方垂直俯视看到的地面**
+
+**通用前缀（每行都加）：**
+
+```
+Pixel art terrain tile strip. CRITICAL PERSPECTIVE: pure 2D flat top-down view,
+as if looking STRAIGHT DOWN from directly above — like a satellite/bird's eye view.
+The entire 64x64 tile area is filled with flat ground surface texture.
+NO isometric angle, NO axonometric projection, NO visible block sides or edges,
+NO voxel depth, NO 3D perspective, NO shadows from block height.
+If any tile shows a dark bottom edge or side face: generation is WRONG.
+
+Reference material texture from: Minecraft voxel island top-face textures
+(vivid grass, sandy path, dark farmland, grey stone). Color palette and pixel
+style only — NOT the isometric 3D shape. Use ONLY the flat top-face colors.
+
+NO transparent background. Opaque fill. Seamless tiling.
+
+Canvas: 1024x64 pixels. 16 cells in one row, each cell 64x64 pixels. No padding, no gaps.
+This is ONE ROW of a terrain autotile blob tileset for a 2D top-down game.
+Each cell is a different edge-connection variant (bitmask 0–15, columns left to right).
+
+CONNECTED SIDE (bit=1): terrain texture extends fully to that tile edge — seamless join.
+EXPOSED SIDE (bit=0): draw a clear 4-6px color transition fringe at the tile edge,
+fading toward warm earth brown #7A5030. The fringe must be visibly different from the
+interior. CRITICAL: col 5 (left+right connected, top+bottom exposed) MUST look
+noticeably different from col 15 (all connected/interior). If they look the same: WRONG.
+
+Do NOT draw: isometric blocks, voxel side faces, trees, crops, water, props, shadows.
+```
+
+**行 0 — 草地（Grass）：** 在通用前缀后追加：
+
+```
+TERRAIN TYPE: grass — vivid medium green top face #4A8A28, scattered darker green square
+pixel clusters #336618 (~30% coverage), bright yellow-green highlight pixels #6BB030,
+occasional 1-2px upward grass blade tips. Matches the bright grass block top faces in
+the voxel island reference — saturated, clean, NOT warm golden or brown.
+
+EXPOSED SIDE specifics: outermost 2px fade to #7A5030, with 1-2px irregular green grass
+blade tips poking outward along the exposed edge, organic uneven silhouette.
+
+The 16 cells (bitmask TRBL, T=Top R=Right B=Bottom L=Left, 1=connected):
+  Col 0  [0000]: isolated — all 4 sides exposed, grass center, earth fringe all around
+  Col 1  [0001]: left connected — right/top/bottom exposed
+  Col 2  [0010]: bottom connected — top/left/right exposed
+  Col 3  [0011]: bottom+left — top/right exposed, top-right corner fringe arc
+  Col 4  [0100]: right connected — left/top/bottom exposed
+  Col 5  [0101]: left+right — horizontal strip, top/bottom exposed with blade fringe
+  Col 6  [0110]: right+bottom — left/top exposed, top-left corner fringe arc
+  Col 7  [0111]: left+right+bottom — only top exposed, grass blades pointing up
+  Col 8  [1000]: top connected — bottom/left/right exposed
+  Col 9  [1001]: top+left — bottom/right exposed, bottom-right corner fringe arc
+  Col 10 [1010]: top+bottom — vertical strip, left/right exposed with blade fringe
+  Col 11 [1011]: top+left+bottom — only right exposed
+  Col 12 [1100]: top+right — bottom/left exposed, bottom-left corner fringe arc
+  Col 13 [1101]: top+right+left — only bottom exposed, grass blades pointing down
+  Col 14 [1110]: top+right+bottom — only left exposed
+  Col 15 [1111]: all connected — pure interior grass texture, no fringe anywhere
+
+Minecraft voxel pixel art, seamless autotile grass strip
+```
+
+**行 1 — 小路（Path）：** 通用前缀 + 替换 TERRAIN TYPE 和 EXPOSED SIDE：
+
+```
+TERRAIN TYPE: sandy dirt path — warm beige top face #C8A060, organic gritty pixel clusters
+in tan #A07840 (~40% coverage), scattered 1-2px dark pebble pixels #705030.
+Matches the sandy path/dirt block top faces in the voxel reference — beige-yellow, grainy.
+
+EXPOSED SIDE specifics: outermost 2px lighten to dry sandy #D4B070, occasional 1px pebble
+pixel at edge, fringe is subtle and roughly rectangular but slightly uneven.
+
+[Same 16-cell bitmask layout as grass strip above]
+
+Minecraft voxel pixel art, seamless autotile path strip
+```
+
+**行 2 — 耕地（Farmland）：** 通用前缀 + 替换：
+
+```
+TERRAIN TYPE: tilled farmland — deep chocolate brown base #4A2810, horizontal furrow lines
+every 3-4px (ridge #5E3418, furrow gap #381A08). Furrows run continuously left-to-right
+and align seamlessly across connected tiles. Matches dark tilled soil in voxel reference.
+
+EXPOSED SIDE specifics: furrows terminate cleanly at the exposed edge (1px dark #381A08).
+Edge boundary is relatively straight — man-made field feel, minimal organic fringe.
+
+[Same 16-cell bitmask layout as grass strip above]
+
+Minecraft voxel pixel art, seamless autotile farmland strip
+```
+
+**行 3 — 石地（Stone）：** 通用前缀 + 替换：
+
+```
+TERRAIN TYPE: stone ground — mid grey top face #787878, irregular crack line patterns
+(NOT regular grid noise), light grey square highlight patches #989898, dark grey crevices
+#585858. Matches grey stone block top faces in the voxel reference — blocky, clean.
+
+EXPOSED SIDE specifics: outermost 2px darken to #585858, crack lines approach edge and
+terminate. Edge has slight jagged pixel variation — broken stone feel.
+
+[Same 16-cell bitmask layout as grass strip above]
+
+Minecraft voxel pixel art, seamless autotile stone strip
+```
+
+---
+
+> **代码已就绪**：`world_generator.gd` 自行计算每格的 4 位掩码（检查上下左右相邻格是否同类型），直接用 `set_cell(Vector2i(mask, tile_type))` 写入 atlas 坐标，不依赖 Godot Terrain 系统。你只需提供符合以下布局的 atlas 图片即可直接运行。
+
+---
 
 ### 当前状态
 
 | 文件 | 尺寸 | 状态 |
 |------|------|------|
-| `assets/sprites/environment/ground_tiles.png` | 64×64 | ✅ 已按体素地形参考图更新 |
+| `assets/sprites/environment/ground_tiles.png` | **1024×256**（16列×4行，每格64×64） | ✅ 已通过内置生图源材质 + `tools/build_ground_tiles_atlas.py` 合成 |
+
+**本次源图**：`assets/sprites/environment/ground_tiles_gpt_image_2_rows_raw/`
+
+**生成方式**：内置生图分别生成草地、小路、耕地、石地 4 张顶视角无缝材质源图，再由脚本按相邻掩码规则确定性合成 16 列自动地形 atlas。这样不要求生图模型一次性精确绘制 16 列网格。
+
+**重建命令**：
+
+```bash
+python3 tools/build_ground_tiles_atlas.py \
+  --grass assets/sprites/environment/ground_tiles_gpt_image_2_rows_raw/0_grass.png \
+  --path assets/sprites/environment/ground_tiles_gpt_image_2_rows_raw/1_path.png \
+  --farmland assets/sprites/environment/ground_tiles_gpt_image_2_rows_raw/2_farmland.png \
+  --stone assets/sprites/environment/ground_tiles_gpt_image_2_rows_raw/3_stone.png \
+  --out assets/sprites/environment/ground_tiles.png
+```
 
 ---
 

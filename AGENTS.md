@@ -135,7 +135,8 @@ GrowthComponent       # 作物/动物生长状态
 ## 文档
 
 - [`docs/roadmap.md`](docs/roadmap.md) — 开发阶段规划与待办事项，按 Phase 划分，开工前更新进度
-- [`docs/art-prompts.md`](docs/art-prompts.md) — 美术资源生成提示词，含角色、环境、建筑、物品图标，Stardew Valley 风格
+- [`docs/art.md`](docs/art.md) — 美术资源生成提示词，含角色、环境、建筑、物品图标，Stardew Valley 风格
+- [`docs/map.md`](docs/map.md) — 地图设计图生成规范，含命名规则、颜色编码、AI 提示词
 
 ## 开发约定
 
@@ -150,13 +151,13 @@ GrowthComponent       # 作物/动物生长状态
 
 ## 美术资产比例同步规则
 
-**任何时候修改了以下任一项，必须同步更新 `docs/art-prompts.md` 中对应的比例字段：**
+**任何时候修改了以下任一项，必须同步更新 `docs/art.md` 中对应的比例字段：**
 
 - 角色 / 怪物 / NPC 的 `AnimatedSprite2D.scale`
 - 环境物件 / 建筑的 `Sprite2D.scale`
 - 玩家 `Camera2D.zoom`
 
-**原因**：`docs/art-prompts.md` 是美术资产生成的唯一参考文档。文档与代码不一致时，AI 生成的新资产会因比例错误无法直接用于游戏。
+**原因**：`docs/art.md` 是美术资产生成的唯一参考文档。文档与代码不一致时，AI 生成的新资产会因比例错误无法直接用于游戏。
 
 ### 当前基准
 
@@ -169,7 +170,7 @@ GrowthComponent       # 作物/动物生长状态
 
 ### 更新方式
 
-修改 `.tscn` 中的 scale/zoom 后，在 `docs/art-prompts.md` 的"精灵表格式约定"表和对应章节中同步更新：
+修改 `.tscn` 中的 scale/zoom 后，在 `docs/art.md` 的"精灵表格式约定"表和对应章节中同步更新：
 - `scene scale` 列
 - `游戏世界渲染尺寸` 列
 - `屏幕像素` 列（= 世界尺寸 × zoom）
