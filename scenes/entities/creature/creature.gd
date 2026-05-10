@@ -98,11 +98,13 @@ func _pick_wander_target() -> void:
 	_wander_timer = randf_range(3.0, 7.0)
 
 func _setup_sprite_frames() -> void:
-	if not data or data.sprite_path.is_empty():
+	if not data:
 		return
-	var tex := load(data.sprite_path) as Texture2D
+	var tex: Texture2D
+	if not data.sprite_path.is_empty():
+		tex = load(data.sprite_path) as Texture2D
 	if tex == null:
-		return
+		tex = _make_fallback_texture()
 	var fw := tex.get_width() / 4
 	var fh := tex.get_height() / 4
 	var frames := SpriteFrames.new()
@@ -121,6 +123,27 @@ func _setup_sprite_frames() -> void:
 			frames.add_frame(anim_name, atlas)
 	visual.sprite_frames = frames
 	visual.play("walk_down")
+
+
+func _make_fallback_texture() -> ImageTexture:
+	const FW := 128
+	const FH := 256
+	var img := Image.create(FW * 4, FH * 4, false, Image.FORMAT_RGBA8)
+	var hue := absf(float(data.id.hash() % 1000) / 1000.0)
+	var fill_col := Color.from_hsv(hue, 0.55, 0.75)
+	var edge_col := Color.from_hsv(hue, 0.80, 0.35)
+	img.fill(fill_col)
+	for row in 4:
+		for ci in 4:
+			var x0 := ci * FW
+			var y0 := row * FH
+			for px in FW:
+				img.set_pixel(x0 + px, y0, edge_col)
+				img.set_pixel(x0 + px, y0 + FH - 1, edge_col)
+			for py in FH:
+				img.set_pixel(x0, y0 + py, edge_col)
+				img.set_pixel(x0 + FW - 1, y0 + py, edge_col)
+	return ImageTexture.create_from_image(img)
 
 
 func _update_facing() -> void:

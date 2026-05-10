@@ -2,7 +2,6 @@
   {
     "id": "chicken",
     "display_name": "鸡",
-    "sprite_path": "res://assets/sprites/characters/chicken.png",
     "feed_item_id": "animal_feed",
     "produce_item_id": "chicken_egg",
     "produce_amount": 1,

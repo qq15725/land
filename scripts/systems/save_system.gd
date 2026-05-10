@@ -114,13 +114,15 @@ func _save_resource_nodes(world: Node2D) -> Array:
 	for node in world.get_node("YSortLayer").get_children():
 		if node is ResourceNode:
 			result.append({
-				"type": node.scene_file_path,
+				"resource_id": node.resource_id,
 				"x": node.global_position.x,
 				"y": node.global_position.y,
 				"depleted": node.is_depleted(),
 				"regen_timer": node.get_regen_timer(),
 			})
 	return result
+
+const _ResourceNodeScene := preload("res://scenes/world/resource.tscn")
 
 func _load_resource_nodes(world: Node2D, data: Array) -> void:
 	var layer: Node2D = world.get_node("YSortLayer")
@@ -129,10 +131,11 @@ func _load_resource_nodes(world: Node2D, data: Array) -> void:
 			node.queue_free()
 	await world.get_tree().process_frame
 	for entry in data:
-		var scene := load(entry.get("type", "")) as PackedScene
-		if not scene:
+		var rid: String = entry.get("resource_id", "")
+		if rid.is_empty():
 			continue
-		var node: ResourceNode = scene.instantiate()
+		var node: ResourceNode = _ResourceNodeScene.instantiate()
+		node.resource_id = rid
 		node.global_position = Vector2(entry.get("x", 0.0), entry.get("y", 0.0))
 		layer.add_child(node)
 		if entry.get("depleted", false):

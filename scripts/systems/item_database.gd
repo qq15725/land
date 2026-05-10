@@ -71,7 +71,7 @@ func _load_animals() -> void:
 		var a := AnimalData.new()
 		a.id = d.get("id", "")
 		a.display_name = d.get("display_name", "")
-		a.sprite_path = d.get("sprite_path", "")
+		a.sprite_path = "res://assets/animals/%s.png" % a.id
 		a.feed_item_id = d.get("feed_item_id", "")
 		a.produce_item_id = d.get("produce_item_id", "")
 		a.produce_amount = d.get("produce_amount", 1)
@@ -86,7 +86,7 @@ func _load_creatures() -> void:
 		var c := CreatureData.new()
 		c.id = d.get("id", "")
 		c.display_name = d.get("display_name", "")
-		c.sprite_path = d.get("sprite_path", "")
+		c.sprite_path = "res://assets/creatures/%s.png" % c.id
 		c.max_health = d.get("max_health", 30.0)
 		c.move_speed = d.get("move_speed", 60.0)
 		c.attack_damage = d.get("attack_damage", 8.0)
@@ -119,17 +119,20 @@ func _load_merchants() -> void:
 		_merchants.append(m)
 
 func _load_resource_nodes() -> void:
-	for d in _read_json("res://data/resource_nodes.json"):
+	for d in _read_json("res://data/resources.json"):
 		var n := ResourceNodeData.new()
 		n.id = d.get("id", "")
 		n.display_name = d.get("display_name", "")
-		n.scene_path = d.get("scene_path", "")
-		n.sprite_path = d.get("sprite_path", "")
 		n.drop_item_id = d.get("drop_item_id", "")
 		n.drop_amount = d.get("drop_amount", 3)
 		n.respawn_time = d.get("respawn_time", 30.0)
 		n.tool_required = d.get("tool_required", "")
 		n.spawn_weight = d.get("spawn_weight", 1.0)
+		var cs: Array = d.get("collision_size", [16, 16])
+		n.collision_size = Vector2(cs[0], cs[1])
+		n.collision_offset_y = d.get("collision_offset_y", 0.0)
+		n.visual_offset_y = d.get("visual_offset_y", 0.0)
+		n.frame_height = d.get("frame_height", 64)
 		_resource_nodes.append(n)
 
 func _resolve_refs() -> void:

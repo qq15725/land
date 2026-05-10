@@ -1,29 +1,21 @@
-[gd_scene load_steps=6 format=3 uid="uid://treenode0001"]
+[gd_scene format=3 uid="uid://resnode0001"]
 
-[ext_resource type="Script" path="res://scenes/world/resource_nodes/tree_node.gd" id="1_tn"]
-[ext_resource type="Texture2D" path="res://assets/sprites/environment/tree.png" id="2_tex"]
+[ext_resource type="Script" path="res://scenes/world/resource.gd" id="1_rn"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
-size = Vector2(12, 20)
+size = Vector2(16, 16)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 45.0
 
-[node name="TreeNode" type="StaticBody2D"]
-script = ExtResource("1_tn")
-drop_amount = 3
-respawn_time = 30.0
+[node name="ResourceNode" type="StaticBody2D"]
+script = ExtResource("1_rn")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_1")
 
 [node name="Visual" type="Sprite2D" parent="."]
-position = Vector2(0, -24)
 scale = Vector2(0.25, 0.25)
-texture = ExtResource("2_tex")
-region_enabled = true
-region_rect = Rect2(0, 0, 128, 192)
 
 [node name="InteractArea" type="Area2D" parent="."]
 

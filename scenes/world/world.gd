@@ -1,6 +1,7 @@
 extends Node2D
 
 const CreatureScene := preload("res://scenes/entities/creature/creature.tscn")
+const ResourceNodeScene := preload("res://scenes/world/resource.tscn")
 const HUDScene := preload("res://scenes/ui/hud.tscn")
 const InventoryUIScene := preload("res://scenes/ui/inventory_ui.tscn")
 const CraftingUIScene := preload("res://scenes/ui/crafting_ui.tscn")
@@ -15,6 +16,10 @@ const MIN_SPAWN_DIST := 80.0
 const CREATURE_SPAWN_RADIUS := 500.0
 const CREATURE_MIN_DIST := 200.0
 
+const TILE_SIZE := 16.0
+const PORTAL_RADIUS := 2        # 触发范围（格）
+const PORTAL_COOLDOWN := 1.5    # 切换后冷却（秒），防止瞬间反复触发
+
 @onready var y_sort_layer: Node2D = $YSortLayer
 @onready var player: Player = $YSortLayer/Player
 
@@ -27,6 +32,7 @@ var terrain_map: TileMap = null
 var terrain_seed: int = 0
 var map_markers: Dictionary = {}   # "next_0"/"next_1"/"next_2"/"prev" → Vector2i
 var current_map_id: String = ""    # 当前地图 id，如 "0"、"0-1"
+var _portal_cooldown: float = 0.0
 
 
 func _ready() -> void:
@@ -59,6 +65,59 @@ func _load_map(map_id: String) -> void:
 func _gen_random() -> void:
 	terrain_seed = randi()
 	WorldGenerator.generate(terrain_map, terrain_seed)
+
+
+func _check_portals(delta: float) -> void:
+	if map_markers.is_empty() or GameManager.world_type != "preset":
+		return
+	if _portal_cooldown > 0.0:
+		_portal_cooldown -= delta
+		return
+	var pt := Vector2i(
+		floori(player.global_position.x / TILE_SIZE),
+		floori(player.global_position.y / TILE_SIZE)
+	)
+	for key in map_markers:
+		var mt: Vector2i = map_markers[key]
+		if absi(pt.x - mt.x) <= PORTAL_RADIUS and absi(pt.y - mt.y) <= PORTAL_RADIUS:
+			_travel(key)
+			return
+
+
+func _travel(marker_key: String) -> void:
+	var target_id: String
+	var spawn_key: String
+
+	if marker_key.begins_with("next_"):
+		var idx := marker_key.substr(5)          # "0" / "1" / "2"
+		target_id = current_map_id + "-" + idx
+		spawn_key = "prev"
+	elif marker_key == "prev":
+		if not "-" in current_map_id:
+			return                               # 根节点无父级
+		var last_dash := current_map_id.rfind("-")
+		var last_idx := current_map_id.substr(last_dash + 1)
+		target_id = current_map_id.substr(0, last_dash)
+		spawn_key = "next_" + last_idx
+	else:
+		return
+
+	# 清除当前地图的临时实体
+	for node in y_sort_layer.get_children():
+		if node is ResourceNode or node is Creature:
+			node.queue_free()
+
+	_load_map(target_id)
+	_scatter_resources()
+	_portal_cooldown = PORTAL_COOLDOWN
+
+	# 传送玩家到目标地图入口
+	if spawn_key in map_markers:
+		var st: Vector2i = map_markers[spawn_key]
+		player.global_position = Vector2(
+			st.x * TILE_SIZE + TILE_SIZE * 0.5,
+			st.y * TILE_SIZE + TILE_SIZE * 0.5
+		)
 
 
 func _setup_terrain() -> void:
@@ -114,10 +173,11 @@ func _setup_ui() -> void:
 	var mobile_controls: Node = load("res://scenes/ui/mobile_controls.gd").new()
 	add_child(mobile_controls)
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if _build_preview:
 		_build_preview.global_position = get_global_mouse_position()
 	_update_day_overlay()
+	_check_portals(delta)
 
 func _update_day_overlay() -> void:
 	if TimeSystem.is_night():
@@ -199,9 +259,8 @@ func _scatter_resources() -> void:
 			if roll <= accumulated:
 				chosen = nd
 				break
-		if chosen.scene_path.is_empty():
-			continue
-		var node: ResourceNode = (load(chosen.scene_path) as PackedScene).instantiate()
+		var node: ResourceNode = ResourceNodeScene.instantiate()
+		node.resource_id = chosen.id
 		node.position = _random_pos(rng, MIN_SPAWN_DIST, SPAWN_RADIUS)
 		y_sort_layer.add_child(node)
 

@@ -2,7 +2,6 @@
   {
     "id": "slime",
     "display_name": "史莱姆",
-    "sprite_path": "res://assets/sprites/characters/slime.png",
     "max_health": 25.0,
     "move_speed": 55.0,
     "attack_damage": 6.0,
@@ -17,7 +16,6 @@
   {
     "id": "skeleton",
     "display_name": "骷髅",
-    "sprite_path": "res://assets/sprites/characters/skeleton.png",
     "max_health": 40.0,
     "move_speed": 75.0,
     "attack_damage": 12.0,

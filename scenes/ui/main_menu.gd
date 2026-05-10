@@ -13,6 +13,7 @@ const C_LABEL    := Color(0.70, 0.65, 0.50)
 var _update_btn: Button = null
 var _new_game_panel: Control = null
 var _update_dialog: Control = null
+var _slots_vbox: VBoxContainer = null
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -132,12 +133,11 @@ func _build_right_panel() -> Control:
 	slots_margin.add_theme_constant_override("margin_bottom", 12)
 	slots_panel.add_child(slots_margin)
 
-	var slots_vbox := VBoxContainer.new()
-	slots_vbox.add_theme_constant_override("separation", 8)
-	slots_margin.add_child(slots_vbox)
+	_slots_vbox = VBoxContainer.new()
+	_slots_vbox.add_theme_constant_override("separation", 8)
+	slots_margin.add_child(_slots_vbox)
 
-	for i in SaveSystem.MAX_SLOTS:
-		slots_vbox.add_child(_make_slot_button(i))
+	_refresh_slots()
 
 	# 底部工具按钮行
 	var spacer := Control.new()
@@ -163,10 +163,22 @@ func _build_right_panel() -> Control:
 	return right
 
 
-func _make_slot_button(slot: int) -> Button:
+func _refresh_slots() -> void:
+	for child in _slots_vbox.get_children():
+		child.queue_free()
+	for i in SaveSystem.MAX_SLOTS:
+		_slots_vbox.add_child(_make_slot_row(i))
+
+
+func _make_slot_row(slot: int) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+
 	var btn := Button.new()
-	btn.custom_minimum_size = Vector2(300, 48)
+	btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	btn.custom_minimum_size = Vector2(0, 48)
 	btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+
 	if SaveSystem.slot_exists(slot):
 		var info := SaveSystem.get_slot_info(slot)
 		btn.text = "  存档 %d    第 %d 天  %s" % [
@@ -175,10 +187,35 @@ func _make_slot_button(slot: int) -> Button:
 			"夜晚" if info.get("phase") == "night" else "白天",
 		]
 		btn.pressed.connect(func(): _start_game(slot))
+
+		var del_btn := Button.new()
+		del_btn.custom_minimum_size = Vector2(56, 48)
+		del_btn.text = "删除"
+		del_btn.modulate = Color(1.0, 0.6, 0.6)
+		del_btn.pressed.connect(func(): _on_delete_pressed(del_btn, slot))
+		row.add_child(btn)
+		row.add_child(del_btn)
 	else:
 		btn.text = "  存档 %d    （空档位）" % (slot + 1)
 		btn.pressed.connect(func(): _show_new_game_panel(slot))
-	return btn
+		row.add_child(btn)
+
+	return row
+
+
+func _on_delete_pressed(del_btn: Button, slot: int) -> void:
+	if del_btn.text == "确认？":
+		SaveSystem.delete_slot(slot)
+		_refresh_slots()
+	else:
+		del_btn.text = "确认？"
+		del_btn.modulate = Color(1.0, 0.3, 0.3)
+		# 3 秒后自动复原
+		get_tree().create_timer(3.0).timeout.connect(func():
+			if is_instance_valid(del_btn):
+				del_btn.text = "删除"
+				del_btn.modulate = Color(1.0, 0.6, 0.6)
+		, CONNECT_ONE_SHOT)
 
 
 func _on_check_update_pressed() -> void:
