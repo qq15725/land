@@ -612,3 +612,136 @@ Minecraft pixel art UI, clean edges, consistent dark grey palette, transparent b
 | 标题栏 | `DraggablePanel` 标题行背景 | `StyleBoxTexture`，`h_axis_stretch_mode = TILE` |
 | 昼夜图标 | HUD `TextureRect` | 根据 `TimeSystem` 切换 sun / moon 帧 |
 | 当前物品框 | HUD 选中格 | `TextureRect` 叠在格子背景上 |
+
+---
+
+## 主菜单专用美术
+
+> 主菜单采用独立的暖木/羊皮纸风格，与游戏内 UI 的深灰石头风格分开。参考 `docs/references/main_menu_concept_v1.png`。
+
+### 资产列表
+
+| 文件 | 尺寸 | 9-patch 边距 | 用途 | 状态 |
+|------|------|------------|------|------|
+| `assets/sprites/ui/main_menu_bg.png` | 1280×720 | — | 全屏背景插图 | ⏳ 待生成 |
+| `assets/sprites/ui/title_land.png` | 384×128 | — | "Land" 装饰标题 Logo | ⏳ 待生成 |
+| `assets/sprites/ui/panel_wood.png` | 192×192 | 32px | 存档槽面板木质框（9-patch） | ⏳ 待生成 |
+| `assets/sprites/ui/slot_frame.png` | 192×80 | 12px | 单个存档槽内框（9-patch） | ⏳ 待生成 |
+| `assets/sprites/ui/save_thumb_farm.png` | 128×80 | — | 有存档时的缩略图（农场场景） | ⏳ 待生成 |
+| `assets/sprites/ui/save_thumb_empty.png` | 128×80 | — | 空存档位缩略图（灰色占位） | ⏳ 待生成 |
+| `assets/sprites/ui/menu_icons.png` | 128×32 | — | 图标条带：叶片/齿轮/出门，各 32×32 | ⏳ 待生成 |
+| `assets/sprites/ui/btn_green.png` | 192×48 | 16px | 绿色按钮（检查更新），3态竖排 192×144 | ⏳ 待生成 |
+| `assets/sprites/ui/btn_brown.png` | 192×48 | 16px | 棕色按钮（退出游戏），3态竖排 192×144 | ⏳ 待生成 |
+| `assets/sprites/ui/icon_trash.png` | 32×32 | — | 红色垃圾桶图标（删除存档） | ⏳ 待生成 |
+
+---
+
+### 提示词
+
+**1. 主菜单背景（main_menu_bg.png）**
+
+```
+Pixel art game main menu background, 1280x720 pixels.
+Warm dusk/sunset scene: orange-purple gradient sky, silhouette of pine trees in background.
+Center-left: cozy wooden log cabin farmhouse with lit windows (warm yellow glow inside),
+thatched or wooden roof, stone chimney. Foreground: small garden with corn crops and
+flower bushes, low wooden fence, one garden lantern with warm light glow.
+Right side: some wooden crates and barrels stacked. Ground is dark green grass.
+Overall mood: warm, cozy, inviting. Rich pixel art detail, Stardew Valley aesthetic.
+No characters, no UI elements, no text.
+Pixel art style, 16-bit color palette, dithering for sky gradient, detailed background scene.
+```
+
+**2. "Land" 标题 Logo（title_land.png）**
+
+```
+Pixel art game title logo, 384x128 pixels, transparent background.
+The word "LAND" in large decorative pixel lettering.
+Style: carved wooden sign / medieval tavern sign aesthetic.
+Letters are thick blocky pixel art, warm golden-brown color (#C8901A),
+with darker brown outline/shadow (#7A4A10) and bright highlight pixels (#F0C060)
+on top-left of each letter stroke. Slight wood grain texture implied.
+No border frame, just the text. Centered on canvas.
+Pixel art, game logo style, transparent background.
+```
+
+**3. 木质面板框 9-patch（panel_wood.png）**
+
+```
+Pixel art decorative wooden panel frame, 192x192 pixels.
+Warm brown wood texture fill (#8B5A2B base, #6B3A1B darker grain lines, #A07040 highlight).
+Border: 32px thick decorative carved wood frame on all sides.
+Corners: slightly ornate square carved detail.
+Interior: slightly lighter warm parchment/paper fill (#D4B88A).
+Clean hard pixel edges, no gradients, 2-3 tone shading per wood plank face.
+Suitable for 9-slice scaling with 32px corner margins.
+Minecraft-style pixel art, transparent background not needed (opaque fill).
+```
+
+**4. 单存档槽内框 9-patch（slot_frame.png）**
+
+```
+Pixel art save slot inner frame, 192x80 pixels.
+Thin decorative border (12px) in warm dark wood (#5A3010).
+Interior fill: slightly darker parchment (#C4A87A), slightly recessed look.
+Left 100px area: darker recessed box for thumbnail preview (#9A7850 border, #3A2810 fill).
+Right area: lighter for text content.
+Hard pixel edges, no gradients.
+Suitable for 9-slice scaling with 12px margins.
+```
+
+**5. 存档缩略图（save_thumb_farm.png）**
+
+```
+Pixel art farm scene thumbnail, 128x80 pixels.
+Top-down slightly angled view of a small farm: green grass field,
+small farmhouse silhouette top-left, plowed soil rows center, one tree.
+Warm afternoon lighting, saturated colors.
+Stardew Valley pixel art style, very small scale, readable key shapes.
+No UI, no text.
+```
+
+**6. 空档位缩略图（save_thumb_empty.png）**
+
+```
+Pixel art empty placeholder thumbnail, 128x80 pixels.
+Dark grey/brown muted background (#3A3028), simple pixel art question mark "?"
+in center in medium grey (#787060), subtle border.
+Implies "no save data". Dark and subdued.
+Pixel art style.
+```
+
+**7. 图标条带（menu_icons.png）**
+
+```
+Pixel art icon strip, 128x32 pixels, 4 icons side by side (each 32x32), transparent background.
+Icon 1 (col 0): green leaf — simple 2-3 tone pixel leaf shape, bright green
+Icon 2 (col 1): gear/cog — grey mechanical gear, 8-tooth, pixel art
+Icon 3 (col 2): door with arrow — brown wooden door with right-pointing arrow, "exit" symbol
+Icon 4 (col 3): trash bin — red open-top bin with vertical line detail, delete symbol
+Hard square pixel edges, flat 2-3 tone fills, Minecraft inventory icon style.
+```
+
+**8. 绿色按钮 3-态（btn_green.png）**
+
+```
+Pixel art button sprite sheet, 192x144 pixels, 3 states stacked vertically (each 192x48).
+Color scheme: green (#4A8A3A base, #336628 dark, #6BB050 highlight).
+State 0 (normal): flat green slab with lighter top-left edge highlight, dark bottom-right edge.
+State 1 (hover): slightly brighter green, 2px bright pixel outline on top and left.
+State 2 (pressed): darker green, no top highlight, slight inset look.
+All states: 16px rounded-square border in darker green. Hard pixel edges, no gradients.
+Minecraft-style pixel art button, opaque.
+```
+
+**9. 棕色按钮 3-态（btn_brown.png）**
+
+```
+Pixel art button sprite sheet, 192x144 pixels, 3 states stacked vertically (each 192x48).
+Color scheme: warm brown/tan (#8B6040 base, #6B4020 dark, #B08060 highlight).
+Same structure as green button above but with warm brown palette.
+State 0 (normal): flat brown slab with highlight/shadow edges.
+State 1 (hover): slightly lighter, pixel outline.
+State 2 (pressed): darker, inset look.
+Minecraft-style pixel art button, opaque.
+```
