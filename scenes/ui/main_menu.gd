@@ -233,12 +233,13 @@ func _make_slot_row(slot: int) -> Button:
 	for state in ["normal", "hover", "pressed", "focus"]:
 		var s := StyleBoxTexture.new()
 		s.texture = slot_tex
-		s.texture_margin_left   = 8
+		# slot_frame.png 左侧 100px 是深色缩略图区，固定不拉伸
+		s.texture_margin_left   = 100
 		s.texture_margin_right  = 8
 		s.texture_margin_top    = 8
 		s.texture_margin_bottom = 8
-		s.content_margin_left   = 10
-		s.content_margin_right  = 10
+		s.content_margin_left   = 8
+		s.content_margin_right  = 8
 		s.content_margin_top    = 8
 		s.content_margin_bottom = 8
 		if state in ["hover", "pressed"]:

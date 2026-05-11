@@ -642,27 +642,32 @@ Minecraft pixel art UI, clean edges, consistent dark grey palette, transparent b
 
 ```
 Pixel art game main menu background, 1280x720 pixels.
-Warm dusk/sunset scene: orange-purple gradient sky, silhouette of pine trees in background.
-Center-left: cozy wooden log cabin farmhouse with lit windows (warm yellow glow inside),
-thatched or wooden roof, stone chimney. Foreground: small garden with corn crops and
-flower bushes, low wooden fence, one garden lantern with warm light glow.
-Right side: some wooden crates and barrels stacked. Ground is dark green grass.
-Overall mood: warm, cozy, inviting. Rich pixel art detail, Stardew Valley aesthetic.
+Evening/twilight scene: deep blue-purple sky (#1A1030 top, #2A1850 mid, #3A2060 horizon),
+a few small stars visible near top. Silhouette of dark pine trees lining both sides.
+Center-left: cozy wooden log cabin farmhouse with warmly lit windows (amber glow #C07020),
+wooden roof, stone chimney with faint smoke. Foreground: small garden with corn crops,
+flower bushes, low wooden fence, one garden lantern casting warm pool of light.
+Right side: wooden crates and barrels stacked in shadow.
+Ground: dark green-grey grass (#1A2A10).
+Overall mood: quiet, atmospheric, slightly mysterious evening. Rich pixel art detail,
+Stardew Valley aesthetic. Left side of scene darker/more open to leave room for UI text.
 No characters, no UI elements, no text.
-Pixel art style, 16-bit color palette, dithering for sky gradient, detailed background scene.
+Pixel art style, 16-bit color palette, detailed background scene.
 ```
 
 **2. "Land" 标题 Logo（title_land.png）**
 
 ```
 Pixel art game title logo, 384x128 pixels, transparent background.
-The word "LAND" in large decorative pixel lettering.
-Style: carved wooden sign / medieval tavern sign aesthetic.
-Letters are thick blocky pixel art, warm golden-brown color (#C8901A),
-with darker brown outline/shadow (#7A4A10) and bright highlight pixels (#F0C060)
-on top-left of each letter stroke. Slight wood grain texture implied.
-No border frame, just the text. Centered on canvas.
-Pixel art, game logo style, transparent background.
+The word "Land" (mixed case: capital L, lowercase a-n-d) in large decorative lettering.
+Style: hand-carved wooden tavern sign — letters have organic, slightly irregular strokes,
+NOT perfectly geometric pixel blocks. Warm golden-amber color (#D4901A base),
+rich dark brown shadow/outline (#6A3A08) giving depth, bright highlight line (#F8D060)
+along top-left edge of each letter stroke. Letters feel thick and three-dimensional,
+like wood carved in relief. Slight wood grain texture implied in the letter fills.
+Overall: warm, rustic, inviting — like a Stardew Valley title card.
+No border frame, just the text. Centered on canvas. Transparent background.
+Pixel art style, NOT blocky all-caps, NOT monospace grid lettering.
 ```
 
 **3. 木质面板框 9-patch（panel_wood.png）**
@@ -715,11 +720,16 @@ Pixel art style.
 
 ```
 Pixel art icon strip, 128x32 pixels, 4 icons side by side (each 32x32), transparent background.
-Icon 1 (col 0): green leaf — simple 2-3 tone pixel leaf shape, bright green
-Icon 2 (col 1): gear/cog — grey mechanical gear, 8-tooth, pixel art
-Icon 3 (col 2): door with arrow — brown wooden door with right-pointing arrow, "exit" symbol
-Icon 4 (col 3): trash bin — red open-top bin with vertical line detail, delete symbol
-Hard square pixel edges, flat 2-3 tone fills, Minecraft inventory icon style.
+Each icon is a circular BADGE / MEDALLION style: a round frame (dark green #2A4A1A border,
+2px thick) filled with medium green (#3A6A28), with a small pixel art symbol in center.
+Badge gives a 3D coin/emblem appearance: bright highlight arc top-left (#6AB050),
+dark shadow arc bottom-right (#1A3010).
+Icon 1 (col 0): small green leaf / sprout inside badge
+Icon 2 (col 1): small grey gear / cog inside badge
+Icon 3 (col 2): small brown door with arrow inside badge
+Icon 4 (col 3): small red trash bin inside badge
+Overall: round embossed badge style, NOT flat icons. Looks like collectible pins or coat-of-arms.
+Transparent background, hard pixel edges.
 ```
 
 **8. 绿色按钮 3-态（btn_green.png）**
