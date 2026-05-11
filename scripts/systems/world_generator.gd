@@ -11,8 +11,10 @@ const TILE_FARMLAND := 2
 const TILE_STONE    := 3
 const TILE_TYPE_COUNT := 4
 
-# Atlas：16 列（掩码 0–15）× 4 行（地砖类型）
-const MASK_COUNT := 16
+# Atlas：基础 16 列（mask 0–15）+ 变体列，× 4 行（地砖类型）
+const MASK_COUNT    := 16
+const VARIANT_COUNT := 3    # mask=15 的额外装饰变体（列 16-18）
+const TOTAL_COLS    := MASK_COUNT + VARIANT_COUNT
 
 # ── 可调参数 ─────────────────────────────────────────────
 # 耕地：以原点为圆心，半径内为起始农场
@@ -42,7 +44,7 @@ func create_tileset() -> TileSet:
 	var src := TileSetAtlasSource.new()
 	src.texture = _load_tile_texture()
 	src.texture_region_size = Vector2i(64, 64)
-	for col in range(MASK_COUNT):
+	for col in range(TOTAL_COLS):
 		for row in range(TILE_TYPE_COUNT):
 			src.create_tile(Vector2i(col, row))
 	ts.add_source(src, SOURCE_ID)
@@ -59,7 +61,7 @@ func generate(tilemap: TileMap, seed_val: int) -> void:
 		for x in range(-MAP_HALF, MAP_HALF):
 			var tile_type: int = map[_idx(x, y)]
 			var mask := _compute_mask(map, x, y)
-			tilemap.set_cell(0, Vector2i(x, y), SOURCE_ID, Vector2i(mask, tile_type))
+			tilemap.set_cell(0, Vector2i(x, y), SOURCE_ID, Vector2i(_variant_col(mask, x, y, seed_val), tile_type))
 
 
 # ─────────────────────────────────────────────────────────
@@ -250,12 +252,14 @@ func generate_from_image(tilemap: TileMap, image_path: String) -> Dictionary:
 			else:
 				map[iy * img_w + ix] = _match_terrain_color(col)
 
+	var map_seed := hash(image_path)
 	tilemap.clear()
 	for iy in img_h:
 		for ix in img_w:
 			var tile_type: int = map[iy * img_w + ix]
 			var mask := _compute_mask_img(map, ix, iy, img_w, img_h)
-			tilemap.set_cell(0, Vector2i(ix - half_w, iy - half_h), SOURCE_ID, Vector2i(mask, tile_type))
+			tilemap.set_cell(0, Vector2i(ix - half_w, iy - half_h), SOURCE_ID,
+					Vector2i(_variant_col(mask, ix, iy, map_seed), tile_type))
 
 	return markers
 
@@ -324,6 +328,22 @@ func _compute_mask(map: Array, x: int, y: int) -> int:
 	return mask
 
 
+# mask=15（四周全同地形）时按位置哈希选变体列，其他 mask 原样返回
+# 用乘法哈希而非 RNG，确保每格结果与遍历顺序无关
+func _variant_col(mask: int, x: int, y: int, seed_val: int) -> int:
+	if mask != 15:
+		return mask
+	var h := (x * 1973 + y * 9277 + seed_val * 4099) & 0x7FFFFFFF
+	var roll := h % 100
+	if roll < 60:
+		return 15   # 60% 基础格
+	if roll < 82:
+		return 16   # 22% 草丛变体
+	if roll < 94:
+		return 17   # 12% 野花变体
+	return 18       # 6%  噪点变体
+
+
 func _make_noise(seed_val: int, freq: float, octaves: int) -> FastNoiseLite:
 	var n := FastNoiseLite.new()
 	n.noise_type          = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
@@ -355,10 +375,12 @@ func _gen_fallback_texture() -> ImageTexture:
 		Color(0.47, 0.47, 0.47),
 	]
 	const CELL := 64
-	var img := Image.create(MASK_COUNT * CELL, TILE_TYPE_COUNT * CELL, false, Image.FORMAT_RGBA8)
-	for col in range(MASK_COUNT):
+	var img := Image.create(TOTAL_COLS * CELL, TILE_TYPE_COUNT * CELL, false, Image.FORMAT_RGBA8)
+	for col in range(TOTAL_COLS):
 		for row in range(TILE_TYPE_COUNT):
 			var c: Color = colors[row]
+			if col >= MASK_COUNT:
+				c = c.darkened(0.12)  # 变体列稍暗，便于无美术时目视区分
 			for py in range(CELL):
 				for px in range(CELL):
 					img.set_pixel(col * CELL + px, row * CELL + py, c)
