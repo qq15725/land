@@ -66,36 +66,51 @@ func _build_left() -> Control:
 	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
 	vbox.add_theme_constant_override("separation", 10)
 
+	# 标题图：384×128，以 3:1 比例缩放到合理大小
 	var title := TextureRect.new()
 	title.texture = load("res://assets/sprites/ui/title_land.png")
 	title.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	title.custom_minimum_size = Vector2(320, 100)
+	title.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	title.custom_minimum_size = Vector2(220, 74)
+	title.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	vbox.add_child(title)
 
 	var sub := Label.new()
 	sub.text = "休闲生存经营"
 	sub.add_theme_font_size_override("font_size", 15)
 	sub.modulate = C_SUB
+	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(sub)
 
 	var sp := Control.new()
 	sp.custom_minimum_size = Vector2(0, 20)
 	vbox.add_child(sp)
 
-	var icon_tex := load("res://assets/sprites/ui/menu_icons.png") as Texture2D
-	for line in ["采集・建造・种菜", "养殖・交易・探索"]:
+	# menu_icons.png：128×32，4 个 32×32 图标（叶片/齿轮/箱子/垃圾桶）
+	var icon_sheet := load("res://assets/sprites/ui/menu_icons.png") as Texture2D
+	var feature_entries: Array = [
+		[Rect2(0, 0, 32, 32),  "采集・建造・种菜"],
+		[Rect2(64, 0, 32, 32), "养殖・交易・探索"],
+	]
+	for entry in feature_entries:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 8)
+		row.alignment = BoxContainer.ALIGNMENT_CENTER
 
-		var leaf := TextureRect.new()
-		leaf.texture = icon_tex
-		leaf.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		leaf.custom_minimum_size = Vector2(16, 16)
-		leaf.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		row.add_child(leaf)
+		var atlas := AtlasTexture.new()
+		atlas.atlas = icon_sheet
+		atlas.region = entry[0] as Rect2
+
+		var icon := TextureRect.new()
+		icon.texture = atlas
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.custom_minimum_size = Vector2(22, 22)
+		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(icon)
 
 		var lbl := Label.new()
-		lbl.text = line
+		lbl.text = entry[1] as String
 		lbl.add_theme_font_size_override("font_size", 14)
 		lbl.modulate = C_FEATURE
 		row.add_child(lbl)
@@ -111,16 +126,17 @@ func _build_right() -> Control:
 	wrapper.size_flags_stretch_ratio = 0.58
 	wrapper.alignment = BoxContainer.ALIGNMENT_CENTER
 
+	# panel_wood.png：192×192，木框边约 18px
 	var panel := PanelContainer.new()
 	var ps := StyleBoxTexture.new()
 	ps.texture = load("res://assets/sprites/ui/panel_wood.png")
-	ps.texture_margin_left   = 32
-	ps.texture_margin_right  = 32
-	ps.texture_margin_top    = 32
-	ps.texture_margin_bottom = 32
+	ps.texture_margin_left   = 18
+	ps.texture_margin_right  = 18
+	ps.texture_margin_top    = 18
+	ps.texture_margin_bottom = 18
 	ps.content_margin_left   = 20
 	ps.content_margin_right  = 20
-	ps.content_margin_top    = 20
+	ps.content_margin_top    = 14
 	ps.content_margin_bottom = 20
 	panel.add_theme_stylebox_override("panel", ps)
 	wrapper.add_child(panel)
@@ -128,6 +144,20 @@ func _build_right() -> Control:
 	var inner := VBoxContainer.new()
 	inner.add_theme_constant_override("separation", 10)
 	panel.add_child(inner)
+
+	# 顶部叶片装饰
+	var header := CenterContainer.new()
+	header.custom_minimum_size = Vector2(0, 4)
+	inner.add_child(header)
+	var emblem_atlas := AtlasTexture.new()
+	emblem_atlas.atlas = load("res://assets/sprites/ui/menu_icons.png")
+	emblem_atlas.region = Rect2(0, 0, 32, 32)
+	var emblem := TextureRect.new()
+	emblem.texture = emblem_atlas
+	emblem.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	emblem.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	emblem.custom_minimum_size = Vector2(24, 24)
+	header.add_child(emblem)
 
 	_slots_vbox = VBoxContainer.new()
 	_slots_vbox.add_theme_constant_override("separation", 8)
@@ -154,24 +184,34 @@ func _build_right() -> Control:
 	return wrapper
 
 
+# tex_path 指向 192×144 三状态竖排精灵表（normal/hover/pressed，各 48px 高）
 func _make_action_btn(txt: String, tex_path: String) -> Button:
 	var btn := Button.new()
 	btn.text = txt
 	btn.custom_minimum_size = Vector2(148, 42)
 	btn.add_theme_font_size_override("font_size", 13)
 	btn.add_theme_color_override("font_color", Color.WHITE)
-	var tex := load(tex_path) as Texture2D
+	var sheet := load(tex_path) as Texture2D
+	var state_regions := {
+		"normal":  Rect2(0, 0,  192, 48),
+		"hover":   Rect2(0, 48, 192, 48),
+		"pressed": Rect2(0, 96, 192, 48),
+		"focus":   Rect2(0, 0,  192, 48),
+	}
 	for state in ["normal", "hover", "pressed", "focus"]:
+		var atlas := AtlasTexture.new()
+		atlas.atlas = sheet
+		atlas.region = state_regions[state]
 		var s := StyleBoxTexture.new()
-		s.texture = tex
-		s.texture_margin_left   = 16
-		s.texture_margin_right  = 16
-		s.texture_margin_top    = 16
-		s.texture_margin_bottom = 16
-		match state:
-			"hover":   s.modulate_color = Color(1.15, 1.15, 1.15)
-			"pressed": s.modulate_color = Color(0.82, 0.82, 0.82)
-			_:         s.modulate_color = Color.WHITE
+		s.texture = atlas
+		s.texture_margin_left   = 12
+		s.texture_margin_right  = 12
+		s.texture_margin_top    = 10
+		s.texture_margin_bottom = 10
+		s.content_margin_left   = 14
+		s.content_margin_right  = 14
+		s.content_margin_top    = 8
+		s.content_margin_bottom = 8
 		btn.add_theme_stylebox_override(state, s)
 	return btn
 
@@ -183,6 +223,7 @@ func _refresh_slots() -> void:
 		_slots_vbox.add_child(_make_slot_row(i))
 
 
+# slot_frame.png：192×80，四周木框约 8px
 func _make_slot_row(slot: int) -> Button:
 	var frame := Button.new()
 	frame.custom_minimum_size = Vector2(0, 76)
@@ -193,10 +234,10 @@ func _make_slot_row(slot: int) -> Button:
 	for state in ["normal", "hover", "pressed", "focus"]:
 		var s := StyleBoxTexture.new()
 		s.texture = slot_tex
-		s.texture_margin_left   = 12
-		s.texture_margin_right  = 12
-		s.texture_margin_top    = 12
-		s.texture_margin_bottom = 12
+		s.texture_margin_left   = 8
+		s.texture_margin_right  = 8
+		s.texture_margin_top    = 8
+		s.texture_margin_bottom = 8
 		s.content_margin_left   = 10
 		s.content_margin_right  = 10
 		s.content_margin_top    = 8
