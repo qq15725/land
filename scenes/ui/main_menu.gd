@@ -2,20 +2,7 @@ extends Control
 
 const WorldScene := preload("res://scenes/world/world.tscn")
 
-# ── 占位颜色（贴图到位后替换各 _build_* 函数里对应的 ColorRect / StyleBoxFlat）──
-const C_BG         := Color(0.12, 0.17, 0.09)
-const C_PANEL      := Color(0.30, 0.19, 0.09)
-const C_PANEL_BDR  := Color(0.52, 0.34, 0.14)
-const C_SLOT_BG    := Color(0.22, 0.14, 0.07)
-const C_SLOT_HOVER := Color(0.30, 0.20, 0.10)
-const C_SLOT_BDR   := Color(0.48, 0.30, 0.13)
-const C_THUMB_OK   := Color(0.16, 0.28, 0.12)
-const C_THUMB_EMPTY := Color(0.18, 0.15, 0.12)
-const C_BTN_GREEN  := Color(0.26, 0.50, 0.21)
-const C_BTN_BROWN  := Color(0.40, 0.25, 0.10)
-const C_DELETE     := Color(0.65, 0.12, 0.10)
-
-# ── 文字颜色 ─────────────────────────────────────────────────────────────────
+const C_DELETE  := Color(0.65, 0.12, 0.10)
 const C_TITLE   := Color(0.96, 0.77, 0.28)
 const C_SUB     := Color(0.84, 0.78, 0.62)
 const C_FEATURE := Color(0.76, 0.70, 0.54)
@@ -38,16 +25,13 @@ func _ready() -> void:
 
 
 func _build_layout() -> void:
-	# 背景
-	# TODO: 替换为 TextureRect，texture = load("res://assets/sprites/ui/main_menu_bg.png")
-	#       stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	var bg := ColorRect.new()
-	bg.color = C_BG
+	var bg := TextureRect.new()
+	bg.texture = load("res://assets/sprites/ui/main_menu_bg.png")
+	bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
 
-	# 主布局（留外边距）
 	var root := MarginContainer.new()
 	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.add_theme_constant_override("margin_left",   64)
@@ -62,7 +46,6 @@ func _build_layout() -> void:
 	hbox.add_child(_build_left())
 	hbox.add_child(_build_right())
 
-	# 右下角版本号
 	var ver := Label.new()
 	ver.text = GameManager.VERSION
 	ver.add_theme_font_size_override("font_size", 11)
@@ -83,13 +66,10 @@ func _build_left() -> Control:
 	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
 	vbox.add_theme_constant_override("separation", 10)
 
-	# "Land" Logo
-	# TODO: 替换为 TextureRect，texture = load("res://assets/sprites/ui/title_land.png")
-	#       custom_minimum_size = Vector2(320, 100)，expand_mode = EXPAND_FIT_WIDTH
-	var title := Label.new()
-	title.text = "Land"
-	title.add_theme_font_size_override("font_size", 72)
-	title.modulate = C_TITLE
+	var title := TextureRect.new()
+	title.texture = load("res://assets/sprites/ui/title_land.png")
+	title.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	title.custom_minimum_size = Vector2(320, 100)
 	vbox.add_child(title)
 
 	var sub := Label.new()
@@ -102,15 +82,14 @@ func _build_left() -> Control:
 	sp.custom_minimum_size = Vector2(0, 20)
 	vbox.add_child(sp)
 
+	var icon_tex := load("res://assets/sprites/ui/menu_icons.png") as Texture2D
 	for line in ["采集・建造・种菜", "养殖・交易・探索"]:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 8)
 
-		# 叶片图标占位
-		# TODO: 替换为 TextureRect，region = Rect2(0, 0, 32, 32)，
-		#       texture = load("res://assets/sprites/ui/menu_icons.png")
-		var leaf := ColorRect.new()
-		leaf.color = Color(0.28, 0.62, 0.20)
+		var leaf := TextureRect.new()
+		leaf.texture = icon_tex
+		leaf.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		leaf.custom_minimum_size = Vector2(16, 16)
 		leaf.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		row.add_child(leaf)
@@ -132,15 +111,13 @@ func _build_right() -> Control:
 	wrapper.size_flags_stretch_ratio = 0.58
 	wrapper.alignment = BoxContainer.ALIGNMENT_CENTER
 
-	# 木质面板
-	# TODO: 换成 StyleBoxTexture，texture = load("res://assets/sprites/ui/panel_wood.png")
-	#       margin_all = 32，draw_center = true
 	var panel := PanelContainer.new()
-	var ps := StyleBoxFlat.new()
-	ps.bg_color = C_PANEL
-	ps.border_color = C_PANEL_BDR
-	ps.set_border_width_all(3)
-	ps.set_corner_radius_all(4)
+	var ps := StyleBoxTexture.new()
+	ps.texture = load("res://assets/sprites/ui/panel_wood.png")
+	ps.texture_margin_left   = 32
+	ps.texture_margin_right  = 32
+	ps.texture_margin_top    = 32
+	ps.texture_margin_bottom = 32
 	ps.content_margin_left   = 20
 	ps.content_margin_right  = 20
 	ps.content_margin_top    = 20
@@ -161,41 +138,40 @@ func _build_right() -> Control:
 	sp.custom_minimum_size = Vector2(0, 6)
 	inner.add_child(sp)
 
-	# 底部按钮行
 	var btn_row := HBoxContainer.new()
 	btn_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	btn_row.add_theme_constant_override("separation", 12)
 	inner.add_child(btn_row)
 
-	# TODO: 按钮贴图到位后换成 StyleBoxTexture(btn_green/brown.png)，margin = 16
-	_update_btn = _make_action_btn("⚙  检查更新", C_BTN_GREEN)
+	_update_btn = _make_action_btn("⚙  检查更新", "res://assets/sprites/ui/btn_green.png")
 	_update_btn.pressed.connect(_on_check_update_pressed)
 	btn_row.add_child(_update_btn)
 
-	var quit_btn := _make_action_btn("⮐  退出游戏", C_BTN_BROWN)
+	var quit_btn := _make_action_btn("⮐  退出游戏", "res://assets/sprites/ui/btn_brown.png")
 	quit_btn.pressed.connect(func(): get_tree().quit())
 	btn_row.add_child(quit_btn)
 
 	return wrapper
 
 
-func _make_action_btn(txt: String, base: Color) -> Button:
+func _make_action_btn(txt: String, tex_path: String) -> Button:
 	var btn := Button.new()
 	btn.text = txt
 	btn.custom_minimum_size = Vector2(148, 42)
 	btn.add_theme_font_size_override("font_size", 13)
 	btn.add_theme_color_override("font_color", Color.WHITE)
+	var tex := load(tex_path) as Texture2D
 	for state in ["normal", "hover", "pressed", "focus"]:
-		var s := StyleBoxFlat.new()
+		var s := StyleBoxTexture.new()
+		s.texture = tex
+		s.texture_margin_left   = 16
+		s.texture_margin_right  = 16
+		s.texture_margin_top    = 16
+		s.texture_margin_bottom = 16
 		match state:
-			"hover":   s.bg_color = base.lightened(0.18)
-			"pressed": s.bg_color = base.darkened(0.18)
-			_:         s.bg_color = base
-		s.border_color = base.lightened(0.30)
-		s.set_border_width_all(2)
-		s.set_corner_radius_all(3)
-		s.content_margin_left  = 14
-		s.content_margin_right = 14
+			"hover":   s.modulate_color = Color(1.15, 1.15, 1.15)
+			"pressed": s.modulate_color = Color(0.82, 0.82, 0.82)
+			_:         s.modulate_color = Color.WHITE
 		btn.add_theme_stylebox_override(state, s)
 	return btn
 
@@ -213,18 +189,20 @@ func _make_slot_row(slot: int) -> Button:
 	frame.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	frame.focus_mode = Control.FOCUS_NONE
 
-	# 槽框样式
-	# TODO: 换成 StyleBoxTexture(slot_frame.png，margin_all = 12)
+	var slot_tex := load("res://assets/sprites/ui/slot_frame.png") as Texture2D
 	for state in ["normal", "hover", "pressed", "focus"]:
-		var s := StyleBoxFlat.new()
-		s.bg_color = C_SLOT_BG if state == "normal" else C_SLOT_HOVER
-		s.border_color = C_SLOT_BDR
-		s.set_border_width_all(2)
-		s.set_corner_radius_all(3)
+		var s := StyleBoxTexture.new()
+		s.texture = slot_tex
+		s.texture_margin_left   = 12
+		s.texture_margin_right  = 12
+		s.texture_margin_top    = 12
+		s.texture_margin_bottom = 12
 		s.content_margin_left   = 10
 		s.content_margin_right  = 10
 		s.content_margin_top    = 8
 		s.content_margin_bottom = 8
+		if state in ["hover", "pressed"]:
+			s.modulate_color = Color(1.12, 1.12, 1.12)
 		frame.add_theme_stylebox_override(state, s)
 
 	var row := HBoxContainer.new()
@@ -239,16 +217,14 @@ func _make_slot_row(slot: int) -> Button:
 		var season : String = info.get("season", "春季")
 		var money  : int    = info.get("money", 0)
 
-		# 缩略图占位
-		# TODO: 换成 TextureRect，texture = load("res://assets/sprites/ui/save_thumb_farm.png")
-		var thumb := ColorRect.new()
-		thumb.color = C_THUMB_OK
+		var thumb := TextureRect.new()
+		thumb.texture = load("res://assets/sprites/ui/save_thumb_farm.png")
+		thumb.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		thumb.custom_minimum_size = Vector2(96, 58)
 		thumb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		thumb.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		row.add_child(thumb)
 
-		# 文字区
 		var info_box := VBoxContainer.new()
 		info_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		info_box.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -270,12 +246,9 @@ func _make_slot_row(slot: int) -> Button:
 		s_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		info_box.add_child(s_lbl)
 
-		# 删除按钮
-		# TODO: 换成 TextureButton，texture_normal = icon_trash.png 32×32 区域
 		var del_btn := Button.new()
+		del_btn.icon = load("res://assets/sprites/ui/icon_trash.png")
 		del_btn.custom_minimum_size = Vector2(36, 36)
-		del_btn.text = "🗑"
-		del_btn.add_theme_font_size_override("font_size", 16)
 		del_btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		del_btn.add_theme_color_override("font_color", Color.WHITE)
 		var ds := StyleBoxFlat.new()
@@ -295,10 +268,9 @@ func _make_slot_row(slot: int) -> Button:
 		frame.pressed.connect(func(): _start_game(slot))
 
 	else:
-		# 空档位缩略图占位
-		# TODO: 换成 TextureRect，texture = load("res://assets/sprites/ui/save_thumb_empty.png")
-		var thumb := ColorRect.new()
-		thumb.color = C_THUMB_EMPTY
+		var thumb := TextureRect.new()
+		thumb.texture = load("res://assets/sprites/ui/save_thumb_empty.png")
+		thumb.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		thumb.custom_minimum_size = Vector2(96, 58)
 		thumb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		thumb.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -324,11 +296,13 @@ func _on_delete_pressed(del_btn: Button, slot: int) -> void:
 		_refresh_slots()
 	else:
 		del_btn.set_meta("confirming", true)
+		del_btn.icon = null
 		del_btn.text = "?"
 		get_tree().create_timer(3.0).timeout.connect(func():
 			if is_instance_valid(del_btn):
 				del_btn.remove_meta("confirming")
-				del_btn.text = "🗑"
+				del_btn.icon = load("res://assets/sprites/ui/icon_trash.png")
+				del_btn.text = ""
 		, CONNECT_ONE_SHOT)
 
 
