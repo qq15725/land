@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://silo001"]
+
+[ext_resource type="Script" path="res://scenes/buildings/silo.gd" id="1_silo"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(24, 24)
+
+[node name="Silo" type="StaticBody2D"]
+script = ExtResource("1_silo")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -10)
+shape = SubResource("RectangleShape2D_1")

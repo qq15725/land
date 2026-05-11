@@ -48,11 +48,32 @@ func setup(inventory: InventoryComponent) -> void:
 	_inventory = inventory
 	_inventory.changed.connect(func(): if visible: _refresh())
 
+const _CATEGORY_LABELS := {
+	"building": "建筑",
+	"farm": "农场",
+	"fence": "围栏",
+	"decoration": "装饰",
+}
+
 func _refresh() -> void:
 	for child in _list.get_children():
 		child.queue_free()
+	var by_category: Dictionary = {}
 	for building in BuildingSystem.get_all_buildings():
-		_add_building_entry(building)
+		var cat: String = building.category
+		if not by_category.has(cat):
+			by_category[cat] = []
+		by_category[cat].append(building)
+	for cat in ["building", "farm", "fence", "decoration"]:
+		if not by_category.has(cat):
+			continue
+		var header := Label.new()
+		header.text = _CATEGORY_LABELS.get(cat, cat)
+		header.add_theme_font_size_override("font_size", 11)
+		header.modulate = Color(0.75, 0.75, 0.75)
+		_list.add_child(header)
+		for building in by_category[cat]:
+			_add_building_entry(building)
 
 func _add_building_entry(building: BuildingData) -> void:
 	var can_afford := BuildingSystem.can_afford(building, _inventory)

@@ -40,10 +40,10 @@ func _ready() -> void:
 	_setup_terrain()
 	_setup_ui()
 	if SaveSystem.slot_exists(GameManager.current_save_slot):
-		SaveSystem.load_save(GameManager.current_save_slot, self)
+		await SaveSystem.load_save(GameManager.current_save_slot, self)
 	else:
 		_load_map("0")
-	_scatter_resources()
+		_scatter_resources()
 	BuildingSystem.build_mode_entered.connect(_on_build_mode_entered)
 	BuildingSystem.build_mode_exited.connect(_on_build_mode_exited)
 	BuildingSystem.building_placed.connect(_on_building_placed)
@@ -175,7 +175,10 @@ func _setup_ui() -> void:
 
 func _process(delta: float) -> void:
 	if _build_preview:
-		_build_preview.global_position = get_global_mouse_position()
+		var mpos := get_global_mouse_position()
+		if BuildingSystem.current_building and BuildingSystem.current_building.connects:
+			mpos = mpos.snapped(Vector2(TILE_SIZE, TILE_SIZE))
+		_build_preview.global_position = mpos
 	_update_day_overlay()
 	_check_portals(delta)
 
@@ -204,7 +207,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton
 		if mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT:
-			BuildingSystem.place_building(get_global_mouse_position(), player.inventory)
+			var place_pos := get_global_mouse_position()
+			if BuildingSystem.current_building and BuildingSystem.current_building.connects:
+				place_pos = place_pos.snapped(Vector2(TILE_SIZE, TILE_SIZE))
+			BuildingSystem.place_building(place_pos, player.inventory)
 			get_viewport().set_input_as_handled()
 		elif mb.pressed and mb.button_index == MOUSE_BUTTON_RIGHT:
 			BuildingSystem.exit_build_mode()

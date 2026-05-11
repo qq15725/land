@@ -1,0 +1,29 @@
+[gd_scene load_steps=4 format=3 uid="uid://fence_gate001"]
+
+[ext_resource type="Script" path="res://scenes/buildings/fence_gate.gd" id="1_fg"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(14, 4)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 28.0
+
+[node name="FenceWoodGate" type="StaticBody2D"]
+script = ExtResource("1_fg")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_1")
+
+[node name="InteractArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractArea"]
+shape = SubResource("CircleShape2D_1")
+
+[node name="HintLabel" type="Label" parent="."]
+offset_left = -36.0
+offset_top = -44.0
+offset_right = 36.0
+offset_bottom = -30.0
+text = "[E] 开门"
+theme_override_font_sizes/font_size = 11
+horizontal_alignment = 1

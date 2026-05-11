@@ -38,8 +38,11 @@ func _load_buildings() -> void:
 		var b := BuildingData.new()
 		b.id = d.get("id", "")
 		b.display_name = d.get("display_name", "")
+		b.category = d.get("category", "building")
 		b.scene_path = d.get("scene_path", "")
 		b.animal_id = d.get("animal_id", "")
+		b.connects = d.get("connects", false)
+		b.is_gate = d.get("is_gate", false)
 		for c in d.get("cost", []):
 			b.cost.append({"item_id": c["item_id"], "amount": c["amount"], "item": null})
 		_buildings.append(b)
@@ -64,6 +67,7 @@ func _load_crops() -> void:
 		c.output_item_id = d.get("output_item_id", "")
 		c.output_amount = d.get("output_amount", 1)
 		c.growth_time = d.get("growth_time", 20.0)
+		c.bonus_drop = d.get("bonus_drop", {})
 		_crops.append(c)
 
 func _load_animals() -> void:
@@ -133,6 +137,7 @@ func _load_resource_nodes() -> void:
 		n.collision_offset_y = d.get("collision_offset_y", 0.0)
 		n.visual_offset_y = d.get("visual_offset_y", 0.0)
 		n.frame_height = d.get("frame_height", 64)
+		n.drop_table = d.get("drop_table", [])
 		_resource_nodes.append(n)
 
 func _resolve_refs() -> void:

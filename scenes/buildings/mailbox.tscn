@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://mailbox001"]
+
+[ext_resource type="Script" path="res://scenes/buildings/mailbox.gd" id="1_mb"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(12, 10)
+
+[node name="Mailbox" type="StaticBody2D"]
+script = ExtResource("1_mb")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -5)
+shape = SubResource("RectangleShape2D_1")

@@ -13,3 +13,4 @@ var collision_size: Vector2 = Vector2(16, 16)
 var collision_offset_y: float = 0.0
 var visual_offset_y: float = 0.0
 var frame_height: int = 64
+var drop_table: Array = []  # [{item_id, amount, chance}]

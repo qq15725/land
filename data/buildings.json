@@ -2,6 +2,7 @@
   {
     "id": "workbench",
     "display_name": "工作台",
+    "category": "building",
     "scene_path": "res://scenes/buildings/workbench.tscn",
     "cost": [
       {"item_id": "wood", "amount": 5}
@@ -11,6 +12,7 @@
   {
     "id": "storage_chest",
     "display_name": "储物箱",
+    "category": "building",
     "scene_path": "res://scenes/buildings/storage_chest.tscn",
     "cost": [
       {"item_id": "wood", "amount": 4},
@@ -21,6 +23,7 @@
   {
     "id": "cooking_pot",
     "display_name": "烹饪锅",
+    "category": "building",
     "scene_path": "res://scenes/buildings/cooking_pot.tscn",
     "cost": [
       {"item_id": "stone", "amount": 5},
@@ -29,18 +32,9 @@
     "animal_id": ""
   },
   {
-    "id": "farm_plot",
-    "display_name": "农田",
-    "scene_path": "res://scenes/farm/farm_plot.tscn",
-    "cost": [
-      {"item_id": "wood", "amount": 2},
-      {"item_id": "stone", "amount": 1}
-    ],
-    "animal_id": ""
-  },
-  {
     "id": "trading_post",
     "display_name": "贸易站",
+    "category": "building",
     "scene_path": "res://scenes/buildings/trading_post.tscn",
     "cost": [
       {"item_id": "wood", "amount": 12},
@@ -49,13 +43,100 @@
     "animal_id": ""
   },
   {
+    "id": "barn",
+    "display_name": "畜棚",
+    "category": "building",
+    "scene_path": "res://scenes/buildings/barn.tscn",
+    "cost": [
+      {"item_id": "wood", "amount": 20},
+      {"item_id": "wooden_plank", "amount": 8},
+      {"item_id": "stone", "amount": 6}
+    ],
+    "animal_id": "cow"
+  },
+  {
+    "id": "farm_plot",
+    "display_name": "农田",
+    "category": "farm",
+    "scene_path": "res://scenes/farm/farm_plot.tscn",
+    "cost": [
+      {"item_id": "wood", "amount": 2},
+      {"item_id": "stone", "amount": 1}
+    ],
+    "animal_id": ""
+  },
+  {
     "id": "animal_pen",
     "display_name": "鸡圈",
+    "category": "farm",
     "scene_path": "res://scenes/farm/animal_pen.tscn",
     "cost": [
       {"item_id": "wood", "amount": 6},
       {"item_id": "stone", "amount": 2}
     ],
     "animal_id": "chicken"
+  },
+  {
+    "id": "silo",
+    "display_name": "筒仓",
+    "category": "farm",
+    "scene_path": "res://scenes/buildings/silo.tscn",
+    "cost": [
+      {"item_id": "stone", "amount": 10},
+      {"item_id": "iron_bar", "amount": 4},
+      {"item_id": "wooden_plank", "amount": 5}
+    ],
+    "animal_id": "",
+    "storage_item_id": "hay",
+    "storage_capacity": 200
+  },
+  {
+    "id": "wood_fence",
+    "display_name": "木栅栏",
+    "category": "fence",
+    "scene_path": "res://scenes/buildings/fence_wood.tscn",
+    "cost": [
+      {"item_id": "wood", "amount": 1},
+      {"item_id": "rope", "amount": 1}
+    ],
+    "animal_id": "",
+    "connects": true,
+    "is_gate": false
+  },
+  {
+    "id": "wood_fence_gate",
+    "display_name": "木栅栏门",
+    "category": "fence",
+    "scene_path": "res://scenes/buildings/fence_wood_gate.tscn",
+    "cost": [
+      {"item_id": "wood", "amount": 2},
+      {"item_id": "rope", "amount": 1}
+    ],
+    "animal_id": "",
+    "connects": true,
+    "is_gate": true
+  },
+  {
+    "id": "iron_fence",
+    "display_name": "铁艺栅栏",
+    "category": "fence",
+    "scene_path": "res://scenes/buildings/fence_iron.tscn",
+    "cost": [
+      {"item_id": "iron_bar", "amount": 1}
+    ],
+    "animal_id": "",
+    "connects": true,
+    "is_gate": false
+  },
+  {
+    "id": "mailbox",
+    "display_name": "信箱",
+    "category": "decoration",
+    "scene_path": "res://scenes/buildings/mailbox.tscn",
+    "cost": [
+      {"item_id": "wood", "amount": 3},
+      {"item_id": "iron_bar", "amount": 1}
+    ],
+    "animal_id": ""
   }
 ]

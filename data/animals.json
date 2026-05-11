@@ -8,5 +8,15 @@
     "produce_time": 30.0,
     "wander_radius": 60.0,
     "color": [0.95, 0.92, 0.85, 1.0]
+  },
+  {
+    "id": "cow",
+    "display_name": "牛",
+    "feed_item_id": "animal_feed",
+    "produce_item_id": "milk",
+    "produce_amount": 1,
+    "produce_time": 60.0,
+    "wander_radius": 80.0,
+    "color": [0.75, 0.60, 0.45, 1.0]
   }
 ]

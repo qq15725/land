@@ -20,7 +20,7 @@ func load_save(slot: int, world: Node2D) -> bool:
 	var result: Variant = JSON.parse_string(file.get_as_text())
 	if result == null:
 		return false
-	_apply(result as Dictionary, world)
+	await _apply(result as Dictionary, world)
 	return true
 
 func slot_exists(slot: int) -> bool:
@@ -36,7 +36,9 @@ func get_slot_info(slot: int) -> Dictionary:
 		return {}
 	return {
 		"day": (result as Dictionary).get("day", 1),
-		"phase": (result as Dictionary).get("phase", "白天"),
+		"phase": (result as Dictionary).get("phase", "day"),
+		"season": (result as Dictionary).get("season", "春季"),
+		"money": (result as Dictionary).get("money", 0),
 		"saved_at": (result as Dictionary).get("saved_at", ""),
 	}
 
@@ -83,7 +85,8 @@ func _apply(data: Dictionary, world: Node2D) -> void:
 	player.health.current_health = data.get("player_hp", player.health.max_health)
 
 	_load_inventory(player.inventory, data.get("inventory", []))
-	_load_resource_nodes(world, data.get("resource_nodes", []))
+	await _load_resource_nodes(world, data.get("resource_nodes", []))
+	await _load_buildings(world, data.get("buildings", []))
 	_load_farm_plots(world, data.get("farm_plots", []))
 
 # --- 背包 ---
@@ -140,6 +143,22 @@ func _load_resource_nodes(world: Node2D, data: Array) -> void:
 		layer.add_child(node)
 		if entry.get("depleted", false):
 			node.restore_from_save(entry.get("regen_timer", 0.0))
+
+# --- 建筑 ---
+
+func _load_buildings(world: Node2D, data: Array) -> void:
+	var layer: Node2D = world.get_node("YSortLayer")
+	for node in layer.get_children():
+		if node is BuildingBase and not node is FarmPlot:
+			node.queue_free()
+	await world.get_tree().process_frame
+	for entry in data:
+		var scene_path: String = entry.get("type", "")
+		if scene_path.is_empty() or not ResourceLoader.exists(scene_path):
+			continue
+		var node := (load(scene_path) as PackedScene).instantiate() as Node2D
+		node.global_position = Vector2(entry.get("x", 0.0), entry.get("y", 0.0))
+		layer.add_child(node)
 
 # --- 农田 ---
 

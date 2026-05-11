@@ -90,7 +90,7 @@ func _build_left() -> Control:
 	var icon_sheet := load("res://assets/sprites/ui/menu_icons.png") as Texture2D
 	var feature_entries: Array = [
 		[Rect2(0, 0, 32, 32), "采集・建造・种菜"],
-		[Rect2(0, 0, 32, 32), "养殖・交易・探索"],
+		[Rect2(32, 0, 32, 32), "养殖・交易・探索"],
 	]
 	for entry in feature_entries:
 		var row := HBoxContainer.new()
@@ -145,12 +145,12 @@ func _build_right() -> Control:
 	inner.add_theme_constant_override("separation", 10)
 	panel.add_child(inner)
 
-	# 顶部叶片装饰
+	# 顶部齿轮装饰（与功能图标区分）
 	var header := CenterContainer.new()
 	inner.add_child(header)
 	var emblem_atlas := AtlasTexture.new()
 	emblem_atlas.atlas = load("res://assets/sprites/ui/menu_icons.png")
-	emblem_atlas.region = Rect2(0, 0, 32, 32)
+	emblem_atlas.region = Rect2(64, 0, 32, 32)
 	var emblem := TextureRect.new()
 	emblem.texture = emblem_atlas
 	emblem.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -217,6 +217,7 @@ func _make_action_btn(txt: String, tex_path: String) -> Button:
 
 func _refresh_slots() -> void:
 	for child in _slots_vbox.get_children():
+		_slots_vbox.remove_child(child)
 		child.queue_free()
 	for i in SaveSystem.MAX_SLOTS:
 		_slots_vbox.add_child(_make_slot_row(i))
@@ -225,7 +226,7 @@ func _refresh_slots() -> void:
 # slot_frame.png：192×80，四周木框约 8px
 func _make_slot_row(slot: int) -> Button:
 	var frame := Button.new()
-	frame.custom_minimum_size = Vector2(0, 76)
+	frame.custom_minimum_size = Vector2(0, 84)
 	frame.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	frame.focus_mode = Control.FOCUS_NONE
 
@@ -235,13 +236,13 @@ func _make_slot_row(slot: int) -> Button:
 		s.texture = slot_tex
 		# slot_frame.png 左侧 100px 是深色缩略图区，固定不拉伸
 		s.texture_margin_left   = 100
-		s.texture_margin_right  = 8
-		s.texture_margin_top    = 8
-		s.texture_margin_bottom = 8
-		s.content_margin_left   = 8
-		s.content_margin_right  = 8
-		s.content_margin_top    = 8
-		s.content_margin_bottom = 8
+		s.texture_margin_right  = 10
+		s.texture_margin_top    = 10
+		s.texture_margin_bottom = 10
+		s.content_margin_left   = 6
+		s.content_margin_right  = 14
+		s.content_margin_top    = 12
+		s.content_margin_bottom = 12
 		if state in ["hover", "pressed"]:
 			s.modulate_color = Color(1.12, 1.12, 1.12)
 		frame.add_theme_stylebox_override(state, s)
@@ -249,6 +250,7 @@ func _make_slot_row(slot: int) -> Button:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 12)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	frame.add_child(row)
 
 	if SaveSystem.slot_exists(slot):

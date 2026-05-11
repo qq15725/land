@@ -4,9 +4,13 @@
     "display_name": "橡树",
     "drop_item_id": "wood",
     "drop_amount": 3,
+    "drop_table": [
+      {"item_id": "wood", "amount": 3, "chance": 1.0},
+      {"item_id": "hay",  "amount": 1, "chance": 0.3}
+    ],
     "respawn_time": 30.0,
     "tool_required": "",
-    "spawn_weight": 0.65,
+    "spawn_weight": 0.55,
     "collision_size": [12, 20],
     "collision_offset_y": -10,
     "visual_offset_y": -24,
@@ -17,11 +21,63 @@
     "display_name": "石堆",
     "drop_item_id": "stone",
     "drop_amount": 2,
+    "drop_table": [
+      {"item_id": "stone", "amount": 2, "chance": 1.0}
+    ],
     "respawn_time": 60.0,
     "tool_required": "",
-    "spawn_weight": 0.35,
+    "spawn_weight": 0.25,
     "collision_size": [24, 18],
     "collision_offset_y": -9,
+    "visual_offset_y": -12,
+    "frame_height": 96
+  },
+  {
+    "id": "iron_ore",
+    "display_name": "铁矿",
+    "drop_item_id": "iron_ore",
+    "drop_amount": 2,
+    "drop_table": [
+      {"item_id": "iron_ore", "amount": 2, "chance": 1.0},
+      {"item_id": "stone",    "amount": 1, "chance": 0.5}
+    ],
+    "respawn_time": 120.0,
+    "tool_required": "",
+    "spawn_weight": 0.08,
+    "collision_size": [22, 16],
+    "collision_offset_y": -8,
+    "visual_offset_y": -10,
+    "frame_height": 96
+  },
+  {
+    "id": "berry_bush",
+    "display_name": "浆果丛",
+    "drop_item_id": "berry",
+    "drop_amount": 2,
+    "drop_table": [
+      {"item_id": "berry", "amount": 2, "chance": 1.0}
+    ],
+    "respawn_time": 20.0,
+    "tool_required": "",
+    "spawn_weight": 0.08,
+    "collision_size": [20, 14],
+    "collision_offset_y": -7,
+    "visual_offset_y": -16,
+    "frame_height": 128
+  },
+  {
+    "id": "mushroom",
+    "display_name": "蘑菇",
+    "drop_item_id": "mushroom",
+    "drop_amount": 1,
+    "drop_table": [
+      {"item_id": "mushroom", "amount": 1, "chance": 1.0}
+    ],
+    "respawn_time": 15.0,
+    "tool_required": "",
+    "spawn_weight": 0.04,
+    "collision_size": [12, 10],
+    "collision_offset_y": -5,
     "visual_offset_y": -12,
     "frame_height": 96
   }

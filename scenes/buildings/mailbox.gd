@@ -1,0 +1,2 @@
+class_name Mailbox
+extends BuildingBase

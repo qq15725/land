@@ -9,11 +9,29 @@
     "required_station": ""
   },
   {
+    "id": "rope",
+    "output_item_id": "rope",
+    "output_amount": 2,
+    "ingredients": [
+      {"item_id": "hay", "amount": 3}
+    ],
+    "required_station": ""
+  },
+  {
+    "id": "iron_bar",
+    "output_item_id": "iron_bar",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "iron_ore", "amount": 3}
+    ],
+    "required_station": "workbench"
+  },
+  {
     "id": "carrot_seed",
     "output_item_id": "carrot_seed",
     "output_amount": 3,
     "ingredients": [
-      {"item_id": "wood", "amount": 2}
+      {"item_id": "carrot", "amount": 1}
     ],
     "required_station": ""
   },
@@ -22,7 +40,25 @@
     "output_item_id": "wheat_seed",
     "output_amount": 3,
     "ingredients": [
-      {"item_id": "wood", "amount": 2}
+      {"item_id": "wheat", "amount": 1}
+    ],
+    "required_station": ""
+  },
+  {
+    "id": "potato_seed",
+    "output_item_id": "potato_seed",
+    "output_amount": 2,
+    "ingredients": [
+      {"item_id": "potato", "amount": 1}
+    ],
+    "required_station": ""
+  },
+  {
+    "id": "tomato_seed",
+    "output_item_id": "tomato_seed",
+    "output_amount": 2,
+    "ingredients": [
+      {"item_id": "tomato", "amount": 1}
     ],
     "required_station": ""
   },
@@ -31,7 +67,7 @@
     "output_item_id": "animal_feed",
     "output_amount": 3,
     "ingredients": [
-      {"item_id": "wheat", "amount": 2}
+      {"item_id": "hay", "amount": 3}
     ],
     "required_station": "workbench"
   },
@@ -41,6 +77,24 @@
     "output_amount": 1,
     "ingredients": [
       {"item_id": "carrot", "amount": 1}
+    ],
+    "required_station": "cooking_pot"
+  },
+  {
+    "id": "cooked_mushroom",
+    "output_item_id": "cooked_mushroom",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "mushroom", "amount": 1}
+    ],
+    "required_station": "cooking_pot"
+  },
+  {
+    "id": "berry_jam",
+    "output_item_id": "berry_jam",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "berry", "amount": 3}
     ],
     "required_station": "cooking_pot"
   }

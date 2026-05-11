@@ -13,6 +13,23 @@
     "seed_item_id": "wheat_seed",
     "output_item_id": "wheat",
     "output_amount": 4,
-    "growth_time": 30.0
+    "growth_time": 30.0,
+    "bonus_drop": {"item_id": "hay", "amount": 2}
+  },
+  {
+    "id": "potato",
+    "display_name": "土豆",
+    "seed_item_id": "potato_seed",
+    "output_item_id": "potato",
+    "output_amount": 4,
+    "growth_time": 35.0
+  },
+  {
+    "id": "tomato",
+    "display_name": "番茄",
+    "seed_item_id": "tomato_seed",
+    "output_item_id": "tomato",
+    "output_amount": 3,
+    "growth_time": 45.0
   }
 ]
