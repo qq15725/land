@@ -89,8 +89,8 @@ func _build_left() -> Control:
 	# menu_icons.png：128×32，4 个 32×32 图标（叶片/齿轮/箱子/垃圾桶）
 	var icon_sheet := load("res://assets/sprites/ui/menu_icons.png") as Texture2D
 	var feature_entries: Array = [
-		[Rect2(0, 0, 32, 32),  "采集・建造・种菜"],
-		[Rect2(64, 0, 32, 32), "养殖・交易・探索"],
+		[Rect2(0, 0, 32, 32), "采集・建造・种菜"],
+		[Rect2(0, 0, 32, 32), "养殖・交易・探索"],
 	]
 	for entry in feature_entries:
 		var row := HBoxContainer.new()
@@ -147,7 +147,6 @@ func _build_right() -> Control:
 
 	# 顶部叶片装饰
 	var header := CenterContainer.new()
-	header.custom_minimum_size = Vector2(0, 4)
 	inner.add_child(header)
 	var emblem_atlas := AtlasTexture.new()
 	emblem_atlas.atlas = load("res://assets/sprites/ui/menu_icons.png")
@@ -156,7 +155,7 @@ func _build_right() -> Control:
 	emblem.texture = emblem_atlas
 	emblem.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	emblem.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	emblem.custom_minimum_size = Vector2(24, 24)
+	emblem.custom_minimum_size = Vector2(32, 32)
 	header.add_child(emblem)
 
 	_slots_vbox = VBoxContainer.new()
