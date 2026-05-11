@@ -37,12 +37,12 @@ func _draw() -> void:
 
 func _draw_fence(color: Color) -> void:
 	var h := CELL * 0.5
-	var has_n := _connected.get("n", false)
-	var has_s := _connected.get("s", false)
-	var has_e := _connected.get("e", false)
-	var has_w := _connected.get("w", false)
-	var any_h := has_e or has_w
-	var any_v := has_n or has_s
+	var has_n: bool = _connected.get("n", false)
+	var has_s: bool = _connected.get("s", false)
+	var has_e: bool = _connected.get("e", false)
+	var has_w: bool = _connected.get("w", false)
+	var any_h: bool = has_e or has_w
+	var any_v: bool = has_n or has_s
 
 	# 中心柱
 	draw_rect(Rect2(-2.0, -4.0, 4.0, 8.0), color)
