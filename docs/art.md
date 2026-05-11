@@ -257,12 +257,17 @@ This is ONE ROW of a terrain autotile blob tileset for a 2D top-down game.
 Each cell is a different edge-connection variant (bitmask 0–15, columns left to right).
 
 CONNECTED SIDE (bit=1): terrain texture extends fully to that tile edge — seamless join.
-EXPOSED SIDE (bit=0): draw a clear 4-6px color transition fringe at the tile edge,
-fading toward warm earth brown #7A5030. The fringe must be visibly different from the
-interior. CRITICAL: col 5 (left+right connected, top+bottom exposed) MUST look
-noticeably different from col 15 (all connected/interior). If they look the same: WRONG.
+EXPOSED SIDE (bit=0): draw a 4-6px fringe at that tile edge, transitioning in
+pixel-perfect hard steps (1-2px per color band) toward warm earth brown #7A5030.
+NO anti-aliasing, NO smooth gradients — each step must be a solid block of color.
+The fringe must be visibly distinct from the interior.
+CRITICAL: col 5 (left+right connected, top+bottom exposed) MUST look noticeably different
+from col 15 (all connected/interior). If they look the same: WRONG.
+CRITICAL: every exposed-edge tile must show the brown fringe on the exposed sides —
+the fringe must be visible and clearly different from the terrain surface color.
 
 Do NOT draw: isometric blocks, voxel side faces, trees, crops, water, props, shadows.
+Do NOT use anti-aliasing or sub-pixel blending anywhere in the image.
 ```
 
 **行 0 — 草地（Grass）：** 在通用前缀后追加：
@@ -280,16 +285,16 @@ The 16 cells (bitmask TRBL, T=Top R=Right B=Bottom L=Left, 1=connected):
   Col 0  [0000]: isolated — all 4 sides exposed, grass center, earth fringe all around
   Col 1  [0001]: left connected — right/top/bottom exposed
   Col 2  [0010]: bottom connected — top/left/right exposed
-  Col 3  [0011]: bottom+left — top/right exposed, top-right corner fringe arc
+  Col 3  [0011]: bottom+left — top/right exposed, top-right corner has square-pixel fringe meeting point
   Col 4  [0100]: right connected — left/top/bottom exposed
   Col 5  [0101]: left+right — horizontal strip, top/bottom exposed with blade fringe
-  Col 6  [0110]: right+bottom — left/top exposed, top-left corner fringe arc
+  Col 6  [0110]: right+bottom — left/top exposed, top-left corner has square-pixel fringe meeting point
   Col 7  [0111]: left+right+bottom — only top exposed, grass blades pointing up
   Col 8  [1000]: top connected — bottom/left/right exposed
-  Col 9  [1001]: top+left — bottom/right exposed, bottom-right corner fringe arc
+  Col 9  [1001]: top+left — bottom/right exposed, bottom-right corner has square-pixel fringe meeting point
   Col 10 [1010]: top+bottom — vertical strip, left/right exposed with blade fringe
   Col 11 [1011]: top+left+bottom — only right exposed
-  Col 12 [1100]: top+right — bottom/left exposed, bottom-left corner fringe arc
+  Col 12 [1100]: top+right — bottom/left exposed, bottom-left corner has square-pixel fringe meeting point
   Col 13 [1101]: top+right+left — only bottom exposed, grass blades pointing down
   Col 14 [1110]: top+right+bottom — only left exposed
   Col 15 [1111]: all connected — pure interior grass texture, no fringe anywhere
@@ -316,8 +321,9 @@ Minecraft voxel pixel art, seamless autotile path strip
 
 ```
 TERRAIN TYPE: tilled farmland — deep chocolate brown base #4A2810, horizontal furrow lines
-every 3-4px (ridge #5E3418, furrow gap #381A08). Furrows run continuously left-to-right
-and align seamlessly across connected tiles. Matches dark tilled soil in voxel reference.
+with a strict 4px repeat (1px ridge #5E3418 then 3px furrow gap #381A08, starting at y=0).
+Furrows MUST be phase-locked: the pattern starts at y=0 so rows align pixel-perfectly
+across all tiles. Matches dark tilled soil in voxel reference.
 
 EXPOSED SIDE specifics: furrows terminate cleanly at the exposed edge (1px dark #381A08).
 Edge boundary is relatively straight — man-made field feel, minimal organic fringe.
@@ -352,21 +358,23 @@ Minecraft voxel pixel art, seamless autotile stone strip
 
 | 文件 | 尺寸 | 状态 |
 |------|------|------|
-| `assets/sprites/environment/ground_tiles.png` | **1024×256**（16列×4行，每格64×64） | ✅ 已通过内置生图源材质 + `tools/build_ground_tiles_atlas.py` 合成 |
+| `assets/sprites/environment/ground_tiles.png` | **1024×256**（16列×4行，每格64×64） | ⚠️ 当前为程序化合成版，待用上方 AI 提示词重新直出 |
 
-**本次源图**：`assets/sprites/environment/ground_tiles_gpt_image_2_rows_raw/`
+**生成方式**：用上方提示词为 4 种地形各直接生成一张 **1024×64 px 条带**（16 格一行，每格 64×64，边缘过渡由 AI 绘制），再用合成脚本垂直拼合。
 
-**生成方式**：内置生图分别生成草地、小路、耕地、石地 4 张顶视角无缝材质源图，再由脚本按相邻掩码规则确定性合成 16 列自动地形 atlas。这样不要求生图模型一次性精确绘制 16 列网格。
+- 不再用平铺原材质 + 程序化叠色的方式
+- 每张条带 AI 直出，边缘质量由提示词控制
+- 合成脚本只做 NEAREST 缩放对齐和垂直拼合，不再处理边缘
 
-**重建命令**：
+**合成命令**（4 张条带生成后执行）：
 
 ```bash
 python3 tools/build_ground_tiles_atlas.py \
-  --grass assets/sprites/environment/ground_tiles_gpt_image_2_rows_raw/0_grass.png \
-  --path assets/sprites/environment/ground_tiles_gpt_image_2_rows_raw/1_path.png \
-  --farmland assets/sprites/environment/ground_tiles_gpt_image_2_rows_raw/2_farmland.png \
-  --stone assets/sprites/environment/ground_tiles_gpt_image_2_rows_raw/3_stone.png \
-  --out assets/sprites/environment/ground_tiles.png
+  --grass  path/to/grass_strip_1024x64.png \
+  --path   path/to/path_strip_1024x64.png \
+  --farmland path/to/farmland_strip_1024x64.png \
+  --stone  path/to/stone_strip_1024x64.png
+# 默认输出到 assets/sprites/environment/ground_tiles.png
 ```
 
 ---

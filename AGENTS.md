@@ -24,48 +24,65 @@
 ```
 land/
 ├── scenes/
-│   ├── world/          # 世界、Chunk、地图生成
-│   ├── entities/       # 玩家、怪物、NPC商人、掉落物
-│   ├── buildings/      # 可建造建筑（家、仓库、围栏、贸易站等）
-│   ├── farm/           # 农田、作物、养殖围栏
-│   ├── ui/             # HUD、背包、合成、交易面板
-│   └── effects/        # 粒子、光照
+│   ├── world/              # 世界场景、资源节点
+│   ├── entities/
+│   │   ├── player/         # 玩家
+│   │   ├── creature/       # 怪物
+│   │   ├── merchant/       # 商人 NPC
+│   │   └── drop_item/      # 掉落物
+│   ├── buildings/          # 可建造建筑
+│   ├── farm/               # 农田、养殖围栏、动物
+│   ├── ui/                 # 所有 UI 场景
+│   └── effects/            # 粒子效果
 ├── scripts/
-│   ├── components/     # 可复用组件
-│   ├── systems/        # 全局系统（Autoload）
-│   ├── data/           # Resource 数据类定义
-│   └── utils/
-├── resources/
-│   ├── items/          # 物品数据
-│   ├── recipes/        # 合成配方
-│   ├── buildings/      # 建筑数据
-│   ├── crops/          # 作物数据
-│   ├── animals/        # 动物数据
-│   ├── creatures/      # 怪物数据
-│   └── trades/         # 商人交易表
-└── assets/
-	├── sprites/
-	├── audio/
-	└── fonts/
+│   ├── components/         # 可复用组件（HealthComponent、InventoryComponent）
+│   ├── systems/            # 全局系统（Autoload）
+│   ├── data/               # GDScript Resource 数据类定义
+│   └── utils/              # 工具脚本（DraggablePanel、UIStyle）
+├── data/                   # JSON 格式游戏数据（物品/配方/建筑/作物/动物/怪物/交易）
+├── resources/              # Godot .tres 资源文件（目前未使用，备用）
+├── assets/
+│   ├── sprites/
+│   │   ├── characters/     # 玩家、商人精灵表
+│   │   ├── environment/    # 地砖 atlas、草/灌木/蘑菇等
+│   │   ├── buildings/      # 建筑精灵
+│   │   ├── items/          # 物品图标表
+│   │   └── ui/             # UI 精灵表
+│   ├── animals/            # 动物精灵（chicken 等）
+│   ├── creatures/          # 怪物精灵（slime、skeleton 等）
+│   ├── resources/          # 资源节点精灵（tree、stone 等）
+│   └── maps/               # 预设地图图片（0.png、0-0.png 等）
+├── docs/                   # 设计文档与美术提示词
+│   └── references/         # 参考图
+└── tools/                  # Python 离线工具（图集合成等）
 ```
 
 ## 全局系统（Autoload）
 
-| 单例名 | 职责 |
-|--------|------|
-| `GameManager` | 游戏状态、流程控制 |
-| `WorldSystem` | Chunk 管理、世界生成 |
-| `TimeSystem` | 昼夜循环、季节 |
-| `ItemDatabase` | 物品/配方/建筑注册表 |
-| `TradeSystem` | 商人刷新、交易逻辑 |
-| `SaveSystem` | 存档读写 |
-| `EventBus` | 全局信号中转 |
+| 单例名 | 脚本 | 职责 |
+|--------|------|------|
+| `EventBus` | `scripts/systems/event_bus.gd` | 全局信号中转 |
+| `GameManager` | `scripts/systems/game_manager.gd` | 游戏状态、流程控制 |
+| `ItemDatabase` | `scripts/systems/item_database.gd` | 物品/配方/建筑/怪物注册表，从 `data/*.json` 加载 |
+| `CraftingSystem` | `scripts/systems/crafting_system.gd` | 合成逻辑 |
+| `BuildingSystem` | `scripts/systems/building_system.gd` | 建造模式、建筑放置 |
+| `TimeSystem` | `scripts/systems/time_system.gd` | 昼夜循环、季节 |
+| `TradeSystem` | `scripts/systems/trade_system.gd` | 商人刷新、交易逻辑 |
+| `SaveSystem` | `scripts/systems/save_system.gd` | 存档读写 |
+| `UpdateSystem` | `scripts/systems/update_system.gd` | 版本更新检查 |
+| `WorldGenerator` | `scripts/systems/world_generator.gd` | 地形生成、TileSet 构建 |
+| `UIStyle` | `scripts/utils/ui_style.gd` | 全局 UI 样式工具 |
 
 ## 核心组件
 
+已实现：
 ```
-HealthComponent       # 生命值、受伤、死亡
-InventoryComponent    # 物品槽、堆叠逻辑
+HealthComponent       # 生命值、受伤、死亡（scripts/components/health_component.gd）
+InventoryComponent    # 物品槽、堆叠逻辑（scripts/components/inventory_component.gd）
+```
+
+规划中（尚未实现）：
+```
 AIComponent           # 怪物状态机（游荡/警觉/攻击/逃跑）
 InteractableComponent # 可交互标记与范围检测
 DurabilityComponent   # 工具/建筑耐久
