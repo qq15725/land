@@ -152,7 +152,8 @@ GrowthComponent       # 作物/动物生长状态
 ## 文档
 
 - [`docs/roadmap.md`](docs/roadmap.md) — 开发阶段规划与待办事项，按 Phase 划分，开工前更新进度
-- [`docs/art.md`](docs/art.md) — 美术资源生成提示词，含角色、环境、建筑、物品图标，Stardew Valley 风格
+- [`docs/art/`](docs/art/README.md) — 美术资源生成提示词（按类别分文件），含角色、环境、建筑、物品图标
+- [`docs/sounds.md`](docs/sounds.md) — 音效与 BGM 资源映射、风格描述
 - [`docs/map.md`](docs/map.md) — 地图设计图生成规范，含命名规则、颜色编码、AI 提示词
 
 ## 开发约定
@@ -166,28 +167,12 @@ GrowthComponent       # 作物/动物生长状态
 
 - git commit 信息不加 `Co-Authored-By`
 
-## 美术资产比例同步规则
+## 美术 / 代码比例约定
 
-**任何时候修改了以下任一项，必须同步更新 `docs/art.md` 中对应的比例字段：**
+美术文档（`docs/art/`）只描述源文件像素尺寸，不包含 Godot scale/zoom。代码层独立维护：
 
-- 角色 / 怪物 / NPC 的 `AnimatedSprite2D.scale`
-- 环境物件 / 建筑的 `Sprite2D.scale`
-- 玩家 `Camera2D.zoom`
+- Camera2D zoom = 4.0（每格 64 屏幕像素）
+- 角色 / 怪物 `AnimatedSprite2D.scale = 0.125`（128×256 单帧源 → 16×32 世界单位 = 1×2 格）
+- 环境物件 / 建筑 `Sprite2D.scale = 0.25`（源尺寸 ÷ 4 = 世界单位）
 
-**原因**：`docs/art.md` 是美术资产生成的唯一参考文档。文档与代码不一致时，AI 生成的新资产会因比例错误无法直接用于游戏。
-
-### 当前基准
-
-| 参数 | 值 | 说明 |
-|------|-----|------|
-| Camera2D zoom | 4.0 | 每格 64px，可见约 20 格宽 |
-| 角色 / 怪物 scale | 0.125 | 128×256 frame → 16×32 世界单位 = 1×2 格 |
-| 环境物件 scale | 0.25 | 原尺寸 ÷ 4 世界单位 |
-| 建筑 scale | 0.25 | 原尺寸 ÷ 4 世界单位 |
-
-### 更新方式
-
-修改 `.tscn` 中的 scale/zoom 后，在 `docs/art.md` 的"精灵表格式约定"表和对应章节中同步更新：
-- `scene scale` 列
-- `游戏世界渲染尺寸` 列
-- `屏幕像素` 列（= 世界尺寸 × zoom）
+修改源文件标准尺寸或 scale 时需要双侧同步，否则新资产会显示错位。

@@ -46,13 +46,13 @@ assets/sprites/items/icons.png         # 物品图标整张表
 
 | 类型 | 文档 | 说明 |
 |------|------|------|
-| 角色与生物 | [art/characters.md](art/characters.md) | 玩家、NPC、怪物、动物帧动画精灵表 |
-| 地砖 Autotile | [art/tiles.md](art/tiles.md) | 掩码系统，变体列，生成提示词 |
-| 环境物件 | [art/environment.md](art/environment.md) | 树、石、草丛、蘑菇等可采集/装饰物件 |
-| 建筑 | [art/buildings.md](art/buildings.md) | 工作台、箱子、贸易站等可建造建筑 |
-| 物品图标 | [art/items.md](art/items.md) | 背包 UI 图标表（8×5 grid） |
-| 游戏内 UI | [art/ui.md](art/ui.md) | HUD、面板、按钮、血量条等游戏内界面 |
-| 主菜单美术 | [art/main_menu.md](art/main_menu.md) | 背景、标题 Logo、存档槽、菜单按钮 |
+| 角色与生物 | [characters.md](characters.md) | 玩家、NPC、怪物、动物帧动画精灵表 |
+| 地砖 Autotile | [tiles.md](tiles.md) | 掩码系统，变体列，生成提示词 |
+| 环境物件 | [environment.md](environment.md) | 树、石、草丛、蘑菇等可采集/装饰物件 |
+| 建筑 | [buildings.md](buildings.md) | 工作台、箱子、贸易站等可建造建筑 |
+| 物品图标 | [items.md](items.md) | 背包 UI 图标表（8×5 grid） |
+| 游戏内 UI | [ui.md](ui.md) | HUD、面板、按钮、血量条等游戏内界面 |
+| 主菜单美术 | [main_menu.md](main_menu.md) | 背景、标题 Logo、存档槽、菜单按钮 |
 
 ## 字体
 
