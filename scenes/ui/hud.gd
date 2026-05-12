@@ -45,6 +45,7 @@ var _event_lbl: Label
 
 # ⑤ ⑥ 小地图 + 任务
 var _coord_lbl: Label
+var _minimap: Minimap
 var _quest_box: VBoxContainer
 
 # ⑦ Hotbar
@@ -57,7 +58,8 @@ var _skill_slots: Array[Control] = []
 
 # ⑪ Bottom info
 var _gold_lbl: Label
-var _durability_lbl: Label
+var _selected_icon: TextureRect
+var _selected_lbl: Label
 var _base_defense_lbl: Label
 
 # ⑫ Danger edge
@@ -97,8 +99,8 @@ func setup(health: HealthComponent, inventory: InventoryComponent) -> void:
 	BuildingSystem.build_mode_entered.connect(func(_b): _mode_label.text = "[建造模式]  左键放置  右键/ESC取消")
 	BuildingSystem.build_mode_exited.connect(func(): _mode_label.text = "")
 
-	inventory.selection_changed.connect(func(_i): _refresh_hotbar())
-	inventory.changed.connect(_refresh_hotbar)
+	inventory.selection_changed.connect(func(_i): _refresh_hotbar(); _refresh_selected())
+	inventory.changed.connect(func(): _refresh_hotbar(); _refresh_selected())
 	inventory.gold_changed.connect(func(g): _gold_lbl.text = str(g))
 	inventory.equipment_changed.connect(func(_t): _refresh_durability())
 	EventBus.item_sold.connect(_on_item_sold)
@@ -109,6 +111,8 @@ func setup(health: HealthComponent, inventory: InventoryComponent) -> void:
 	_refresh_durability()
 	_set_bar(_stamina_bar, 100, 100)
 	_gold_lbl.text = str(inventory.gold)
+	if _minimap and _player is Node2D:
+		_minimap.setup(_player as Node2D)
 
 # ─── ① 角色信息条 hud_charinfo.png 320×128 ──────────────────────────────
 
@@ -231,17 +235,22 @@ func _build_top_right() -> void:
 	col.add_theme_constant_override("separation", 8)
 	add_child(col)
 
+	# 顶部菜单按钮组：角色 / 地图 / 设置
+	var menu_row := HBoxContainer.new()
+	menu_row.alignment = BoxContainer.ALIGNMENT_END
+	menu_row.add_theme_constant_override("separation", 4)
+	col.add_child(menu_row)
+	menu_row.add_child(_make_menu_btn("👤", "角色", _on_menu_inventory))
+	menu_row.add_child(_make_menu_btn("🗺", "地图", _on_menu_map))
+	menu_row.add_child(_make_menu_btn("⚙", "设置", _on_menu_settings))
+
 	# ⑤ 小地图
 	var map := _texture(ART + "hud_minimap.png", Vector2(192, 192))
 	col.add_child(map)
 
-	# 占位文字（地图绘制后期由 RenderingServer 实绘）
-	var placeholder := Label.new()
-	placeholder.text = "地图"
-	placeholder.modulate = Color(0.55, 0.55, 0.55)
-	placeholder.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	placeholder.add_theme_font_size_override("font_size", 10)
-	map.add_child(placeholder)
+	_minimap = Minimap.new()
+	_minimap.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	map.add_child(_minimap)
 
 	# 坐标条
 	var coord := _texture(ART + "hud_coord.png", Vector2(160, 24))
@@ -490,26 +499,24 @@ func _build_bottom_info_row() -> void:
 	_gold_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	coin.add_child(_gold_lbl)
 
-	# 装备耐久
-	var dura := _texture(ART + "hud_infoslot.png", Vector2(192, 48))
-	row.add_child(dura)
-	var dura_icon := Label.new()
-	dura_icon.text = "⛏"
-	dura_icon.position = Vector2(12, 8)
-	dura_icon.size = Vector2(32, 32)
-	dura_icon.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
-	dura_icon.add_theme_font_size_override("font_size", 16)
-	dura_icon.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	dura_icon.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	dura.add_child(dura_icon)
-	_durability_lbl = Label.new()
-	_durability_lbl.text = "—/—"
-	_durability_lbl.position = Vector2(48, 8)
-	_durability_lbl.size = Vector2(136, 32)
-	_durability_lbl.add_theme_font_size_override("font_size", 12)
-	_durability_lbl.add_theme_color_override("font_color", Color(0.95, 0.92, 0.78))
-	_durability_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	dura.add_child(_durability_lbl)
+	# 选中物品（图标 + 名字 + 数量）
+	var sel := _texture(ART + "hud_infoslot.png", Vector2(192, 48))
+	row.add_child(sel)
+	_selected_icon = TextureRect.new()
+	_selected_icon.position = Vector2(12, 8)
+	_selected_icon.size = Vector2(32, 32)
+	_selected_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_selected_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_selected_icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	sel.add_child(_selected_icon)
+	_selected_lbl = Label.new()
+	_selected_lbl.text = "—"
+	_selected_lbl.position = Vector2(48, 8)
+	_selected_lbl.size = Vector2(136, 32)
+	_selected_lbl.add_theme_font_size_override("font_size", 12)
+	_selected_lbl.add_theme_color_override("font_color", Color(0.95, 0.92, 0.78))
+	_selected_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	sel.add_child(_selected_lbl)
 
 	# 基地防御
 	var base := _texture(ART + "hud_infoslot.png", Vector2(192, 48))
@@ -533,10 +540,21 @@ func _build_bottom_info_row() -> void:
 	base.add_child(_base_defense_lbl)
 
 func _refresh_durability() -> void:
-	if not _inventory:
+	# 兼容旧调用：刷新选中物品信息
+	_refresh_selected()
+
+func _refresh_selected() -> void:
+	if not _inventory or not _selected_lbl:
 		return
-	var count: int = _inventory.equipped.size()
-	_durability_lbl.text = "装备 %d 件" % count
+	var item: ItemData = _inventory.get_selected_item()
+	if item == null:
+		_selected_icon.texture = null
+		_selected_lbl.text = "— 未选 —"
+		return
+	_selected_icon.texture = ItemDatabase.get_item_icon(item)
+	var slot_idx: int = _inventory.selected_slot
+	var amount: int = _inventory.slots[slot_idx].amount if slot_idx >= 0 and slot_idx < _inventory.slots.size() else 0
+	_selected_lbl.text = "%s  ×%d" % [item.display_name, amount]
 
 # ─── ⑫ 危险边框 hud_danger_edge.png ─────────────────────────────────────
 
@@ -577,6 +595,32 @@ func _build_center_overlay() -> void:
 	top_box.add_child(_toast_label)
 
 # ─── 公共 helper ──────────────────────────────────────────────────────────
+
+func _make_menu_btn(icon_text: String, tooltip: String, cb: Callable) -> Button:
+	var b := Button.new()
+	b.text = icon_text
+	b.tooltip_text = tooltip
+	b.custom_minimum_size = Vector2(40, 40)
+	b.add_theme_font_size_override("font_size", 18)
+	b.pressed.connect(cb)
+	return b
+
+func _on_menu_inventory() -> void:
+	# 模拟 "inventory" 动作（Tab 键），让 InventoryUI 自己处理打开/关闭切换
+	var ev := InputEventAction.new()
+	ev.action = "inventory"
+	ev.pressed = true
+	Input.parse_input_event(ev)
+
+func _on_menu_map() -> void:
+	show_toast("大地图尚未实现", 1.5)
+
+func _on_menu_settings() -> void:
+	# 模拟 ESC（打开暂停菜单），暂停菜单内含设置入口
+	var ev := InputEventAction.new()
+	ev.action = "ui_cancel"
+	ev.pressed = true
+	Input.parse_input_event(ev)
 
 func _texture(path: String, fixed_size: Vector2) -> TextureRect:
 	var t := TextureRect.new()
