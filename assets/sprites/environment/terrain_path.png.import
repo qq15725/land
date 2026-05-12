@@ -2,12 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bmt417beqvoqk"
-valid=false
+uid="uid://du502qbp4h53y"
+path="res://.godot/imported/terrain_path.png-c3e4d5e276108d570864bade6f58f322.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
-source_file="res://assets/sprites/environment/ground_tiles.png"
+source_file="res://assets/sprites/environment/terrain_path.png"
+dest_files=["res://.godot/imported/terrain_path.png-c3e4d5e276108d570864bade6f58f322.ctex"]
 
 [params]
 

@@ -65,32 +65,16 @@ func _make_slot(index: int) -> Control:
 	var slot: Dictionary = _inventory.slots[index]
 	var btn := Button.new()
 	btn.custom_minimum_size = Vector2(52, 52)
+	btn.flat = true
+	btn.focus_mode = Control.FOCUS_NONE
 
-	var slot_s := UIStyle.make_slot_style(index == _inventory.selected_slot)
-	btn.add_theme_stylebox_override("normal",  slot_s)
-	btn.add_theme_stylebox_override("hover",   slot_s)
-	btn.add_theme_stylebox_override("pressed", slot_s)
-
+	var icon := ItemIcon.new()
+	icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon.set_selected(index == _inventory.selected_slot)
 	if slot.item != null:
-		var inner := ColorRect.new()
-		inner.color = slot.item.color
-		inner.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		inner.offset_left   = 9
-		inner.offset_right  = -9
-		inner.offset_top    = 9
-		inner.offset_bottom = -9
-		inner.mouse_filter  = Control.MOUSE_FILTER_IGNORE
-		btn.add_child(inner)
-
-		if slot.amount > 1:
-			var lbl := Label.new()
-			lbl.text = "x%d" % slot.amount
-			lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-			lbl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
-			lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-			lbl.add_theme_font_size_override("font_size", 9)
-			lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			btn.add_child(lbl)
+		icon.show_item(slot.item, slot.amount)
+	btn.add_child(icon)
 
 	btn.pressed.connect(func(): _inventory.select_slot(index))
 	return btn

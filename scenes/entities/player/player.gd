@@ -29,6 +29,8 @@ const CLICK_STOP_DIST := 6.0
 
 func _ready() -> void:
 	health.died.connect(_on_died)
+	health.damaged.connect(func(amount): EventBus.player_damaged.emit(amount))
+	health.died.connect(func(): EventBus.player_died.emit())
 	add_to_group("player")
 	_setup_sprite_frames()
 
@@ -141,6 +143,7 @@ func _use_selected_item() -> void:
 	if item.heal_amount > 0.0 and health.current_health < health.max_health:
 		health.heal(item.heal_amount)
 		inventory.remove_item(item, 1)
+		EventBus.item_used.emit(item)
 
 
 func _try_attack() -> void:

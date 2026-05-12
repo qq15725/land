@@ -5,7 +5,8 @@
     "seed_item_id": "carrot_seed",
     "output_item_id": "carrot",
     "output_amount": 3,
-    "growth_time": 20.0
+    "growth_time": 20.0,
+    "allowed_seasons": ["spring", "autumn"]
   },
   {
     "id": "wheat",
@@ -14,7 +15,8 @@
     "output_item_id": "wheat",
     "output_amount": 4,
     "growth_time": 30.0,
-    "bonus_drop": {"item_id": "hay", "amount": 2}
+    "bonus_drop": {"item_id": "hay", "amount": 2},
+    "allowed_seasons": ["summer", "autumn"]
   },
   {
     "id": "potato",
@@ -22,7 +24,8 @@
     "seed_item_id": "potato_seed",
     "output_item_id": "potato",
     "output_amount": 4,
-    "growth_time": 35.0
+    "growth_time": 35.0,
+    "allowed_seasons": ["spring", "winter"]
   },
   {
     "id": "tomato",
@@ -30,6 +33,7 @@
     "seed_item_id": "tomato_seed",
     "output_item_id": "tomato",
     "output_amount": 3,
-    "growth_time": 45.0
+    "growth_time": 45.0,
+    "allowed_seasons": ["summer"]
   }
 ]

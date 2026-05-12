@@ -1,5 +1,11 @@
 extends Node
 
+const ICON_SHEET_PATH := "res://assets/sprites/items/icons.png"
+const ICON_GRID_COLS := 8
+const ICON_GRID_ROWS := 4
+
+var _icon_size: int = 32
+
 var _items: Dictionary = {}
 var _buildings: Array = []
 var _recipes: Array = []
@@ -8,8 +14,15 @@ var _animals: Dictionary = {}
 var _creatures: Dictionary = {}
 var _merchants: Array = []
 var _resource_nodes: Array = []
+var _biomes: Array = []
+
+var _icon_sheet: Texture2D = null
+var _icon_cache: Dictionary = {}
 
 func _ready() -> void:
+	_icon_sheet = load(ICON_SHEET_PATH) as Texture2D
+	if _icon_sheet:
+		_icon_size = _icon_sheet.get_width() / ICON_GRID_COLS
 	_load_items()
 	_load_buildings()
 	_load_recipes()
@@ -18,6 +31,7 @@ func _ready() -> void:
 	_load_creatures()
 	_load_merchants()
 	_load_resource_nodes()
+	_load_biomes()
 	_resolve_refs()
 
 func _load_items() -> void:
@@ -31,6 +45,8 @@ func _load_items() -> void:
 		item.heal_amount = d.get("heal_amount", 0.0)
 		var c: Array = d.get("color", [1.0, 1.0, 1.0, 1.0])
 		item.color = Color(c[0], c[1], c[2], c[3])
+		var g: Array = d.get("icon_grid", [0, 0])
+		item.icon_grid = Vector2i(int(g[0]), int(g[1]))
 		_items[item.id] = item
 
 func _load_buildings() -> void:
@@ -40,9 +56,11 @@ func _load_buildings() -> void:
 		b.display_name = d.get("display_name", "")
 		b.category = d.get("category", "building")
 		b.scene_path = d.get("scene_path", "")
+		b.sprite_path = d.get("sprite_path", "res://assets/sprites/buildings/%s.png" % b.id)
 		b.animal_id = d.get("animal_id", "")
 		b.connects = d.get("connects", false)
 		b.is_gate = d.get("is_gate", false)
+		b.custom_render = d.get("custom_render", false)
 		for c in d.get("cost", []):
 			b.cost.append({"item_id": c["item_id"], "amount": c["amount"], "item": null})
 		_buildings.append(b)
@@ -68,6 +86,7 @@ func _load_crops() -> void:
 		c.output_amount = d.get("output_amount", 1)
 		c.growth_time = d.get("growth_time", 20.0)
 		c.bonus_drop = d.get("bonus_drop", {})
+		c.allowed_seasons = d.get("allowed_seasons", [])
 		_crops.append(c)
 
 func _load_animals() -> void:
@@ -140,6 +159,16 @@ func _load_resource_nodes() -> void:
 		n.drop_table = d.get("drop_table", [])
 		_resource_nodes.append(n)
 
+func _load_biomes() -> void:
+	for d in _read_json("res://data/biomes.json"):
+		var b := BiomeData.new()
+		b.id = d.get("id", "")
+		b.display_name = d.get("display_name", "")
+		b.spawn_density = float(d.get("spawn_density", 1.0))
+		b.resource_weights = d.get("resource_weights", {})
+		b.creature_weights = d.get("creature_weights", {})
+		_biomes.append(b)
+
 func _resolve_refs() -> void:
 	for b in _buildings:
 		for c in b.cost:
@@ -165,6 +194,37 @@ func _resolve_refs() -> void:
 
 func get_item(id: String) -> ItemData:
 	return _items.get(id, null)
+
+func get_icon_size() -> int:
+	return _icon_size
+
+# 返回 item 在图标表中的 AtlasTexture（已缓存）。
+# icons.png 缺失或字段为空时回退到一个纯色占位 ImageTexture。
+func get_item_icon(item: ItemData) -> Texture2D:
+	if item == null:
+		return null
+	var key: String = item.id
+	if _icon_cache.has(key):
+		return _icon_cache[key]
+	var tex: Texture2D
+	if _icon_sheet:
+		var atlas := AtlasTexture.new()
+		atlas.atlas = _icon_sheet
+		atlas.region = Rect2(
+			item.icon_grid.x * _icon_size,
+			item.icon_grid.y * _icon_size,
+			_icon_size, _icon_size
+		)
+		tex = atlas
+	else:
+		tex = _make_color_icon(item.color)
+	_icon_cache[key] = tex
+	return tex
+
+func _make_color_icon(c: Color) -> ImageTexture:
+	var img := Image.create(_icon_size, _icon_size, false, Image.FORMAT_RGBA8)
+	img.fill(c)
+	return ImageTexture.create_from_image(img)
 
 func get_crop_for_seed(item: ItemData) -> CropData:
 	for crop in _crops:
@@ -209,6 +269,15 @@ func get_resource_node(id: String) -> ResourceNodeData:
 	for n in _resource_nodes:
 		if n.id == id:
 			return n
+	return null
+
+func get_all_biomes() -> Array:
+	return _biomes
+
+func get_biome(id: String) -> BiomeData:
+	for b in _biomes:
+		if b.id == id:
+			return b
 	return null
 
 func _read_json(path: String) -> Array:

@@ -1,13 +1,19 @@
 extends Node
 
 const SHEET_PATH := "res://assets/sprites/ui/ui_sheet.png"
+const FONT_PATH := "res://assets/fonts/pixel.ttf"  # 用户自行放置即可启用
+const DEFAULT_FONT_SIZE := 13
 
-# 对外暴露，挂到需要统一风格的节点上即可
+# 对外暴露的全局 Theme。所有 UI 通过 `theme = UIStyle.theme` 接入。
 var theme := Theme.new()
 # 格子美术，单独暴露供背包/储物箱槽位复用
 var _slot_base: StyleBoxTexture = null
 
 func _ready() -> void:
+	_load_sheet()
+	_load_font()
+
+func _load_sheet() -> void:
 	var sheet := Image.load_from_file(SHEET_PATH)
 	if not sheet:
 		return
@@ -22,6 +28,7 @@ func _ready() -> void:
 	var sep_s    := _crop(sheet, Rect2i(0, 528,   64,  12),  0,  0,  0,  0)
 
 	theme.set_stylebox("panel",      "PanelContainer", panel_s)
+	theme.set_stylebox("panel",      "Panel",          _slot_base.duplicate())
 	theme.set_stylebox("normal",     "Button",         btn_n)
 	theme.set_stylebox("hover",      "Button",         btn_h)
 	theme.set_stylebox("pressed",    "Button",         btn_p)
@@ -31,6 +38,15 @@ func _ready() -> void:
 	theme.set_constant("separation", "HSeparator", 12)
 	theme.set_stylebox("background", "ProgressBar",    hp_bg)
 	theme.set_stylebox("fill",       "ProgressBar",    hp_fill)
+
+func _load_font() -> void:
+	if not ResourceLoader.exists(FONT_PATH):
+		return
+	var font := load(FONT_PATH) as Font
+	if font == null:
+		return
+	theme.default_font = font
+	theme.default_font_size = DEFAULT_FONT_SIZE
 
 
 func make_slot_style(selected: bool) -> StyleBox:

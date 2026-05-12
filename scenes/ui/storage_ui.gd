@@ -83,45 +83,26 @@ func _fill_grid(grid: GridContainer, inventory: InventoryComponent, is_storage: 
 		child.queue_free()
 	for i in inventory.slots.size():
 		var slot: Dictionary = inventory.slots[i]
-		grid.add_child(_make_slot_btn(slot, inventory, is_storage))
+		grid.add_child(_make_slot_btn(slot, is_storage))
 
-func _make_slot_btn(slot: Dictionary, source: InventoryComponent, from_storage: bool) -> Control:
+func _make_slot_btn(slot: Dictionary, from_storage: bool) -> Control:
 	var btn := Button.new()
 	btn.custom_minimum_size = Vector2(50, 50)
+	btn.flat = true
+	btn.focus_mode = Control.FOCUS_NONE
 
-	var slot_s := UIStyle.make_slot_style(false)
-	btn.add_theme_stylebox_override("normal",  slot_s)
-	btn.add_theme_stylebox_override("hover",   slot_s)
-	btn.add_theme_stylebox_override("pressed", slot_s)
-
+	var icon := ItemIcon.new()
+	icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if slot.item != null:
-		var inner := ColorRect.new()
-		inner.color = slot.item.color
-		inner.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		inner.offset_left   = 9
-		inner.offset_right  = -9
-		inner.offset_top    = 9
-		inner.offset_bottom = -9
-		inner.mouse_filter  = Control.MOUSE_FILTER_IGNORE
-		btn.add_child(inner)
-
-		if slot.amount > 1:
-			var lbl := Label.new()
-			lbl.text = "x%d" % slot.amount
-			lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-			lbl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
-			lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-			lbl.add_theme_font_size_override("font_size", 9)
-			lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			btn.add_child(lbl)
-
+		icon.show_item(slot.item, slot.amount)
 		var item: ItemData = slot.item
 		var amount: int = slot.amount
 		if from_storage:
 			btn.pressed.connect(func(): _transfer(item, amount, _storage_inventory, _player_inventory))
 		else:
 			btn.pressed.connect(func(): _transfer(item, amount, _player_inventory, _storage_inventory))
-
+	btn.add_child(icon)
 	return btn
 
 func _transfer(item: ItemData, amount: int, from: InventoryComponent, to: InventoryComponent) -> void:

@@ -1,0 +1,46 @@
+[
+  {
+    "id": "grassland",
+    "display_name": "草原",
+    "spawn_density": 1.0,
+    "resource_weights": {
+      "tree": 0.35, "stone": 0.25, "iron_ore": 0.05, "berry_bush": 0.25, "mushroom": 0.10
+    },
+    "creature_weights": {
+      "slime": 0.7, "skeleton": 0.3
+    }
+  },
+  {
+    "id": "forest",
+    "display_name": "森林",
+    "spawn_density": 1.3,
+    "resource_weights": {
+      "tree": 0.70, "stone": 0.05, "iron_ore": 0.02, "berry_bush": 0.13, "mushroom": 0.10
+    },
+    "creature_weights": {
+      "slime": 0.5, "skeleton": 0.5
+    }
+  },
+  {
+    "id": "rocky",
+    "display_name": "山地",
+    "spawn_density": 0.9,
+    "resource_weights": {
+      "tree": 0.15, "stone": 0.50, "iron_ore": 0.25, "berry_bush": 0.05, "mushroom": 0.05
+    },
+    "creature_weights": {
+      "slime": 0.3, "skeleton": 0.7
+    }
+  },
+  {
+    "id": "swamp",
+    "display_name": "沼泽",
+    "spawn_density": 1.1,
+    "resource_weights": {
+      "tree": 0.25, "stone": 0.10, "iron_ore": 0.05, "berry_bush": 0.20, "mushroom": 0.40
+    },
+    "creature_weights": {
+      "slime": 0.8, "skeleton": 0.2
+    }
+  }
+]

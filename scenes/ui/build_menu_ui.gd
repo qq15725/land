@@ -5,7 +5,7 @@ var _list: VBoxContainer
 
 func _ready() -> void:
 	super()
-	custom_minimum_size = Vector2(280, 360)
+	custom_minimum_size = Vector2(320, 400)
 	set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	visible = false
 	_build_layout()
@@ -79,8 +79,11 @@ func _add_building_entry(building: BuildingData) -> void:
 	var can_afford := BuildingSystem.can_afford(building, _inventory)
 
 	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
 	row.modulate = Color.WHITE if can_afford else Color(0.6, 0.6, 0.6)
 	_list.add_child(row)
+
+	row.add_child(_make_building_thumb(building))
 
 	var info := VBoxContainer.new()
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -90,10 +93,14 @@ func _add_building_entry(building: BuildingData) -> void:
 	name_lbl.text = building.display_name
 	info.add_child(name_lbl)
 
-	var cost_lbl := Label.new()
-	cost_lbl.text = _format_cost(building.cost)
-	cost_lbl.add_theme_font_size_override("font_size", 11)
-	info.add_child(cost_lbl)
+	var cost_box := HBoxContainer.new()
+	cost_box.add_theme_constant_override("separation", 2)
+	for c in building.cost:
+		var chip := ItemIcon.new()
+		chip.custom_minimum_size = Vector2(28, 28)
+		chip.show_item(c["item"], c["amount"])
+		cost_box.add_child(chip)
+	info.add_child(cost_box)
 
 	var btn := Button.new()
 	btn.text = "放置"
@@ -103,11 +110,25 @@ func _add_building_entry(building: BuildingData) -> void:
 
 	_list.add_child(HSeparator.new())
 
-func _format_cost(cost: Array) -> String:
-	var parts: PackedStringArray = []
-	for c in cost:
-		parts.append("%s ×%d" % [c["item"].display_name, c["amount"]])
-	return "消耗：" + ", ".join(parts)
+func _make_building_thumb(building: BuildingData) -> Control:
+	var box := Panel.new()
+	box.custom_minimum_size = Vector2(48, 48)
+	box.add_theme_stylebox_override("panel", UIStyle.make_slot_style(false))
+	var tex := BuildingSystem.get_thumb_texture(building)
+	if tex:
+		var rect := TextureRect.new()
+		rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		rect.offset_left = 6
+		rect.offset_top = 6
+		rect.offset_right = -6
+		rect.offset_bottom = -6
+		rect.texture = tex
+		rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		rect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		box.add_child(rect)
+	return box
 
 func _on_place(building: BuildingData) -> void:
 	hide()

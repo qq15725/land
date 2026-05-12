@@ -74,7 +74,8 @@
       {"item_id": "wood", "amount": 6},
       {"item_id": "stone", "amount": 2}
     ],
-    "animal_id": "chicken"
+    "animal_id": "chicken",
+    "custom_render": true
   },
   {
     "id": "silo",
@@ -101,7 +102,8 @@
     ],
     "animal_id": "",
     "connects": true,
-    "is_gate": false
+    "is_gate": false,
+    "custom_render": true
   },
   {
     "id": "wood_fence_gate",
@@ -114,7 +116,8 @@
     ],
     "animal_id": "",
     "connects": true,
-    "is_gate": true
+    "is_gate": true,
+    "custom_render": true
   },
   {
     "id": "iron_fence",
@@ -126,7 +129,8 @@
     ],
     "animal_id": "",
     "connects": true,
-    "is_gate": false
+    "is_gate": false,
+    "custom_render": true
   },
   {
     "id": "mailbox",

@@ -6,10 +6,11 @@ const AnimalScene := preload("res://scenes/farm/animal.tscn")
 func interact(_player: Player) -> void:
 	pass
 
-func on_placed(building_data: BuildingData = null) -> void:
+func on_placed(data: BuildingData = null) -> void:
+	super.on_placed(data)
 	var animal_id := ""
-	if building_data != null:
-		animal_id = building_data.animal_id
+	if data != null:
+		animal_id = data.animal_id
 	else:
 		var bd := ItemDatabase.get_building("animal_pen")
 		if bd:

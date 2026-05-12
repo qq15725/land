@@ -6,8 +6,14 @@
 | 类型 | 源文件尺寸 | 游戏内渲染 | 示例 |
 |------|----------|-----------|------|
 | 小型家具/设施 | 192×192 px | 48×48 px | 工作台、箱子、烹饪锅 |
-| 中型建筑 | 256×256 px | 64×64 px | 贸易摊、围栏门、小棚屋 |
+| 中型建筑 | 256×256 px | 64×64 px | 贸易摊、信箱、筒仓 |
 | 大型建筑 | 384×384 / 384×512 px | 96×96 / 96×128 px | 房屋、仓库、畜棚 |
+
+## 代码接入说明
+
+- `BuildingBase`（`scenes/buildings/building_base.gd`）会在 `on_placed()` 中自动加载 `BuildingData.sprite_path`（默认 `res://assets/sprites/buildings/{id}.png`）到 Visual 子节点。
+- 缺少 sprite 时回退到按 id 哈希着色的占位矩形。
+- 围栏/特殊建筑通过 `custom_render: true` 跳过此流程，自行绘制（参见 `fence_wood.gd` 的 `_draw()`）。
 
 ## 提示词模板
 
@@ -33,3 +39,9 @@ Minecraft pixel art, game asset, no background
 | `cooking_pot` | stone block furnace with orange fire pixel glow on front face | 192×192 | `assets/sprites/buildings/cooking_pot.png` | ✅ 已接入 |
 | `farm_plot` | flat farmland block, dark brown tilled soil with pixel row lines | 192×192 | `assets/sprites/buildings/farm_plot.png` | ✅ 已接入 |
 | `trading_post` | wooden block booth, plank walls, colorful pixel banner squares on front | 256×256 | `assets/sprites/buildings/trading_post.png` | ✅ 已接入 |
+| `barn` | large red wood barn block, white pixel trim, hay door on front face | 384×384 | `assets/sprites/buildings/barn.png` | ⏳ 待生成（用占位） |
+| `silo` | tall cylindrical silo made of grey metal block panels, conical top, square pixel rivets | 256×384 | `assets/sprites/buildings/silo.png` | ⏳ 待生成（用占位） |
+| `mailbox` | small wooden mailbox block on a thin post, red pixel flag on side | 192×192 | `assets/sprites/buildings/mailbox.png` | ⏳ 待生成（用占位） |
+| `animal_pen` | small wooden fenced pen with hay floor square inside, oak fence post blocks | 256×256 | `assets/sprites/buildings/animal_pen.png` | ⏳ 占位（custom_render=true 走 Polygon2D） |
+
+> 围栏（`wood_fence` / `iron_fence` / `wood_fence_gate`）由 `_draw()` 程序绘制，无 sprite。

@@ -19,4 +19,5 @@ func craft(recipe: RecipeData, inventory: InventoryComponent) -> bool:
 	for ing in recipe.ingredients:
 		inventory.remove_item(ing["item"], ing["amount"])
 	inventory.add_item(recipe.output_item, recipe.output_amount)
+	EventBus.item_crafted.emit(recipe)
 	return true

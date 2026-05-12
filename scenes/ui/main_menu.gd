@@ -62,7 +62,6 @@ func _build_layout() -> void:
 func _build_left() -> Control:
 	var vbox := VBoxContainer.new()
 	vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	vbox.size_flags_stretch_ratio = 0.42
 	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
 	vbox.add_theme_constant_override("separation", 10)
 
@@ -122,8 +121,8 @@ func _build_left() -> Control:
 
 func _build_right() -> Control:
 	var wrapper := VBoxContainer.new()
-	wrapper.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	wrapper.size_flags_stretch_ratio = 0.58
+	wrapper.size_flags_horizontal = Control.SIZE_SHRINK_END
+	wrapper.custom_minimum_size = Vector2(500, 0)
 	wrapper.alignment = BoxContainer.ALIGNMENT_CENTER
 
 	# panel_wood.png：192×192，木框边约 18px
@@ -382,6 +381,17 @@ func _show_new_game_panel(slot: int) -> void:
 	overlay.add_child(center)
 
 	var panel := PanelContainer.new()
+	var ps := StyleBoxTexture.new()
+	ps.texture = load("res://assets/sprites/ui/panel_wood.png")
+	ps.texture_margin_left   = 18
+	ps.texture_margin_right  = 18
+	ps.texture_margin_top    = 18
+	ps.texture_margin_bottom = 18
+	ps.content_margin_left   = 0
+	ps.content_margin_right  = 0
+	ps.content_margin_top    = 0
+	ps.content_margin_bottom = 0
+	panel.add_theme_stylebox_override("panel", ps)
 	center.add_child(panel)
 
 	var margin := MarginContainer.new()

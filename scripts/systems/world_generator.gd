@@ -4,6 +4,10 @@ extends Node
 const MAP_HALF := 100
 const MAP_SIZE := MAP_HALF * 2
 
+# ── Biome 噪声 ───────────────────────────────────────────────────────────────
+const BIOME_FREQ := 0.008
+var _biome_noise: FastNoiseLite = null
+
 # ── 地形类型 ID ───────────────────────────────────────────────────────────────
 const TERRAIN_GRASS    := 0
 const TERRAIN_PATH     := 1
@@ -124,15 +128,54 @@ func generate(tilemap: TileMap, seed_val: int) -> void:
 	_carve_paths(map, seed_val)
 	tilemap.clear()
 	_apply_terrain(tilemap, map, MAP_SIZE, MAP_SIZE, -MAP_HALF, -MAP_HALF)
+	init_biome_noise(seed_val)
+
+
+# Biome 噪声基于世界 seed，与 tile 生成同步。
+func init_biome_noise(seed_val: int) -> void:
+	_biome_noise = _make_noise(seed_val + 1000, BIOME_FREQ, 2)
+
+
+# 按世界坐标查 biome。预设地图模式下也用同一噪声（地图 id hash 作为 seed）。
+func get_biome_at(pos: Vector2) -> BiomeData:
+	var biomes := ItemDatabase.get_all_biomes()
+	if biomes.is_empty():
+		return null
+	if _biome_noise == null:
+		init_biome_noise(0)
+	# 用 [TILE_SIZE] 把世界坐标转成噪声坐标
+	var n := _biome_noise.get_noise_2d(pos.x, pos.y)
+	# n ∈ [-1, 1] 等分给 N 个 biome
+	var idx := clampi(int((n + 1.0) * 0.5 * biomes.size()), 0, biomes.size() - 1)
+	return biomes[idx]
 
 
 func _apply_terrain(tilemap: TileMap, map: Array, w: int, h: int, ox: int, oy: int) -> void:
-	var by_terrain: Array = [[], [], [], []]
+	# 预建 blob bitmask → atlas坐标 查找表，绕开 set_cells_terrain_connect 的传播开销
+	var lookup: Dictionary = {}
+	var blob_tiles := _enumerate_blob_tiles()
+	for idx in blob_tiles.size():
+		var b: Dictionary = blob_tiles[idx]
+		var key: int = (b.n << 7) | (b.e << 6) | (b.s << 5) | (b.w << 4) \
+					 | (b.ne << 3) | (b.se << 2) | (b.sw << 1) | b.nw
+		lookup[key] = Vector2i(idx % ATLAS_COLS, idx / ATLAS_COLS)
+
+	var w1 := w - 1
+	var h1 := h - 1
 	for row in h:
 		for col in w:
-			by_terrain[map[row * w + col]].append(Vector2i(ox + col, oy + row))
-	for terrain_id in TERRAIN_COUNT:
-		tilemap.set_cells_terrain_connect(0, by_terrain[terrain_id], TERRAIN_SET, terrain_id)
+			var tid: int = map[row * w + col]
+			var n_v: int  = 1 if (row > 0  and map[(row - 1) * w + col]     == tid) else 0
+			var s_v: int  = 1 if (row < h1 and map[(row + 1) * w + col]     == tid) else 0
+			var e_v: int  = 1 if (col < w1 and map[row * w + col + 1]       == tid) else 0
+			var ww_v: int = 1 if (col > 0  and map[row * w + col - 1]       == tid) else 0
+			var ne_v: int = 1 if (n_v == 1 and e_v  == 1 and map[(row-1)*w + col+1] == tid) else 0
+			var se_v: int = 1 if (s_v == 1 and e_v  == 1 and map[(row+1)*w + col+1] == tid) else 0
+			var sw_v: int = 1 if (s_v == 1 and ww_v == 1 and map[(row+1)*w + col-1] == tid) else 0
+			var nw_v: int = 1 if (n_v == 1 and ww_v == 1 and map[(row-1)*w + col-1] == tid) else 0
+			var key: int = (n_v << 7) | (e_v << 6) | (s_v << 5) | (ww_v << 4) \
+						 | (ne_v << 3) | (se_v << 2) | (sw_v << 1) | nw_v
+			tilemap.set_cell(0, Vector2i(ox + col, oy + row), tid, lookup.get(key, Vector2i.ZERO))
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -170,6 +213,7 @@ func generate_from_image(tilemap: TileMap, image_path: String) -> Dictionary:
 
 	tilemap.clear()
 	_apply_terrain(tilemap, map, img_w, img_h, -half_w, -half_h)
+	init_biome_noise(image_path.hash())
 	return markers
 
 
@@ -264,7 +308,10 @@ func _smooth(map: Array) -> Array:
 				if n_stone * 2 > n_total:   nxt[_idx(x, y)] = TERRAIN_STONE
 				elif n_grass * 2 > n_total: nxt[_idx(x, y)] = TERRAIN_GRASS
 				else:                        nxt[_idx(x, y)] = cur[_idx(x, y)]
-		cur = nxt.duplicate()
+		# 引用交换代替 nxt.duplicate()，避免每次拷贝 40,000 元素
+		var tmp: Array = cur
+		cur = nxt
+		nxt = tmp
 	return cur
 
 

@@ -43,9 +43,16 @@ assets/sprites/items/{id}.png          # 物品图标（整张图标表）
 | 类型 | 文档 | 说明 |
 |------|------|------|
 | 角色与生物 | [art/characters.md](art/characters.md) | 玩家、NPC、怪物帧动画精灵表 |
-| 地砖 Autotile | [art/tiles.md](art/tiles.md) | ground_tiles.png，掩码系统，变体列，生成提示词 |
-| 环境物件 | [art/environment.md](art/environment.md) | 树、石、草丛、蘑菇等可采集/装饰物件 |
+| 地砖 Autotile | [art/tiles.md](art/tiles.md) | 掩码系统，变体列，生成提示词 |
+| 环境物件 | [art/environment.md](art/environment.md) | 树、石、草丛、蘑菇等可采集/装饰物件（含 3 帧采集动画） |
 | 建筑 | [art/buildings.md](art/buildings.md) | 工作台、箱子、贸易站等可建造建筑 |
-| 物品图标 | [art/items.md](art/items.md) | 背包 UI 图标表 |
+| 物品图标 | [art/items.md](art/items.md) | 背包 UI 图标表（8×4 grid，25 个物品） |
 | 游戏内 UI | [art/ui.md](art/ui.md) | HUD、面板、按钮、血量条等游戏内界面 |
 | 主菜单美术 | [art/main_menu.md](art/main_menu.md) | 背景、标题 Logo、存档槽、菜单按钮 |
+| 音效 | [../sounds.md](../sounds.md) | 事件 → 音效映射、风格描述、占位策略 |
+
+## 字体
+
+可选项：在 `assets/fonts/pixel.ttf` 放一个像素字体，`UIStyle` 自动接入到 Theme。文件不存在时使用 Godot 默认字体。
+
+推荐字体方向：等宽像素字体（如 Press Start 2P、Pixeled、Determination Mono Web），支持中文则需要包含 CJK 字形或单独中文像素字体（如 Zpix）。

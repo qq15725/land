@@ -3,6 +3,7 @@ class_name ItemData
 var id: String = ""
 var display_name: String = ""
 var icon_path: String = ""
+var icon_grid: Vector2i = Vector2i.ZERO
 var max_stack: int = 64
 var description: String = ""
 var color: Color = Color.WHITE

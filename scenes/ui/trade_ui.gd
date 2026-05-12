@@ -7,7 +7,7 @@ var _title_label: Label
 
 func _ready() -> void:
 	super()
-	custom_minimum_size = Vector2(340, 420)
+	custom_minimum_size = Vector2(360, 420)
 	set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	visible = false
 	_build_layout()
@@ -71,6 +71,7 @@ func _refresh() -> void:
 		return
 	for entry in _merchant_data.trades:
 		_trade_list.add_child(_make_trade_row(entry))
+		_trade_list.add_child(HSeparator.new())
 
 func _make_trade_row(entry: Dictionary) -> Control:
 	var row := HBoxContainer.new()
@@ -78,21 +79,18 @@ func _make_trade_row(entry: Dictionary) -> Control:
 
 	var can_afford := _player_inventory.has_item(entry["give_item"], entry["give_amount"])
 
-	var give_lbl := Label.new()
-	give_lbl.text = "%s ×%d" % [entry["give_item"].display_name, entry["give_amount"]]
-	give_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	give_lbl.add_theme_font_size_override("font_size", 13)
-	row.add_child(give_lbl)
+	row.add_child(_make_chip(entry["give_item"], entry["give_amount"]))
 
 	var arrow := Label.new()
 	arrow.text = "→"
+	arrow.add_theme_font_size_override("font_size", 18)
 	row.add_child(arrow)
 
-	var recv_lbl := Label.new()
-	recv_lbl.text = "%s ×%d" % [entry["receive_item"].display_name, entry["receive_amount"]]
-	recv_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	recv_lbl.add_theme_font_size_override("font_size", 13)
-	row.add_child(recv_lbl)
+	row.add_child(_make_chip(entry["receive_item"], entry["receive_amount"]))
+
+	var spacer := Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(spacer)
 
 	var btn := Button.new()
 	btn.text = "交换"
@@ -105,13 +103,20 @@ func _make_trade_row(entry: Dictionary) -> Control:
 
 	return row
 
+func _make_chip(item: ItemData, amount: int) -> Control:
+	var icon := ItemIcon.new()
+	icon.custom_minimum_size = Vector2(40, 40)
+	icon.show_item(item, amount)
+	return icon
+
 func _do_trade(entry: Dictionary) -> void:
 	if not _player_inventory.has_item(entry["give_item"], entry["give_amount"]):
 		return
 	var leftover := _player_inventory.add_item(entry["receive_item"], entry["receive_amount"])
 	if leftover > 0:
-		return  # 背包满，不扣除
+		return
 	_player_inventory.remove_item(entry["give_item"], entry["give_amount"])
+	EventBus.trade_completed.emit(entry["give_item"], entry["receive_item"])
 	_refresh()
 
 func _unhandled_input(event: InputEvent) -> void:

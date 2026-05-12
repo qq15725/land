@@ -1,0 +1,11 @@
+[
+  {"id": "pickup",  "path": "res://assets/audio/pickup.wav",  "volume_db": -4.0},
+  {"id": "collect", "path": "res://assets/audio/collect.wav", "volume_db": -2.0},
+  {"id": "craft",   "path": "res://assets/audio/craft.wav",   "volume_db": -3.0},
+  {"id": "place",   "path": "res://assets/audio/place.wav",   "volume_db": -3.0},
+  {"id": "hurt",    "path": "res://assets/audio/hurt.wav",    "volume_db": 0.0},
+  {"id": "death",   "path": "res://assets/audio/death.wav",   "volume_db": 0.0},
+  {"id": "use",     "path": "res://assets/audio/use.wav",     "volume_db": -4.0},
+  {"id": "trade",   "path": "res://assets/audio/trade.wav",   "volume_db": -3.0},
+  {"id": "ui_click","path": "res://assets/audio/ui_click.wav","volume_db": -6.0}
+]

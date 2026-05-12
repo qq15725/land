@@ -10,8 +10,7 @@ const StorageUIScene := preload("res://scenes/ui/storage_ui.tscn")
 const TradeUIScene := preload("res://scenes/ui/trade_ui.tscn")
 const PauseMenuScene := preload("res://scenes/ui/pause_menu.tscn")
 
-const RESOURCE_COUNT := 40
-const SPAWN_RADIUS := 600.0
+const SPAWN_RADIUS_TILES := 64           # 资源覆盖半径（tile）
 const MIN_SPAWN_DIST := 80.0
 const CREATURE_SPAWN_RADIUS := 500.0
 const CREATURE_MIN_DIST := 200.0
@@ -228,6 +227,8 @@ func _on_build_mode_entered(building: BuildingData) -> void:
 		if child is CollisionShape2D or child is CollisionObject2D:
 			child.set_deferred("disabled", true)
 	y_sort_layer.add_child(_build_preview)
+	if _build_preview.has_method("setup_preview"):
+		_build_preview.setup_preview(building)
 
 func _on_build_mode_exited() -> void:
 	if _build_preview:
@@ -253,22 +254,67 @@ func _scatter_resources() -> void:
 	var node_types := ItemDatabase.get_all_resource_nodes()
 	if node_types.is_empty():
 		return
-	var total_weight := 0.0
+	var biomes_exist := not ItemDatabase.get_all_biomes().is_empty()
+	var global_total := 0.0
 	for nd in node_types:
-		total_weight += nd.spawn_weight
-	for i in RESOURCE_COUNT:
-		var roll := rng.randf() * total_weight
-		var accumulated := 0.0
-		var chosen: ResourceNodeData = node_types[0]
-		for nd in node_types:
-			accumulated += nd.spawn_weight
-			if roll <= accumulated:
-				chosen = nd
-				break
-		var node: ResourceNode = ResourceNodeScene.instantiate()
-		node.resource_id = chosen.id
-		node.position = _random_pos(rng, MIN_SPAWN_DIST, SPAWN_RADIUS)
-		y_sort_layer.add_child(node)
+		global_total += nd.spawn_weight
+
+	# 按 chunk 划分均匀生成，每个 chunk 独立选 biome / 资源
+	var player_tile := Vector2i(
+		floori(player.global_position.x / TILE_SIZE),
+		floori(player.global_position.y / TILE_SIZE)
+	)
+	var chunks := ChunkManager.chunks_in_radius(player_tile, SPAWN_RADIUS_TILES)
+	for chunk in chunks:
+		for i in ChunkManager.RESOURCES_PER_CHUNK:
+			var pos := ChunkManager.random_in_chunk(rng, chunk)
+			if pos.distance_to(player.global_position) < MIN_SPAWN_DIST:
+				continue
+			var chosen: ResourceNodeData = null
+			if biomes_exist:
+				var biome := WorldGenerator.get_biome_at(pos)
+				if biome and rng.randf() > biome.spawn_density:
+					continue
+				chosen = _pick_resource_by_biome(rng, node_types, biome)
+			if chosen == null:
+				chosen = _pick_resource_global(rng, node_types, global_total)
+			if chosen == null:
+				continue
+			var node: ResourceNode = ResourceNodeScene.instantiate()
+			node.resource_id = chosen.id
+			node.position = pos
+			y_sort_layer.add_child(node)
+			ChunkManager.register_entity(chunk, node)
+
+func _pick_resource_by_biome(rng: RandomNumberGenerator, node_types: Array, biome: BiomeData) -> ResourceNodeData:
+	if biome == null or biome.resource_weights.is_empty():
+		return null
+	var total := 0.0
+	for w in biome.resource_weights.values():
+		total += float(w)
+	if total <= 0.0:
+		return null
+	var roll := rng.randf() * total
+	var acc := 0.0
+	for res_id in biome.resource_weights:
+		acc += float(biome.resource_weights[res_id])
+		if roll <= acc:
+			for nd in node_types:
+				if nd.id == res_id:
+					return nd
+			return null
+	return null
+
+func _pick_resource_global(rng: RandomNumberGenerator, node_types: Array, total_weight: float) -> ResourceNodeData:
+	if total_weight <= 0.0:
+		return null
+	var roll := rng.randf() * total_weight
+	var acc := 0.0
+	for nd in node_types:
+		acc += nd.spawn_weight
+		if roll <= acc:
+			return nd
+	return node_types[0]
 
 func _spawn_night_creatures() -> void:
 	var rng := RandomNumberGenerator.new()
@@ -278,10 +324,32 @@ func _spawn_night_creatures() -> void:
 		return
 	var count := rng.randi_range(3, 6)
 	for i in count:
+		var pos := _random_pos(rng, CREATURE_MIN_DIST, CREATURE_SPAWN_RADIUS)
+		var chosen := _pick_creature_for_pos(rng, all_creatures, pos)
+		if chosen == null:
+			continue
 		var creature: Creature = CreatureScene.instantiate()
-		creature.data = all_creatures[rng.randi() % all_creatures.size()]
-		creature.position = _random_pos(rng, CREATURE_MIN_DIST, CREATURE_SPAWN_RADIUS)
+		creature.data = chosen
+		creature.position = pos
 		y_sort_layer.add_child(creature)
+
+func _pick_creature_for_pos(rng: RandomNumberGenerator, all_creatures: Array, pos: Vector2) -> CreatureData:
+	var biome := WorldGenerator.get_biome_at(pos)
+	if biome and not biome.creature_weights.is_empty():
+		var total := 0.0
+		for w in biome.creature_weights.values():
+			total += float(w)
+		if total > 0.0:
+			var roll := rng.randf() * total
+			var acc := 0.0
+			for cid in biome.creature_weights:
+				acc += float(biome.creature_weights[cid])
+				if roll <= acc:
+					var c := ItemDatabase.get_creature(cid)
+					if c:
+						return c
+					break
+	return all_creatures[rng.randi() % all_creatures.size()]
 
 func _random_pos(rng: RandomNumberGenerator, min_dist: float, max_dist: float) -> Vector2:
 	var angle := rng.randf() * TAU

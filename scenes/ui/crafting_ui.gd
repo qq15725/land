@@ -6,7 +6,7 @@ var _current_station: String = ""
 
 func _ready() -> void:
 	super()
-	custom_minimum_size = Vector2(320, 420)
+	custom_minimum_size = Vector2(360, 440)
 	set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	visible = false
 	_build_layout()
@@ -67,27 +67,31 @@ func _add_recipe_entry(recipe: RecipeData) -> void:
 	var craftable := accessible and CraftingSystem.can_craft(recipe, _inventory)
 
 	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
 	row.modulate = Color.WHITE if craftable else Color(0.6, 0.6, 0.6)
 	_recipe_list.add_child(row)
+
+	row.add_child(_make_chip(recipe.output_item, recipe.output_amount, 44))
 
 	var info := VBoxContainer.new()
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(info)
 
 	var name_lbl := Label.new()
-	name_lbl.text = "%s  ×%d" % [recipe.output_item.display_name, recipe.output_amount]
+	name_lbl.text = recipe.output_item.display_name
 	info.add_child(name_lbl)
 
-	var ing_lbl := Label.new()
-	ing_lbl.text = _format_ingredients(recipe.ingredients)
-	ing_lbl.add_theme_font_size_override("font_size", 11)
-	info.add_child(ing_lbl)
+	var ing_box := HBoxContainer.new()
+	ing_box.add_theme_constant_override("separation", 2)
+	for ing in recipe.ingredients:
+		ing_box.add_child(_make_chip(ing["item"], ing["amount"], 28))
+	info.add_child(ing_box)
 
 	var btn := Button.new()
 	btn.custom_minimum_size = Vector2(72, 0)
 	btn.disabled = not craftable
 	if not accessible:
-		btn.text = "需要：" + _station_name(recipe.required_station)
+		btn.text = _station_name(recipe.required_station)
 	else:
 		btn.text = "合成"
 		btn.pressed.connect(func(): _on_craft(recipe))
@@ -95,17 +99,17 @@ func _add_recipe_entry(recipe: RecipeData) -> void:
 
 	_recipe_list.add_child(HSeparator.new())
 
+func _make_chip(item: ItemData, amount: int, size: int) -> Control:
+	var chip := ItemIcon.new()
+	chip.custom_minimum_size = Vector2(size, size)
+	chip.show_item(item, amount)
+	return chip
+
 func _station_name(station: String) -> String:
 	match station:
-		"workbench": return "工作台"
-		"cooking_pot": return "烹饪锅"
-		_: return station
-
-func _format_ingredients(ingredients: Array) -> String:
-	var parts: PackedStringArray = []
-	for ing in ingredients:
-		parts.append("%s ×%d" % [ing["item"].display_name, ing["amount"]])
-	return "需要：" + ", ".join(parts)
+		"workbench": return "需要工作台"
+		"cooking_pot": return "需要烹饪锅"
+		_: return "需要 " + station
 
 func _on_craft(recipe: RecipeData) -> void:
 	if CraftingSystem.craft(recipe, _inventory):
