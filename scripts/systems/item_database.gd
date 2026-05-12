@@ -2,7 +2,7 @@ extends Node
 
 const ICON_SHEET_PATH := "res://assets/sprites/items/icons.png"
 const ICON_GRID_COLS := 8
-const ICON_GRID_ROWS := 4
+const ICON_GRID_ROWS := 5
 
 var _icon_size: int = 32
 
@@ -47,6 +47,7 @@ func _load_items() -> void:
 		item.color = Color(c[0], c[1], c[2], c[3])
 		var g: Array = d.get("icon_grid", [0, 0])
 		item.icon_grid = Vector2i(int(g[0]), int(g[1]))
+		item.tool_type = d.get("tool_type", "")
 		_items[item.id] = item
 
 func _load_buildings() -> void:
@@ -208,14 +209,16 @@ func get_item_icon(item: ItemData) -> Texture2D:
 		return _icon_cache[key]
 	var tex: Texture2D
 	if _icon_sheet:
-		var atlas := AtlasTexture.new()
-		atlas.atlas = _icon_sheet
-		atlas.region = Rect2(
-			item.icon_grid.x * _icon_size,
-			item.icon_grid.y * _icon_size,
-			_icon_size, _icon_size
-		)
-		tex = atlas
+		var x := item.icon_grid.x * _icon_size
+		var y := item.icon_grid.y * _icon_size
+		# icons.png 未扩到新格子时回退到纯色，避免读越界透明
+		if x + _icon_size > _icon_sheet.get_width() or y + _icon_size > _icon_sheet.get_height():
+			tex = _make_color_icon(item.color)
+		else:
+			var atlas := AtlasTexture.new()
+			atlas.atlas = _icon_sheet
+			atlas.region = Rect2(x, y, _icon_size, _icon_size)
+			tex = atlas
 	else:
 		tex = _make_color_icon(item.color)
 	_icon_cache[key] = tex

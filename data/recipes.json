@@ -97,5 +97,91 @@
       {"item_id": "berry", "amount": 3}
     ],
     "required_station": "cooking_pot"
+  },
+  {
+    "id": "axe",
+    "output_item_id": "axe",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "wood", "amount": 3},
+      {"item_id": "stone", "amount": 2}
+    ],
+    "required_station": "workbench"
+  },
+  {
+    "id": "pickaxe",
+    "output_item_id": "pickaxe",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "wood", "amount": 2},
+      {"item_id": "stone", "amount": 3}
+    ],
+    "required_station": "workbench"
+  },
+  {
+    "id": "cooked_meat",
+    "output_item_id": "cooked_meat",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "meat", "amount": 1}
+    ],
+    "required_station": "cooking_pot"
+  },
+  {
+    "id": "corn_seed",
+    "output_item_id": "corn_seed",
+    "output_amount": 3,
+    "ingredients": [
+      {"item_id": "corn", "amount": 1}
+    ],
+    "required_station": ""
+  },
+  {
+    "id": "pumpkin_seed",
+    "output_item_id": "pumpkin_seed",
+    "output_amount": 2,
+    "ingredients": [
+      {"item_id": "pumpkin", "amount": 1}
+    ],
+    "required_station": ""
+  },
+  {
+    "id": "mushroom_soup",
+    "output_item_id": "mushroom_soup",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "mushroom", "amount": 2},
+      {"item_id": "milk", "amount": 1}
+    ],
+    "required_station": "cooking_pot"
+  },
+  {
+    "id": "pumpkin_soup",
+    "output_item_id": "pumpkin_soup",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "pumpkin", "amount": 1},
+      {"item_id": "milk", "amount": 1}
+    ],
+    "required_station": "cooking_pot"
+  },
+  {
+    "id": "corn_bread",
+    "output_item_id": "corn_bread",
+    "output_amount": 2,
+    "ingredients": [
+      {"item_id": "corn", "amount": 2},
+      {"item_id": "wheat", "amount": 1}
+    ],
+    "required_station": "cooking_pot"
+  },
+  {
+    "id": "bone_meal",
+    "output_item_id": "bone_meal",
+    "output_amount": 3,
+    "ingredients": [
+      {"item_id": "bone", "amount": 1}
+    ],
+    "required_station": "workbench"
   }
 ]

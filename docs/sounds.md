@@ -17,9 +17,21 @@
 | `EventBus.trade_completed` | 商人交易成功 | `trade` | `assets/audio/trade.wav` | 300–500 ms | 金币掉落 + 商人吆喝点缀 |
 | （UI 按钮按下） | UI 点击 | `ui_click` | `assets/audio/ui_click.wav` | 50–80 ms | 短促"哒" |
 
+## BGM 映射
+
+BGM 通过 `play_bgm(id)` 切换（独立 AudioStreamPlayer，循环播放）。`data/sounds.json` 中 BGM 条目带 `"loop": true`，文件名以 `bgm_` 开头时自动判定 loop。
+
+| 触发时机 | 音效 id | 路径 | 风格描述 |
+|----------|---------|------|---------|
+| 主菜单 | `bgm_menu` | `assets/audio/bgm_menu.ogg` | 温暖民谣主旋律，木吉他 + 风铃，循环 60s |
+| 世界 - 白天 | `bgm_day` | `assets/audio/bgm_day.ogg` | 轻快田园曲，长笛/木琴主旋律，循环 90s |
+| 世界 - 夜晚 | `bgm_night` | `assets/audio/bgm_night.ogg` | 神秘氛围音乐，钢琴 + 弦乐悬疑感，循环 90s |
+
+由 `TimeSystem.day_started` / `night_started` 信号自动切换。主菜单进入时 `SoundSystem.play_bgm("bgm_menu")`。World 场景 `_ready` 末尾调 `SoundSystem.play_world_bgm()` 按当前昼夜自动选歌。
+
 ## 调整音量
 
-在 `data/sounds.json` 中调 `volume_db`：`0.0` 原始，`-6.0` 一半响度，`-12.0` 1/4 响度。
+在 `data/sounds.json` 中调 `volume_db`：`0.0` 原始，`-6.0` 一半响度，`-12.0` 1/4 响度。BGM 通常 `-10.0` ~ `-14.0` 比 SFX 安静。
 
 ## 添加新音效
 

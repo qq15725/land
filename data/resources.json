@@ -9,7 +9,7 @@
       {"item_id": "hay",  "amount": 1, "chance": 0.3}
     ],
     "respawn_time": 30.0,
-    "tool_required": "",
+    "tool_required": "axe",
     "spawn_weight": 0.55,
     "collision_size": [12, 20],
     "collision_offset_y": -10,
@@ -42,7 +42,7 @@
       {"item_id": "stone",    "amount": 1, "chance": 0.5}
     ],
     "respawn_time": 120.0,
-    "tool_required": "",
+    "tool_required": "pickaxe",
     "spawn_weight": 0.08,
     "collision_size": [22, 16],
     "collision_offset_y": -8,

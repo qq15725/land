@@ -50,6 +50,8 @@ func delete_slot(slot: int) -> void:
 func _collect(world: Node2D) -> Dictionary:
 	var player: Player = world.get_node("YSortLayer/Player")
 	var ts: Variant = world.get("terrain_seed")
+	# 把当前 active chunk 状态同步到 ChunkManager._snapshots
+	ChunkManager.snapshot_active_chunks()
 	var data := {
 		"saved_at": Time.get_datetime_string_from_system(),
 		"day": TimeSystem.current_day,
@@ -59,7 +61,7 @@ func _collect(world: Node2D) -> Dictionary:
 		"player_pos": {"x": player.global_position.x, "y": player.global_position.y},
 		"player_hp": player.health.current_health,
 		"inventory": _save_inventory(player.inventory),
-		"resource_nodes": _save_resource_nodes(world),
+		"chunk_snapshots": ChunkManager.export_snapshots(),
 		"buildings": _save_buildings(world),
 	}
 	return data
@@ -84,7 +86,12 @@ func _apply(data: Dictionary, world: Node2D) -> void:
 	player.health.current_health = data.get("player_hp", player.health.max_health)
 
 	_load_inventory(player.inventory, data.get("inventory", []))
-	await _load_resource_nodes(world, data.get("resource_nodes", []))
+	# 新存档使用 chunk_snapshots；旧存档 resource_nodes 兜底
+	ChunkManager.clear_state()
+	if data.has("chunk_snapshots"):
+		ChunkManager.import_snapshots(data["chunk_snapshots"])
+	else:
+		_migrate_legacy_resource_nodes(data.get("resource_nodes", []))
 	await _load_buildings(world, data.get("buildings", []), data.get("farm_plots", []))
 
 # --- 背包 ---
@@ -108,39 +115,28 @@ func _load_inventory(inv: InventoryComponent, data: Array) -> void:
 			inv.slots[i] = {item = item, amount = entry.get("amount", 0)}
 	inv.changed.emit()
 
-# --- 资源节点 ---
-
-func _save_resource_nodes(world: Node2D) -> Array:
-	var result := []
-	for node in world.get_node("YSortLayer").get_children():
-		if node is ResourceNode:
-			result.append({
-				"resource_id": node.resource_id,
-				"x": node.global_position.x,
-				"y": node.global_position.y,
-				"depleted": node.is_depleted(),
-				"regen_timer": node.get_regen_timer(),
-			})
-	return result
+# --- 资源节点（统一走 ChunkManager.snapshots） ---
 
 const _ResourceNodeScene := preload("res://scenes/world/resource.tscn")
 
-func _load_resource_nodes(world: Node2D, data: Array) -> void:
-	var layer: Node2D = world.get_node("YSortLayer")
-	for node in layer.get_children():
-		if node is ResourceNode:
-			node.queue_free()
-	await world.get_tree().process_frame
+# 旧存档把 ResourceNode 平铺在 resource_nodes 数组里。
+# 按位置归到对应 chunk 的 snapshot，world.gd._update_chunks 加载附近 chunk 时会从中还原。
+func _migrate_legacy_resource_nodes(data: Array) -> void:
 	for entry in data:
 		var rid: String = entry.get("resource_id", "")
 		if rid.is_empty():
 			continue
-		var node: ResourceNode = _ResourceNodeScene.instantiate()
-		node.resource_id = rid
-		node.global_position = Vector2(entry.get("x", 0.0), entry.get("y", 0.0))
-		layer.add_child(node)
-		if entry.get("depleted", false):
-			node.restore_from_save(entry.get("regen_timer", 0.0))
+		var pos := Vector2(entry.get("x", 0.0), entry.get("y", 0.0))
+		var chunk := ChunkManager.world_to_chunk(pos)
+		ChunkManager.import_snapshots([{
+			"kind": "resource",
+			"id": rid,
+			"x": pos.x,
+			"y": pos.y,
+			"depleted": entry.get("depleted", false),
+			"chunk_x": chunk.x,
+			"chunk_y": chunk.y,
+		}])
 
 # --- 建筑（含 FarmPlot，统一路径） ---
 

@@ -24,8 +24,53 @@
     "detection_radius": 180.0,
     "wander_radius": 250.0,
     "drop_table": [
-      {"item_id": "wood", "min": 1, "max": 3, "chance": 0.7},
-      {"item_id": "stone", "min": 1, "max": 2, "chance": 0.5}
+      {"item_id": "bone", "min": 1, "max": 2, "chance": 0.9},
+      {"item_id": "wood", "min": 1, "max": 3, "chance": 0.5},
+      {"item_id": "stone", "min": 1, "max": 2, "chance": 0.4}
+    ]
+  },
+  {
+    "id": "wolf",
+    "display_name": "野狼",
+    "max_health": 50.0,
+    "move_speed": 110.0,
+    "attack_damage": 14.0,
+    "attack_range": 28.0,
+    "attack_cooldown": 0.9,
+    "detection_radius": 220.0,
+    "wander_radius": 280.0,
+    "drop_table": [
+      {"item_id": "meat", "min": 1, "max": 2, "chance": 0.7},
+      {"item_id": "leather", "min": 1, "max": 2, "chance": 0.5}
+    ]
+  },
+  {
+    "id": "zombie",
+    "display_name": "僵尸",
+    "max_health": 70.0,
+    "move_speed": 45.0,
+    "attack_damage": 18.0,
+    "attack_range": 30.0,
+    "attack_cooldown": 1.4,
+    "detection_radius": 160.0,
+    "wander_radius": 200.0,
+    "drop_table": [
+      {"item_id": "bone", "min": 1, "max": 2, "chance": 0.6},
+      {"item_id": "leather", "min": 0, "max": 1, "chance": 0.4}
+    ]
+  },
+  {
+    "id": "bat",
+    "display_name": "蝙蝠",
+    "max_health": 15.0,
+    "move_speed": 130.0,
+    "attack_damage": 5.0,
+    "attack_range": 24.0,
+    "attack_cooldown": 0.7,
+    "detection_radius": 250.0,
+    "wander_radius": 320.0,
+    "drop_table": [
+      {"item_id": "bone", "min": 1, "max": 1, "chance": 0.5}
     ]
   }
 ]

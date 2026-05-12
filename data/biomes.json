@@ -7,7 +7,7 @@
       "tree": 0.35, "stone": 0.25, "iron_ore": 0.05, "berry_bush": 0.25, "mushroom": 0.10
     },
     "creature_weights": {
-      "slime": 0.7, "skeleton": 0.3
+      "slime": 0.5, "skeleton": 0.2, "wolf": 0.3
     }
   },
   {
@@ -18,7 +18,7 @@
       "tree": 0.70, "stone": 0.05, "iron_ore": 0.02, "berry_bush": 0.13, "mushroom": 0.10
     },
     "creature_weights": {
-      "slime": 0.5, "skeleton": 0.5
+      "skeleton": 0.3, "wolf": 0.4, "bat": 0.3
     }
   },
   {
@@ -29,7 +29,7 @@
       "tree": 0.15, "stone": 0.50, "iron_ore": 0.25, "berry_bush": 0.05, "mushroom": 0.05
     },
     "creature_weights": {
-      "slime": 0.3, "skeleton": 0.7
+      "skeleton": 0.5, "zombie": 0.5
     }
   },
   {
@@ -40,7 +40,7 @@
       "tree": 0.25, "stone": 0.10, "iron_ore": 0.05, "berry_bush": 0.20, "mushroom": 0.40
     },
     "creature_weights": {
-      "slime": 0.8, "skeleton": 0.2
+      "slime": 0.4, "zombie": 0.4, "bat": 0.2
     }
   }
 ]

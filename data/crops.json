@@ -35,5 +35,23 @@
     "output_amount": 3,
     "growth_time": 45.0,
     "allowed_seasons": ["summer"]
+  },
+  {
+    "id": "corn",
+    "display_name": "玉米",
+    "seed_item_id": "corn_seed",
+    "output_item_id": "corn",
+    "output_amount": 3,
+    "growth_time": 50.0,
+    "allowed_seasons": ["summer", "autumn"]
+  },
+  {
+    "id": "pumpkin",
+    "display_name": "南瓜",
+    "seed_item_id": "pumpkin_seed",
+    "output_item_id": "pumpkin",
+    "output_amount": 2,
+    "growth_time": 60.0,
+    "allowed_seasons": ["autumn"]
   }
 ]

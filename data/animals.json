@@ -18,5 +18,25 @@
     "produce_time": 60.0,
     "wander_radius": 80.0,
     "color": [0.75, 0.60, 0.45, 1.0]
+  },
+  {
+    "id": "pig",
+    "display_name": "猪",
+    "feed_item_id": "animal_feed",
+    "produce_item_id": "meat",
+    "produce_amount": 1,
+    "produce_time": 90.0,
+    "wander_radius": 70.0,
+    "color": [0.95, 0.78, 0.78, 1.0]
+  },
+  {
+    "id": "sheep",
+    "display_name": "羊",
+    "feed_item_id": "hay",
+    "produce_item_id": "wool",
+    "produce_amount": 1,
+    "produce_time": 75.0,
+    "wander_radius": 70.0,
+    "color": [0.95, 0.95, 0.92, 1.0]
   }
 ]

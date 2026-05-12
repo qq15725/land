@@ -11,6 +11,7 @@ var resource_id: String = ""
 var item: ItemData
 var drop_amount: int = 3
 var respawn_time: float = 30.0
+var tool_required: String = ""
 
 @onready var _collision: CollisionShape2D = $CollisionShape2D
 @onready var visual: Sprite2D = $Visual
@@ -30,6 +31,7 @@ func _ready() -> void:
 			item = data.drop_item
 			drop_amount = data.drop_amount
 			respawn_time = data.respawn_time
+			tool_required = data.tool_required
 			_apply_data(data)
 	hint_label.hide()
 	interact_area.body_entered.connect(_on_body_entered)
@@ -105,11 +107,22 @@ func _make_fallback_texture(data: ResourceNodeData) -> ImageTexture:
 func interact(player: Player) -> void:
 	if depleted_flag or item == null:
 		return
+	if not tool_required.is_empty():
+		var held := player.inventory.get_selected_item()
+		if held == null or held.tool_type != tool_required:
+			hint_label.text = "需要 %s" % _tool_label(tool_required)
+			return
 	var leftover := player.inventory.add_item(item, drop_amount)
 	if leftover > 0:
 		_spawn_drops(leftover)
 	HitParticles.spawn(get_parent(), global_position, item.color)
 	_play_break_and_deplete()
+
+func _tool_label(tool: String) -> String:
+	match tool:
+		"axe": return "斧子"
+		"pickaxe": return "镐子"
+		_: return tool
 
 func _play_break_and_deplete() -> void:
 	depleted_flag = true

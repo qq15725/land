@@ -1,9 +1,9 @@
 # 美术：物品图标
 
-物品图标统一打包成一张 sprite sheet，按 **8 列 × 4 行** grid 排列。Godot 自动按 `icons.png.width / 8` 推断单格尺寸，所以**占位与正式版尺寸可以不同**，只要保持 8×4 网格即可：
+物品图标统一打包成一张 sprite sheet，按 **8 列 × 5 行** grid 排列。Godot 自动按 `icons.png.width / 8` 推断单格尺寸，所以**占位与正式版尺寸可以不同**，只要保持 8×5 网格即可：
 
-- 占位（已存在）：`256×128 px` → 单格 `32×32 px`
-- 正式版：`512×256 px` → 单格 `64×64 px`
+- 占位（已存在 8×4 旧版）：`256×128 px` → 单格 `32×32 px`，第 5 行越界会自动回退到纯色 icon
+- 正式版：`512×320 px` → 单格 `64×64 px`，扩到 5 行装下全部物品
 
 每个物品在 `data/items.json` 中通过 `icon_grid: [col, row]` 指定自己在网格中的坐标。
 
@@ -14,7 +14,7 @@
 ```
 Minecraft-style pixel art icon sheet, transparent background, flat front view,
 blocky item icons, hard square pixel edges, flat 2-3 tone color fills, no gradients.
-Grid layout, 8 columns × 4 rows. Canvas size {W}x{H} pixels, each cell {S}x{S} pixels.
+Grid layout, 8 columns × 5 rows. Canvas size {W}x{H} pixels, each cell {S}x{S} pixels.
 Strict grid layout, no padding between cells, no spacing between cells.
 Each icon is a simple recognizable block or item, Minecraft inventory icon style.
 
@@ -24,7 +24,7 @@ Icons (left to right, top to bottom):
 Minecraft pixel art, game asset icons, clean grid, transparent background
 ```
 
-## 当前图标分布（8 列 × 4 行）
+## 当前图标分布（8 列 × 5 行）
 
 `assets/sprites/items/icons.png` 中每个物品的网格坐标如下（与 `data/items.json` 一致）：
 
@@ -55,8 +55,21 @@ Minecraft pixel art, game asset icons, clean grid, transparent background
 | (6, 2) | `berry_jam` | 紫红色果酱玻璃罐 |
 | (7, 2) | `rare_seed` | 紫色发光稀有种子，星点像素 |
 | (0, 3) | `blueprint` | 卷起的米色羊皮纸蓝图 |
-
-> 剩下 (1, 3) 到 (7, 3) 共 7 格留空，方便未来加新物品。
+| (1, 3) | `axe` | 木柄铁斧子，刀刃像素高光 |
+| (2, 3) | `pickaxe` | 木柄铁镐子，T 字形头部 |
+| (3, 3) | `meat` | 粉红色生肉块，骨头白点像素 |
+| (4, 3) | `cooked_meat` | 棕色烤肉块，火烤纹路像素 |
+| (5, 3) | `leather` | 棕色皮革卷，方形堆叠 |
+| (6, 3) | `wool` | 白色绒毛团，方块化云朵 |
+| (7, 3) | `bone` | 白色骨头，两端方块状骨节 |
+| (0, 4) | `corn` | 黄色玉米棒，绿色苞叶像素 |
+| (1, 4) | `corn_seed` | 小袋装黄色玉米种子 |
+| (2, 4) | `pumpkin` | 橙色南瓜，纵向凹槽像素，绿色蒂 |
+| (3, 4) | `pumpkin_seed` | 小袋装橙色种子 |
+| (4, 4) | `mushroom_soup` | 木碗装棕色蘑菇汤，蘑菇块漂浮 |
+| (5, 4) | `pumpkin_soup` | 木碗装橙色南瓜汤，热气像素 |
+| (6, 4) | `corn_bread` | 金黄色玉米饼，方形扁面包 |
+| (7, 4) | `bone_meal` | 米白色骨粉堆，颗粒像素 |
 
 ## 替换流程
 

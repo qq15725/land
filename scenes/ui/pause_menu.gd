@@ -3,10 +3,15 @@ extends Control
 signal resumed
 signal saved_and_quit
 
+var _settings_menu: SettingsMenu = null
+
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	visible = false
 	_build_layout()
+	_settings_menu = SettingsMenu.new()
+	_settings_menu.process_mode = Node.PROCESS_MODE_ALWAYS  # 暂停时仍可点击
+	add_child(_settings_menu)
 
 func _build_layout() -> void:
 	var overlay := ColorRect.new()
@@ -50,6 +55,11 @@ func _build_layout() -> void:
 	save_btn.text = "保存游戏"
 	save_btn.pressed.connect(_on_save)
 	vbox.add_child(save_btn)
+
+	var settings_btn := Button.new()
+	settings_btn.text = "设置"
+	settings_btn.pressed.connect(func(): _settings_menu.open())
+	vbox.add_child(settings_btn)
 
 	var quit_btn := Button.new()
 	quit_btn.text = "保存并退出"

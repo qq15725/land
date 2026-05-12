@@ -11,9 +11,13 @@ const TradeUIScene := preload("res://scenes/ui/trade_ui.tscn")
 const PauseMenuScene := preload("res://scenes/ui/pause_menu.tscn")
 
 const SPAWN_RADIUS_TILES := 64           # 资源覆盖半径（tile）
+const ACTIVE_RADIUS_TILES := 64          # 玩家附近多少 tile 范围内的 chunk 保持 active
+const CHUNK_UPDATE_INTERVAL := 1.0       # 每 N 秒检查一次 chunk
 const MIN_SPAWN_DIST := 80.0
 const CREATURE_SPAWN_RADIUS := 500.0
 const CREATURE_MIN_DIST := 200.0
+
+var _chunk_update_timer: float = 0.0
 
 const TILE_SIZE := 16.0
 const PORTAL_RADIUS := 2        # 触发范围（格）
@@ -36,18 +40,20 @@ var _portal_cooldown: float = 0.0
 
 func _ready() -> void:
 	add_to_group("world")
+	ChunkManager.clear_state()
 	_setup_terrain()
 	_setup_ui()
 	if SaveSystem.slot_exists(GameManager.current_save_slot):
 		await SaveSystem.load_save(GameManager.current_save_slot, self)
 	else:
 		_load_map("0")
-		_scatter_resources()
+	_update_chunks()
 	BuildingSystem.build_mode_entered.connect(_on_build_mode_entered)
 	BuildingSystem.build_mode_exited.connect(_on_build_mode_exited)
 	BuildingSystem.building_placed.connect(_on_building_placed)
 	TimeSystem.night_started.connect(_on_night_started)
 	TimeSystem.day_started.connect(_on_day_started)
+	SoundSystem.play_world_bgm()
 
 func _load_map(map_id: String) -> void:
 	current_map_id = map_id
@@ -101,13 +107,14 @@ func _travel(marker_key: String) -> void:
 	else:
 		return
 
-	# 清除当前地图的临时实体
+	# 清除当前地图的临时实体（地图切换重置 chunk 状态）
 	for node in y_sort_layer.get_children():
 		if node is ResourceNode or node is Creature:
 			node.queue_free()
+	ChunkManager.clear_state()
 
 	_load_map(target_id)
-	_scatter_resources()
+	_update_chunks()
 	_portal_cooldown = PORTAL_COOLDOWN
 
 	# 传送玩家到目标地图入口
@@ -180,6 +187,10 @@ func _process(delta: float) -> void:
 		_build_preview.global_position = mpos
 	_update_day_overlay()
 	_check_portals(delta)
+	_chunk_update_timer += delta
+	if _chunk_update_timer >= CHUNK_UPDATE_INTERVAL:
+		_chunk_update_timer = 0.0
+		_update_chunks()
 
 func _update_day_overlay() -> void:
 	if TimeSystem.is_night():
@@ -248,7 +259,46 @@ func _on_night_started(_day: int) -> void:
 func _on_day_started(_day: int) -> void:
 	pass
 
-func _scatter_resources() -> void:
+func _update_chunks() -> void:
+	var player_tile := Vector2i(
+		floori(player.global_position.x / TILE_SIZE),
+		floori(player.global_position.y / TILE_SIZE)
+	)
+	var wanted := ChunkManager.chunks_in_radius(player_tile, ACTIVE_RADIUS_TILES)
+	var wanted_set: Dictionary = {}
+	for c in wanted:
+		wanted_set[c] = true
+
+	# 卸载远处的 chunk
+	for chunk in ChunkManager.get_active_chunks():
+		if not wanted_set.has(chunk):
+			ChunkManager.deactivate_chunk(chunk)
+
+	# 加载新进入的 chunk
+	for chunk in wanted:
+		if not ChunkManager.is_active(chunk):
+			_activate_chunk(chunk)
+
+func _activate_chunk(chunk: Vector2i) -> void:
+	ChunkManager.mark_active(chunk)
+	if ChunkManager.has_snapshot(chunk):
+		_restore_chunk_from_snapshot(chunk)
+	else:
+		_spawn_chunk_resources(chunk)
+
+func _restore_chunk_from_snapshot(chunk: Vector2i) -> void:
+	for entry in ChunkManager.get_snapshot(chunk):
+		if entry.get("kind", "") != "resource":
+			continue
+		var node: ResourceNode = ResourceNodeScene.instantiate()
+		node.resource_id = entry.get("id", "")
+		node.position = Vector2(entry.get("x", 0.0), entry.get("y", 0.0))
+		y_sort_layer.add_child(node)
+		if entry.get("depleted", false):
+			node.call_deferred("restore_from_save", 0.0)
+		ChunkManager.register_entity(chunk, node)
+
+func _spawn_chunk_resources(chunk: Vector2i) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
 	var node_types := ItemDatabase.get_all_resource_nodes()
@@ -258,33 +308,25 @@ func _scatter_resources() -> void:
 	var global_total := 0.0
 	for nd in node_types:
 		global_total += nd.spawn_weight
-
-	# 按 chunk 划分均匀生成，每个 chunk 独立选 biome / 资源
-	var player_tile := Vector2i(
-		floori(player.global_position.x / TILE_SIZE),
-		floori(player.global_position.y / TILE_SIZE)
-	)
-	var chunks := ChunkManager.chunks_in_radius(player_tile, SPAWN_RADIUS_TILES)
-	for chunk in chunks:
-		for i in ChunkManager.RESOURCES_PER_CHUNK:
-			var pos := ChunkManager.random_in_chunk(rng, chunk)
-			if pos.distance_to(player.global_position) < MIN_SPAWN_DIST:
+	for i in ChunkManager.RESOURCES_PER_CHUNK:
+		var pos := ChunkManager.random_in_chunk(rng, chunk)
+		if pos.distance_to(player.global_position) < MIN_SPAWN_DIST:
+			continue
+		var chosen: ResourceNodeData = null
+		if biomes_exist:
+			var biome := WorldGenerator.get_biome_at(pos)
+			if biome and rng.randf() > biome.spawn_density:
 				continue
-			var chosen: ResourceNodeData = null
-			if biomes_exist:
-				var biome := WorldGenerator.get_biome_at(pos)
-				if biome and rng.randf() > biome.spawn_density:
-					continue
-				chosen = _pick_resource_by_biome(rng, node_types, biome)
-			if chosen == null:
-				chosen = _pick_resource_global(rng, node_types, global_total)
-			if chosen == null:
-				continue
-			var node: ResourceNode = ResourceNodeScene.instantiate()
-			node.resource_id = chosen.id
-			node.position = pos
-			y_sort_layer.add_child(node)
-			ChunkManager.register_entity(chunk, node)
+			chosen = _pick_resource_by_biome(rng, node_types, biome)
+		if chosen == null:
+			chosen = _pick_resource_global(rng, node_types, global_total)
+		if chosen == null:
+			continue
+		var node: ResourceNode = ResourceNodeScene.instantiate()
+		node.resource_id = chosen.id
+		node.position = pos
+		y_sort_layer.add_child(node)
+		ChunkManager.register_entity(chunk, node)
 
 func _pick_resource_by_biome(rng: RandomNumberGenerator, node_types: Array, biome: BiomeData) -> ResourceNodeData:
 	if biome == null or biome.resource_weights.is_empty():

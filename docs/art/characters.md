@@ -64,3 +64,11 @@ Minecraft pixel art, game asset, no background, clean sprite sheet grid
 | `slime` | green cube slime, square body, pixel dot eyes, bouncy block movement | 512×1024 | `assets/sprites/characters/slime.png` | ✅ 已接入 |
 | `skeleton` | white rectangular skeleton, block skull head, stick-like limbs made of thin rectangles | 512×1024 | `assets/sprites/characters/skeleton.png` | ✅ 已接入 |
 | `chicken` | small white blocky chicken, square body, rectangular beak, stubby block legs | 512×1024 | `assets/sprites/characters/chicken.png` | ✅ 已接入 |
+| `cow` | blocky cow, white body with brown pixel patches, pink square nose, stubby block legs | 512×1024 | `assets/animals/cow.png` | ⏳ 待生成 |
+| `pig` | blocky pink pig, round-ish square body, pixel snout, four stubby block legs | 512×1024 | `assets/animals/pig.png` | ⏳ 待生成 |
+| `sheep` | blocky white woolly sheep, fluffy square block body, small head, four block legs | 512×1024 | `assets/animals/sheep.png` | ⏳ 待生成 |
+| `wolf` | blocky grey wolf, lean rectangular body, pixel teeth, sharp triangular ears made of squares | 512×1024 | `assets/creatures/wolf.png` | ⏳ 待生成 |
+| `zombie` | green-skinned blocky humanoid zombie, torn shirt, dragging walk pose | 512×1024 | `assets/creatures/zombie.png` | ⏳ 待生成 |
+| `bat` | small black bat with pixel wings, glowing red dot eyes, hovering in place | 512×1024 | `assets/creatures/bat.png` | ⏳ 待生成 |
+
+> 占位策略：缺失 PNG 时 `creature.gd` / `animal.gd` 加载会失败但不报错，节点保留但 sprite 透明。先以纯色 modulate 区分。建议用上方提示词在 AI 中生成 6 张 512×1024 sprite sheet 后放入对应路径。

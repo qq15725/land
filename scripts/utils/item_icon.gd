@@ -85,8 +85,64 @@ func _apply() -> void:
 		_icon.texture = ItemDatabase.get_item_icon(_item)
 		_icon.modulate = Color.WHITE
 		_count_label.text = "x%d" % _amount if _amount > 1 else ""
+		# 设非空 tooltip_text 让 Godot 触发 hover；实际样式走 _make_custom_tooltip
 		tooltip_text = _item.display_name
 	else:
 		_icon.texture = null
 		_count_label.text = ""
 		tooltip_text = ""
+
+
+# 自定义 tooltip：标题 + 描述 + 食物/工具效果 chip
+func _make_custom_tooltip(_for_text: String) -> Object:
+	if _item == null:
+		return null
+	var panel := PanelContainer.new()
+	panel.theme = UIStyle.theme
+	panel.custom_minimum_size = Vector2(220, 0)
+
+	var margin := MarginContainer.new()
+	for side in ["margin_left", "margin_right", "margin_top", "margin_bottom"]:
+		margin.add_theme_constant_override(side, 10)
+	panel.add_child(margin)
+
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 6)
+	margin.add_child(vbox)
+
+	var title := Label.new()
+	title.text = _item.display_name
+	title.add_theme_font_size_override("font_size", 14)
+	title.add_theme_color_override("font_color", Color(1.0, 0.95, 0.7))
+	vbox.add_child(title)
+
+	# 效果 chip
+	var chips: PackedStringArray = []
+	if _item.heal_amount > 0.0:
+		chips.append("回血 +%d" % int(_item.heal_amount))
+	if not _item.tool_type.is_empty():
+		chips.append("工具：" + _tool_type_label(_item.tool_type))
+	if not chips.is_empty():
+		var chip_lbl := Label.new()
+		chip_lbl.text = "  ·  ".join(chips)
+		chip_lbl.add_theme_font_size_override("font_size", 11)
+		chip_lbl.add_theme_color_override("font_color", Color(0.7, 0.95, 0.7))
+		vbox.add_child(chip_lbl)
+
+	if not _item.description.is_empty():
+		var desc := Label.new()
+		desc.text = _item.description
+		desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		desc.add_theme_font_size_override("font_size", 11)
+		desc.add_theme_color_override("font_color", Color(0.78, 0.78, 0.78))
+		desc.custom_minimum_size = Vector2(200, 0)
+		vbox.add_child(desc)
+
+	return panel
+
+
+func _tool_type_label(t: String) -> String:
+	match t:
+		"axe": return "斧子"
+		"pickaxe": return "镐子"
+		_: return t

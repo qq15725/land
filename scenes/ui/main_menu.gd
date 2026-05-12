@@ -15,13 +15,17 @@ var _update_btn: Button = null
 var _new_game_panel: Control = null
 var _update_dialog: Control = null
 var _slots_vbox: VBoxContainer = null
+var _settings_menu: SettingsMenu = null
 
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	theme = UIStyle.theme
 	_build_layout()
+	_settings_menu = SettingsMenu.new()
+	add_child(_settings_menu)
 	UpdateSystem.update_available.connect(_on_update_available)
+	SoundSystem.play_bgm("bgm_menu")
 
 
 func _build_layout() -> void:
@@ -174,6 +178,10 @@ func _build_right() -> Control:
 	_update_btn = _make_action_btn("⚙  检查更新", "res://assets/sprites/ui/btn_green.png")
 	_update_btn.pressed.connect(_on_check_update_pressed)
 	btn_row.add_child(_update_btn)
+
+	var settings_btn := _make_action_btn("⚙  设置", "res://assets/sprites/ui/btn_brown.png")
+	settings_btn.pressed.connect(func(): _settings_menu.open())
+	btn_row.add_child(settings_btn)
 
 	var quit_btn := _make_action_btn("⮐  退出游戏", "res://assets/sprites/ui/btn_brown.png")
 	quit_btn.pressed.connect(func(): get_tree().quit())
