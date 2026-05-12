@@ -62,6 +62,7 @@ land/
 | 单例名 | 脚本 | 职责 |
 |--------|------|------|
 | `EventBus` | `scripts/systems/event_bus.gd` | 全局信号中转 |
+| `Network` | `scripts/systems/network_system.gd` | 多人协议层（host-authoritative，单机用 OfflineMultiplayerPeer 包装）|
 | `GameManager` | `scripts/systems/game_manager.gd` | 游戏状态、流程控制 |
 | `ItemDatabase` | `scripts/systems/item_database.gd` | 物品/配方/建筑/怪物注册表，从 `data/*.json` 加载 |
 | `CraftingSystem` | `scripts/systems/crafting_system.gd` | 合成逻辑 |
