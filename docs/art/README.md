@@ -51,7 +51,8 @@ assets/sprites/items/icons.png         # 物品图标整张表
 | 环境物件 | [environment.md](environment.md) | 树、石、草丛、蘑菇等可采集/装饰物件 |
 | 建筑 | [buildings.md](buildings.md) | 工作台、箱子、贸易站等可建造建筑 |
 | 物品图标 | [items.md](items.md) | 背包 UI 图标表（8×5 grid） |
-| 游戏内 UI | [ui.md](ui.md) | HUD、面板、按钮、血量条等游戏内界面 |
+| 游戏内 UI | [ui.md](ui.md) | 面板背景、按钮、9-patch、血量条等通用 UI 元素 |
+| HUD 布局 | [hud.md](hud.md) | 游戏内 HUD 各区域部件规格（角色信息 / 快捷栏 / 小地图 / 状态栏 / 移动端控制） |
 | 主菜单美术 | [main_menu.md](main_menu.md) | 背景、标题 Logo、存档槽、菜单按钮 |
 
 ## 字体

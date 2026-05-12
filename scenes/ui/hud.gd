@@ -6,6 +6,7 @@ var _health_bar: ProgressBar
 var _mode_label: Label
 var _time_label: Label
 var _phase_icon: Label  # 占位：未接入图标前用 emoji 字符
+var _gold_label: Label
 var _toast_label: Label
 var _toast_timer: float = 0.0
 var _hotbar_row: HBoxContainer
@@ -46,6 +47,22 @@ func _build_top_left() -> void:
 	_health_bar.custom_minimum_size = Vector2(180, 20)
 	_health_bar.show_percentage = false
 	hp_row.add_child(_health_bar)
+
+	var gold_row := HBoxContainer.new()
+	gold_row.add_theme_constant_override("separation", 6)
+	vbox.add_child(gold_row)
+
+	var gold_icon := Label.new()
+	gold_icon.text = "⛂"
+	gold_icon.add_theme_font_size_override("font_size", 14)
+	gold_icon.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3))
+	gold_row.add_child(gold_icon)
+
+	_gold_label = Label.new()
+	_gold_label.text = "0 G"
+	_gold_label.add_theme_font_size_override("font_size", 12)
+	_gold_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3))
+	gold_row.add_child(_gold_label)
 
 	var time_row := HBoxContainer.new()
 	time_row.add_theme_constant_override("separation", 6)
@@ -136,7 +153,16 @@ func setup(health: HealthComponent, inventory: InventoryComponent) -> void:
 	BuildingSystem.build_mode_exited.connect(func(): _mode_label.text = "")
 	inventory.selection_changed.connect(func(_i): _refresh_hotbar())
 	inventory.changed.connect(_refresh_hotbar)
+	inventory.gold_changed.connect(_refresh_gold)
+	EventBus.item_sold.connect(_on_item_sold)
 	_refresh_hotbar()
+	_refresh_gold(inventory.gold)
+
+func _refresh_gold(amount: int) -> void:
+	_gold_label.text = "%d G" % amount
+
+func _on_item_sold(item: ItemData, amount: int, gold_received: int) -> void:
+	show_toast("+%d G  (%s ×%d)" % [gold_received, item.display_name, amount], 1.6)
 
 func _refresh_hotbar() -> void:
 	if not _inventory:

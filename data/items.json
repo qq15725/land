@@ -6,7 +6,8 @@
     "max_stack": 99,
     "description": "普通木材，用于建造和合成",
     "color": [0.6, 0.4, 0.2, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 2
   },
   {
     "id": "stone",
@@ -15,7 +16,8 @@
     "max_stack": 99,
     "description": "坚硬的石头，用于建造和工具制作",
     "color": [0.55, 0.55, 0.58, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 2
   },
   {
     "id": "wooden_plank",
@@ -24,7 +26,8 @@
     "max_stack": 99,
     "description": "加工过的木材，用途更广",
     "color": [0.75, 0.55, 0.25, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 5
   },
   {
     "id": "iron_ore",
@@ -33,7 +36,8 @@
     "max_stack": 99,
     "description": "从铁矿节点采集的原矿，需要熔炼",
     "color": [0.5, 0.45, 0.42, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 6
   },
   {
     "id": "iron_bar",
@@ -42,7 +46,8 @@
     "max_stack": 50,
     "description": "熔炼后的铁块，用于工具和围栏制作",
     "color": [0.65, 0.62, 0.60, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 15
   },
   {
     "id": "rope",
@@ -51,7 +56,8 @@
     "max_stack": 50,
     "description": "用干草编成，固定围栏和建造用",
     "color": [0.75, 0.65, 0.35, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 4
   },
   {
     "id": "hay",
@@ -60,7 +66,8 @@
     "max_stack": 99,
     "description": "收割小麦时获得，可用于饲料和编绳",
     "color": [0.88, 0.80, 0.35, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 1
   },
   {
     "id": "carrot",
@@ -69,7 +76,8 @@
     "max_stack": 20,
     "description": "",
     "color": [1.0, 0.55, 0.1, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 6
   },
   {
     "id": "carrot_seed",
@@ -87,7 +95,8 @@
     "max_stack": 20,
     "description": "",
     "color": [0.95, 0.88, 0.4, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 5
   },
   {
     "id": "wheat_seed",
@@ -105,7 +114,8 @@
     "max_stack": 20,
     "description": "",
     "color": [0.85, 0.72, 0.4, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 7
   },
   {
     "id": "potato_seed",
@@ -123,7 +133,8 @@
     "max_stack": 20,
     "description": "",
     "color": [0.9, 0.2, 0.15, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 9
   },
   {
     "id": "tomato_seed",
@@ -141,7 +152,8 @@
     "max_stack": 30,
     "description": "从浆果丛采摘，可直接食用或加工",
     "color": [0.7, 0.1, 0.55, 1.0],
-    "heal_amount": 5.0
+    "heal_amount": 5.0,
+    "sell_price": 8
   },
   {
     "id": "mushroom",
@@ -150,7 +162,8 @@
     "max_stack": 20,
     "description": "野生蘑菇，烹饪后更美味",
     "color": [0.65, 0.38, 0.22, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 7
   },
   {
     "id": "chicken_egg",
@@ -159,7 +172,8 @@
     "max_stack": 20,
     "description": "",
     "color": [0.98, 0.95, 0.82, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 10
   },
   {
     "id": "milk",
@@ -168,7 +182,8 @@
     "max_stack": 10,
     "description": "新鲜牛奶，可直接饮用或用于烹饪",
     "color": [0.97, 0.96, 0.92, 1.0],
-    "heal_amount": 15.0
+    "heal_amount": 15.0,
+    "sell_price": 18
   },
   {
     "id": "animal_feed",
@@ -186,7 +201,8 @@
     "max_stack": 10,
     "description": "",
     "color": [0.85, 0.38, 0.08, 1.0],
-    "heal_amount": 20.0
+    "heal_amount": 20.0,
+    "sell_price": 22
   },
   {
     "id": "cooked_mushroom",
@@ -195,7 +211,8 @@
     "max_stack": 10,
     "description": "",
     "color": [0.55, 0.28, 0.12, 1.0],
-    "heal_amount": 25.0
+    "heal_amount": 25.0,
+    "sell_price": 28
   },
   {
     "id": "berry_jam",
@@ -204,7 +221,8 @@
     "max_stack": 10,
     "description": "香甜的浆果酱，回复大量生命",
     "color": [0.75, 0.08, 0.5, 1.0],
-    "heal_amount": 35.0
+    "heal_amount": 35.0,
+    "sell_price": 45
   },
   {
     "id": "rare_seed",
@@ -251,7 +269,8 @@
     "max_stack": 20,
     "description": "猪/羊提供的生肉，烹饪后食用",
     "color": [0.85, 0.4, 0.4, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 14
   },
   {
     "id": "cooked_meat",
@@ -260,7 +279,8 @@
     "max_stack": 10,
     "description": "香喷喷的烤肉，恢复大量生命",
     "color": [0.7, 0.35, 0.2, 1.0],
-    "heal_amount": 40.0
+    "heal_amount": 40.0,
+    "sell_price": 55
   },
   {
     "id": "leather",
@@ -269,7 +289,8 @@
     "max_stack": 50,
     "description": "动物皮革，可制作护甲与装备",
     "color": [0.55, 0.35, 0.2, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 12
   },
   {
     "id": "wool",
@@ -278,7 +299,8 @@
     "max_stack": 50,
     "description": "柔软的羊毛，可纺织或填充",
     "color": [0.95, 0.95, 0.9, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 14
   },
   {
     "id": "bone",
@@ -287,7 +309,8 @@
     "max_stack": 50,
     "description": "怪物掉落的骨头，可制作高级工具",
     "color": [0.95, 0.92, 0.8, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 6
   },
   {
     "id": "corn",
@@ -296,7 +319,8 @@
     "max_stack": 20,
     "description": "秋季作物，可烹饪成玉米饼",
     "color": [0.95, 0.78, 0.25, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 12
   },
   {
     "id": "corn_seed",
@@ -314,7 +338,8 @@
     "max_stack": 10,
     "description": "秋季大块头作物，烹饪成南瓜汤",
     "color": [0.95, 0.55, 0.15, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 22
   },
   {
     "id": "pumpkin_seed",
@@ -332,7 +357,8 @@
     "max_stack": 5,
     "description": "蘑菇加牛奶熬煮，温暖回血",
     "color": [0.78, 0.65, 0.4, 1.0],
-    "heal_amount": 45.0
+    "heal_amount": 45.0,
+    "sell_price": 70
   },
   {
     "id": "pumpkin_soup",
@@ -341,7 +367,8 @@
     "max_stack": 5,
     "description": "甜美南瓜汤，大幅恢复生命",
     "color": [0.95, 0.55, 0.15, 1.0],
-    "heal_amount": 55.0
+    "heal_amount": 55.0,
+    "sell_price": 90
   },
   {
     "id": "corn_bread",
@@ -350,7 +377,8 @@
     "max_stack": 10,
     "description": "金黄玉米饼，便携食物",
     "color": [0.92, 0.7, 0.3, 1.0],
-    "heal_amount": 30.0
+    "heal_amount": 30.0,
+    "sell_price": 40
   },
   {
     "id": "bone_meal",
@@ -359,7 +387,8 @@
     "max_stack": 30,
     "description": "压碎的骨粉，未来可用作肥料",
     "color": [0.92, 0.9, 0.78, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 8
   },
   {
     "id": "wooden_sword",

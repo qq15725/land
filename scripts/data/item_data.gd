@@ -18,3 +18,5 @@ var defense: float = 0.0
 var attack_speed: float = 0.0      # 加成倍率（>0 表示攻击更快）
 var ranged: bool = false
 var ammo_item_id: String = ""      # 远程武器消耗的弹药 id
+# 商人收购单价（金币/个）。0 表示不可出售。
+var sell_price: int = 0

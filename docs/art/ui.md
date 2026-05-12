@@ -15,6 +15,9 @@
 | 标题栏背景 | 128×64 px（可横向拉伸） | 面板顶部拖拽区域 |
 | 时间 / 昼夜图标 | 64×64 px × 2（太阳 + 月亮） | HUD 昼夜状态 |
 | 当前物品框 | 208×208 px | HUD 选中物品显示框 |
+| 金币图标 | 64×64 px | HUD 金币余额前缀图标 |
+| Hotbar 选中边框 | 96×96 px（9-patch，角 16px） | 1–9 动作栏当前选中格高亮，覆盖 80×80 物品格 + 8px 余边 |
+| Toast 气泡背景（9-patch） | 96×48 px，角 16px | HUD 顶部临时提示（拾取、卖出、自动保存等）|
 
 文件路径：`assets/sprites/ui/ui_sheet.png`（统一一张图，各元素按行排列）
 
@@ -25,9 +28,9 @@ Minecraft-style pixel art UI sprite sheet, transparent background,
 blocky square UI elements, dark stone/grey panel texture, hard pixel edges,
 flat color fills, no gradients, no rounded corners, no soft outlines.
 
-Canvas size: 512×832 pixels.
+Canvas size: 512×1120 pixels.
 All elements aligned to the top-left, pixel-perfect, clean hard edges.
-No labels, no text, no icons except the requested sun and moon.
+No labels, no text, no icons except the requested sun, moon, and gold coin.
 Each element on a separate row, 8px gap between rows:
 
 ROW 0 — Panel 9-patch (128x128 px):
@@ -61,6 +64,23 @@ ROW 6 — HUD icons (64x64 px each, side by side, total 128x64):
 ROW 7 — Current item frame (208x208 px):
   dark grey square frame with lighter grey border, inner darker slot area,
   Minecraft hotbar selected slot style.
+
+ROW 8 — Gold coin icon (64x64 px):
+  blocky pixel gold coin, bright golden yellow flat fill, 4px darker amber outline,
+  small 4px white pixel highlight in upper-left corner for shine,
+  centered on transparent background, no text or numerals on the coin face,
+  Minecraft pixel art style.
+
+ROW 9 — Hotbar selected highlight (96x96 px, 9-patch with 16px corners):
+  bright white pixel square border, 4px thick outer line plus 2px inner shadow line,
+  fully transparent center so the underlying item slot shows through,
+  designed to overlay an 80x80 item slot with 8px outset on every side,
+  Minecraft hotbar selected slot outline style, no fill, no glow.
+
+ROW 10 — Toast bubble background (96x48 px, 9-patch with 16px corners):
+  dark grey stone slab with 4px lighter grey border, slightly translucent feel
+  via subtle 1-pixel dither in the body, square edges, designed to tile horizontally
+  for variable-length text, Minecraft notification banner style, no text.
 
 Minecraft pixel art UI, clean edges, consistent dark grey palette, transparent background
 ```

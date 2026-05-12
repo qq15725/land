@@ -54,6 +54,7 @@ func _load_items() -> void:
 		item.attack_speed = float(d.get("attack_speed", 0.0))
 		item.ranged = bool(d.get("ranged", false))
 		item.ammo_item_id = d.get("ammo_item_id", "")
+		item.sell_price = int(d.get("sell_price", 0))
 		_items[item.id] = item
 
 func _load_buildings() -> void:

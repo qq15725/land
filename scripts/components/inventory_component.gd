@@ -4,11 +4,13 @@ extends Node
 signal changed
 signal selection_changed(slot_index: int)
 signal equipment_changed(slot_type: String)
+signal gold_changed(amount: int)
 
 @export var slot_count: int = 20
 
 var slots: Array[Dictionary] = []
 var selected_slot: int = -1
+var gold: int = 0
 
 # 装备槽：slot_type → ItemData。slot_type 取自 ItemData.equip_slot
 # 常见值："weapon" / "armor" / "accessory"
@@ -114,6 +116,21 @@ func unequip(slot_type: String) -> bool:
 
 func get_equipped(slot_type: String) -> ItemData:
 	return equipped.get(slot_type)
+
+# ─── 金币 ────────────────────────────────────────────────────────────────────
+
+func add_gold(amount: int) -> void:
+	if amount == 0:
+		return
+	gold = maxi(0, gold + amount)
+	gold_changed.emit(gold)
+
+func spend_gold(amount: int) -> bool:
+	if amount <= 0 or gold < amount:
+		return false
+	gold -= amount
+	gold_changed.emit(gold)
+	return true
 
 func total_damage_bonus() -> float:
 	var v := 0.0

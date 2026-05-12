@@ -60,6 +60,7 @@ func _collect(world: Node2D) -> Dictionary:
 		"terrain_seed": ts if ts is int else 0,
 		"player_pos": {"x": player.global_position.x, "y": player.global_position.y},
 		"player_hp": player.health.current_health,
+		"money": player.inventory.gold,
 		"inventory": _save_inventory(player.inventory),
 		"equipped": _save_equipped(player.inventory),
 		"skills": SkillSystem.export_state(),
@@ -86,6 +87,8 @@ func _apply(data: Dictionary, world: Node2D) -> void:
 	var pos: Dictionary = data.get("player_pos", {})
 	player.global_position = Vector2(pos.get("x", 0.0), pos.get("y", 0.0))
 	player.health.current_health = data.get("player_hp", player.health.max_health)
+	player.inventory.gold = int(data.get("money", 0))
+	player.inventory.gold_changed.emit(player.inventory.gold)
 
 	_load_inventory(player.inventory, data.get("inventory", []))
 	_load_equipped(player.inventory, data.get("equipped", {}))
