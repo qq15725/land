@@ -54,6 +54,7 @@ func interact(player: Player) -> void:
 		State.READY:
 			player.inventory.add_item(_current_crop.output_item, _current_crop.output_amount)
 			HitParticles.spawn(get_parent(), global_position, Color(1.0, 0.85, 0.1))
+			EventBus.crop_harvested.emit(_current_crop)
 			_current_crop = null
 			_state = State.EMPTY
 			_apply_state_visual()

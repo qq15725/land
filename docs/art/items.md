@@ -1,9 +1,9 @@
 # 美术：物品图标
 
-物品图标统一打包成一张 sprite sheet，**8 列 × 5 行** grid 排列。占位与正式版尺寸均可，只要保持 8×5 网格：
+物品图标统一打包成一张 sprite sheet，**8 列 × 6 行** grid 排列。占位与正式版尺寸均可，只要保持 8×6 网格：
 
-- 占位：`256×128 px`，单格 `32×32 px`（仅装下 4 行，第 5 行空）
-- 正式版：`512×320 px`，单格 `64×64 px`（装下全部 40 格）
+- 占位：`256×128 px`，单格 `32×32 px`（仅装下 4 行，其余越界自动回退纯色）
+- 正式版：`512×384 px`，单格 `64×64 px`（装下全部 48 格）
 
 文件：`assets/sprites/items/icons.png`
 
@@ -12,7 +12,7 @@
 ```
 Minecraft-style pixel art icon sheet, transparent background, flat front view,
 blocky item icons, hard square pixel edges, flat 2-3 tone color fills, no gradients.
-Grid layout, 8 columns × 5 rows. Canvas size {W}x{H} pixels, each cell {S}x{S} pixels.
+Grid layout, 8 columns × 6 rows. Canvas size {W}x{H} pixels, each cell {S}x{S} pixels.
 Strict grid layout, no padding between cells, no spacing between cells.
 Each icon is a simple recognizable block or item, Minecraft inventory icon style.
 
@@ -22,7 +22,7 @@ Icons (left to right, top to bottom):
 Minecraft pixel art, game asset icons, clean grid, transparent background
 ```
 
-## 当前图标分布（8 列 × 5 行）
+## 当前图标分布（8 列 × 6 行）
 
 | (col, row) | id | 描述 |
 |------------|----|------|
@@ -66,6 +66,13 @@ Minecraft pixel art, game asset icons, clean grid, transparent background
 | (5, 4) | `pumpkin_soup` | 木碗装橙色南瓜汤，热气像素 |
 | (6, 4) | `corn_bread` | 金黄色玉米饼，方形扁面包 |
 | (7, 4) | `bone_meal` | 米白色骨粉堆，颗粒像素 |
+| (0, 5) | `wooden_sword` | 木柄木剑，方形短剑 |
+| (1, 5) | `iron_sword` | 木柄铁剑，长方形剑刃 |
+| (2, 5) | `bow` | 木弓 + 弓弦像素，"D" 形 |
+| (3, 5) | `arrow` | 一束木箭矢，箭头像素 |
+| (4, 5) | `leather_armor` | 棕色皮甲背心，缝线像素 |
+| (5, 5) | `iron_armor` | 灰色铁甲胸甲，铆钉像素 |
+| (6, 5) | `lucky_charm` | 金色四叶草吊坠 |
 
 ## 替换流程
 

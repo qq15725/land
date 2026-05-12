@@ -61,6 +61,8 @@ func _collect(world: Node2D) -> Dictionary:
 		"player_pos": {"x": player.global_position.x, "y": player.global_position.y},
 		"player_hp": player.health.current_health,
 		"inventory": _save_inventory(player.inventory),
+		"equipped": _save_equipped(player.inventory),
+		"skills": SkillSystem.export_state(),
 		"chunk_snapshots": ChunkManager.export_snapshots(),
 		"buildings": _save_buildings(world),
 	}
@@ -86,6 +88,8 @@ func _apply(data: Dictionary, world: Node2D) -> void:
 	player.health.current_health = data.get("player_hp", player.health.max_health)
 
 	_load_inventory(player.inventory, data.get("inventory", []))
+	_load_equipped(player.inventory, data.get("equipped", {}))
+	SkillSystem.import_state(data.get("skills", {}))
 	# 新存档使用 chunk_snapshots；旧存档 resource_nodes 兜底
 	ChunkManager.clear_state()
 	if data.has("chunk_snapshots"):
@@ -113,6 +117,23 @@ func _load_inventory(inv: InventoryComponent, data: Array) -> void:
 		else:
 			var item := ItemDatabase.get_item(entry.get("id", ""))
 			inv.slots[i] = {item = item, amount = entry.get("amount", 0)}
+	inv.changed.emit()
+
+func _save_equipped(inv: InventoryComponent) -> Dictionary:
+	var result := {}
+	for slot_type in inv.equipped:
+		var it: ItemData = inv.equipped[slot_type]
+		if it:
+			result[slot_type] = it.id
+	return result
+
+func _load_equipped(inv: InventoryComponent, data: Dictionary) -> void:
+	inv.equipped.clear()
+	for slot_type in data:
+		var item := ItemDatabase.get_item(data[slot_type])
+		if item:
+			inv.equipped[slot_type] = item
+			inv.equipment_changed.emit(slot_type)
 	inv.changed.emit()
 
 # --- 资源节点（统一走 ChunkManager.snapshots） ---

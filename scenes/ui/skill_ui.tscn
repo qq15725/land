@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/skill_ui.gd" id="1_sui"]
+
+[node name="SkillUI" type="PanelContainer"]
+script = ExtResource("1_sui")

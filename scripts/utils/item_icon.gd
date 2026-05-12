@@ -122,6 +122,14 @@ func _make_custom_tooltip(_for_text: String) -> Object:
 		chips.append("回血 +%d" % int(_item.heal_amount))
 	if not _item.tool_type.is_empty():
 		chips.append("工具：" + _tool_type_label(_item.tool_type))
+	if _item.damage > 0.0:
+		chips.append("伤害 +%d" % int(_item.damage))
+	if _item.defense > 0.0:
+		chips.append("防御 +%d" % int(_item.defense))
+	if _item.ranged:
+		chips.append("远程")
+	if not _item.equip_slot.is_empty():
+		chips.append(_equip_slot_label(_item.equip_slot))
 	if not chips.is_empty():
 		var chip_lbl := Label.new()
 		chip_lbl.text = "  ·  ".join(chips)
@@ -146,3 +154,10 @@ func _tool_type_label(t: String) -> String:
 		"axe": return "斧子"
 		"pickaxe": return "镐子"
 		_: return t
+
+func _equip_slot_label(s: String) -> String:
+	match s:
+		"weapon": return "武器槽"
+		"armor": return "护甲槽"
+		"accessory": return "饰品槽"
+		_: return s

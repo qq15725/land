@@ -8,6 +8,7 @@ const CraftingUIScene := preload("res://scenes/ui/crafting_ui.tscn")
 const BuildMenuUIScene := preload("res://scenes/ui/build_menu_ui.tscn")
 const StorageUIScene := preload("res://scenes/ui/storage_ui.tscn")
 const TradeUIScene := preload("res://scenes/ui/trade_ui.tscn")
+const SkillUIScene := preload("res://scenes/ui/skill_ui.tscn")
 const PauseMenuScene := preload("res://scenes/ui/pause_menu.tscn")
 
 const SPAWN_RADIUS_TILES := 64           # 资源覆盖半径（tile）
@@ -172,6 +173,9 @@ func _setup_ui() -> void:
 	var trade_ui := TradeUIScene.instantiate()
 	ui_layer.add_child(trade_ui)
 	trade_ui.setup(player.inventory)
+
+	var skill_ui := SkillUIScene.instantiate()
+	ui_layer.add_child(skill_ui)
 
 	_pause_menu = PauseMenuScene.instantiate()
 	ui_layer.add_child(_pause_menu)

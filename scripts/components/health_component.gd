@@ -8,6 +8,8 @@ signal died
 @export var max_health: float = 100.0
 
 var current_health: float
+# 装备/buff 提供的伤害减免，HealthComponent 处理时直接扣除
+var damage_reduction: float = 0.0
 
 func _ready() -> void:
 	current_health = max_health
@@ -15,8 +17,11 @@ func _ready() -> void:
 func take_damage(amount: float) -> void:
 	if amount <= 0.0:
 		return
-	var actual: float = minf(amount, current_health)
-	current_health = maxf(0.0, current_health - amount)
+	var effective := maxf(0.0, amount - damage_reduction)
+	if effective <= 0.0:
+		return
+	var actual: float = minf(effective, current_health)
+	current_health = maxf(0.0, current_health - effective)
 	health_changed.emit(current_health, max_health)
 	damaged.emit(actual)
 	var owner_node := get_parent()

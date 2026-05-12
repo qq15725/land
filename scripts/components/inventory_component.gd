@@ -3,11 +3,16 @@ extends Node
 
 signal changed
 signal selection_changed(slot_index: int)
+signal equipment_changed(slot_type: String)
 
 @export var slot_count: int = 20
 
 var slots: Array[Dictionary] = []
 var selected_slot: int = -1
+
+# 装备槽：slot_type → ItemData。slot_type 取自 ItemData.equip_slot
+# 常见值："weapon" / "armor" / "accessory"
+var equipped: Dictionary = {}
 
 func _ready() -> void:
 	slots.resize(slot_count)
@@ -68,6 +73,53 @@ func get_selected_item() -> ItemData:
 	if selected_slot < 0 or selected_slot >= slots.size():
 		return null
 	return slots[selected_slot].item
+
+# ─── 装备 ────────────────────────────────────────────────────────────────────
+
+func equip_from_slot(slot_index: int) -> bool:
+	if slot_index < 0 or slot_index >= slots.size():
+		return false
+	var item: ItemData = slots[slot_index].item
+	if item == null or item.equip_slot.is_empty():
+		return false
+	var st: String = item.equip_slot
+	# 先卸下旧装备到背包
+	var old: ItemData = equipped.get(st)
+	slots[slot_index] = {item = null, amount = 0}
+	equipped[st] = item
+	if old != null:
+		add_item(old, 1)
+	equipment_changed.emit(st)
+	changed.emit()
+	return true
+
+func unequip(slot_type: String) -> bool:
+	var old: ItemData = equipped.get(slot_type)
+	if old == null:
+		return false
+	equipped.erase(slot_type)
+	# 塞回背包；如果背包满则掉在地上的逻辑交给调用者
+	var leftover := add_item(old, 1)
+	equipment_changed.emit(slot_type)
+	changed.emit()
+	return leftover == 0
+
+func get_equipped(slot_type: String) -> ItemData:
+	return equipped.get(slot_type)
+
+func total_damage_bonus() -> float:
+	var v := 0.0
+	for it in equipped.values():
+		if it:
+			v += it.damage
+	return v
+
+func total_defense() -> float:
+	var v := 0.0
+	for it in equipped.values():
+		if it:
+			v += it.defense
+	return v
 
 func get_contents() -> String:
 	var parts: PackedStringArray = []

@@ -112,7 +112,12 @@ func interact(player: Player) -> void:
 		if held == null or held.tool_type != tool_required:
 			hint_label.text = "需要 %s" % _tool_label(tool_required)
 			return
-	var leftover := player.inventory.add_item(item, drop_amount)
+	# 等级额外掉落概率（按资源对应技能）
+	var bonus := 0
+	var skill_id: String = SkillSystem.RESOURCE_TO_SKILL.get(resource_id, "")
+	if not skill_id.is_empty() and randf() < SkillSystem.bonus_drop_chance(skill_id):
+		bonus = 1
+	var leftover := player.inventory.add_item(item, drop_amount + bonus)
 	if leftover > 0:
 		_spawn_drops(leftover)
 	HitParticles.spawn(get_parent(), global_position, item.color)

@@ -2,7 +2,7 @@ extends Node
 
 const ICON_SHEET_PATH := "res://assets/sprites/items/icons.png"
 const ICON_GRID_COLS := 8
-const ICON_GRID_ROWS := 5
+const ICON_GRID_ROWS := 6
 
 var _icon_size: int = 32
 
@@ -48,6 +48,12 @@ func _load_items() -> void:
 		var g: Array = d.get("icon_grid", [0, 0])
 		item.icon_grid = Vector2i(int(g[0]), int(g[1]))
 		item.tool_type = d.get("tool_type", "")
+		item.equip_slot = d.get("equip_slot", "")
+		item.damage = float(d.get("damage", 0.0))
+		item.defense = float(d.get("defense", 0.0))
+		item.attack_speed = float(d.get("attack_speed", 0.0))
+		item.ranged = bool(d.get("ranged", false))
+		item.ammo_item_id = d.get("ammo_item_id", "")
 		_items[item.id] = item
 
 func _load_buildings() -> void:
@@ -198,6 +204,19 @@ func get_item(id: String) -> ItemData:
 
 func get_icon_size() -> int:
 	return _icon_size
+
+# 借用 items.png 中任意一格作为通用图标（例如技能图标占位）。
+func get_icon_at_grid(grid: Vector2i) -> Texture2D:
+	if _icon_sheet == null:
+		return null
+	var x := grid.x * _icon_size
+	var y := grid.y * _icon_size
+	if x + _icon_size > _icon_sheet.get_width() or y + _icon_size > _icon_sheet.get_height():
+		return null
+	var atlas := AtlasTexture.new()
+	atlas.atlas = _icon_sheet
+	atlas.region = Rect2(x, y, _icon_size, _icon_size)
+	return atlas
 
 # 返回 item 在图标表中的 AtlasTexture（已缓存）。
 # icons.png 缺失或字段为空时回退到一个纯色占位 ImageTexture。

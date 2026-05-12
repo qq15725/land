@@ -360,5 +360,81 @@
     "description": "压碎的骨粉，未来可用作肥料",
     "color": [0.92, 0.9, 0.78, 1.0],
     "heal_amount": 0.0
+  },
+  {
+    "id": "wooden_sword",
+    "display_name": "木剑",
+    "icon_grid": [0, 5],
+    "max_stack": 1,
+    "description": "简陋的木剑，提升近战伤害",
+    "color": [0.7, 0.55, 0.3, 1.0],
+    "heal_amount": 0.0,
+    "equip_slot": "weapon",
+    "damage": 5.0
+  },
+  {
+    "id": "iron_sword",
+    "display_name": "铁剑",
+    "icon_grid": [1, 5],
+    "max_stack": 1,
+    "description": "锋利的铁剑，大幅提升近战伤害",
+    "color": [0.7, 0.7, 0.75, 1.0],
+    "heal_amount": 0.0,
+    "equip_slot": "weapon",
+    "damage": 12.0
+  },
+  {
+    "id": "bow",
+    "display_name": "短弓",
+    "icon_grid": [2, 5],
+    "max_stack": 1,
+    "description": "远程武器，需要箭矢射击",
+    "color": [0.55, 0.4, 0.2, 1.0],
+    "heal_amount": 0.0,
+    "equip_slot": "weapon",
+    "damage": 8.0,
+    "ranged": true,
+    "ammo_item_id": "arrow"
+  },
+  {
+    "id": "arrow",
+    "display_name": "箭矢",
+    "icon_grid": [3, 5],
+    "max_stack": 99,
+    "description": "弓的弹药",
+    "color": [0.6, 0.45, 0.25, 1.0],
+    "heal_amount": 0.0
+  },
+  {
+    "id": "leather_armor",
+    "display_name": "皮甲",
+    "icon_grid": [4, 5],
+    "max_stack": 1,
+    "description": "轻便的皮制护甲，减少受伤",
+    "color": [0.55, 0.35, 0.2, 1.0],
+    "heal_amount": 0.0,
+    "equip_slot": "armor",
+    "defense": 5.0
+  },
+  {
+    "id": "iron_armor",
+    "display_name": "铁甲",
+    "icon_grid": [5, 5],
+    "max_stack": 1,
+    "description": "坚固的铁制护甲，大幅减伤",
+    "color": [0.65, 0.65, 0.7, 1.0],
+    "heal_amount": 0.0,
+    "equip_slot": "armor",
+    "defense": 12.0
+  },
+  {
+    "id": "lucky_charm",
+    "display_name": "幸运护符",
+    "icon_grid": [6, 5],
+    "max_stack": 1,
+    "description": "提升采集额外掉落概率",
+    "color": [0.85, 0.75, 0.3, 1.0],
+    "heal_amount": 0.0,
+    "equip_slot": "accessory"
   }
 ]

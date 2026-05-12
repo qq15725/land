@@ -183,5 +183,76 @@
       {"item_id": "bone", "amount": 1}
     ],
     "required_station": "workbench"
+  },
+  {
+    "id": "wooden_sword",
+    "output_item_id": "wooden_sword",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "wood", "amount": 4},
+      {"item_id": "rope", "amount": 1}
+    ],
+    "required_station": "workbench"
+  },
+  {
+    "id": "iron_sword",
+    "output_item_id": "iron_sword",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "iron_bar", "amount": 3},
+      {"item_id": "wood", "amount": 2}
+    ],
+    "required_station": "workbench"
+  },
+  {
+    "id": "bow",
+    "output_item_id": "bow",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "wood", "amount": 3},
+      {"item_id": "rope", "amount": 2}
+    ],
+    "required_station": "workbench"
+  },
+  {
+    "id": "arrow",
+    "output_item_id": "arrow",
+    "output_amount": 8,
+    "ingredients": [
+      {"item_id": "wood", "amount": 2},
+      {"item_id": "bone", "amount": 1}
+    ],
+    "required_station": "workbench"
+  },
+  {
+    "id": "leather_armor",
+    "output_item_id": "leather_armor",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "leather", "amount": 5},
+      {"item_id": "rope", "amount": 2}
+    ],
+    "required_station": "workbench"
+  },
+  {
+    "id": "iron_armor",
+    "output_item_id": "iron_armor",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "iron_bar", "amount": 5},
+      {"item_id": "leather", "amount": 2}
+    ],
+    "required_station": "workbench"
+  },
+  {
+    "id": "lucky_charm",
+    "output_item_id": "lucky_charm",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "rare_seed", "amount": 1},
+      {"item_id": "wool", "amount": 2},
+      {"item_id": "rope", "amount": 1}
+    ],
+    "required_station": "workbench"
   }
 ]

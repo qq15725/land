@@ -179,6 +179,7 @@ func _on_died() -> void:
 	velocity = Vector2.ZERO
 	set_physics_process(false)
 	_spawn_drops()
+	EventBus.creature_killed.emit(data)
 	visual.modulate = Color(0.4, 0.4, 0.4, 0.5)
 	await get_tree().create_timer(1.5).timeout
 	queue_free()

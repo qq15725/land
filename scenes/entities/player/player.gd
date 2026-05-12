@@ -31,8 +31,14 @@ func _ready() -> void:
 	health.died.connect(_on_died)
 	health.damaged.connect(func(amount): EventBus.player_damaged.emit(amount))
 	health.died.connect(func(): EventBus.player_died.emit())
+	inventory.equipment_changed.connect(_on_equipment_changed)
 	add_to_group("player")
 	_setup_sprite_frames()
+	_on_equipment_changed("")
+
+
+func _on_equipment_changed(_slot_type: String) -> void:
+	health.damage_reduction = inventory.total_defense()
 
 
 func _setup_sprite_frames() -> void:
@@ -149,12 +155,23 @@ func _use_selected_item() -> void:
 func _try_attack() -> void:
 	if _attack_timer > 0.0:
 		return
-	_attack_timer = ATTACK_COOLDOWN
+	var weapon := inventory.get_equipped("weapon")
+	# 远程武器需要消耗弹药
+	if weapon and weapon.ranged:
+		var ammo_item := ItemDatabase.get_item(weapon.ammo_item_id) if not weapon.ammo_item_id.is_empty() else null
+		if ammo_item == null or not inventory.has_item(ammo_item, 1):
+			return
+		inventory.remove_item(ammo_item, 1)
+
+	var speed_mod := weapon.attack_speed if weapon else 0.0
+	_attack_timer = ATTACK_COOLDOWN * maxf(0.2, 1.0 - speed_mod)
 	_flash_attack()
+
+	var total_damage := ATTACK_DAMAGE + inventory.total_damage_bonus()
 	for body in attack_area.get_overlapping_bodies():
 		if body is Creature:
 			var creature := body as Creature
-			creature.health.take_damage(ATTACK_DAMAGE)
+			creature.health.take_damage(total_damage)
 			var kb_dir := (creature.global_position - global_position).normalized()
 			creature.velocity += kb_dir * KNOCKBACK_FORCE
 
