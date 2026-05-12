@@ -142,5 +142,16 @@
       {"item_id": "iron_bar", "amount": 1}
     ],
     "animal_id": ""
+  },
+  {
+    "id": "bed",
+    "display_name": "床",
+    "category": "building",
+    "scene_path": "res://scenes/buildings/bed.tscn",
+    "cost": [
+      {"item_id": "wood", "amount": 10},
+      {"item_id": "wool", "amount": 2}
+    ],
+    "animal_id": ""
   }
 ]

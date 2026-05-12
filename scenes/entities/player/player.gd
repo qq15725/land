@@ -106,6 +106,14 @@ func _update_animation(move_dir: Vector2) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if _is_dead:
 		return
+	# 数字键 1-9 直接选 hotbar 槽位
+	if event is InputEventKey and event.pressed and not event.echo:
+		var key := event as InputEventKey
+		var code := key.physical_keycode
+		if code >= KEY_1 and code <= KEY_9:
+			inventory.set_selected_slot(code - KEY_1)
+			get_viewport().set_input_as_handled()
+			return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 		_click_target = get_global_mouse_position()
 		_click_moving = true
@@ -183,13 +191,49 @@ func _flash_attack() -> void:
 		visual.modulate = Color.WHITE
 
 
+const DropItemScene := preload("res://scenes/entities/drop_item/drop_item.tscn")
+
 func _on_died() -> void:
 	_is_dead = true
+	var death_pos := global_position
 	visible = false
 	set_physics_process(false)
+	_drop_inventory_on_death(death_pos)
 	await get_tree().create_timer(2.0).timeout
+	if not is_instance_valid(self):
+		return
 	health.heal(health.max_health)
-	global_position = Vector2.ZERO
+	global_position = _find_respawn_position()
 	visible = true
 	_is_dead = false
 	set_physics_process(true)
+
+func _find_respawn_position() -> Vector2:
+	var beds := get_tree().get_nodes_in_group("bed")
+	if beds.is_empty():
+		return Vector2.ZERO
+	var best: Node2D = beds[0]
+	var best_d := global_position.distance_to(best.global_position)
+	for b in beds:
+		var d: float = global_position.distance_to((b as Node2D).global_position)
+		if d < best_d:
+			best = b
+			best_d = d
+	return best.global_position + Vector2(0, 16)  # 床下方一格出生
+
+# 死亡时背包非装备物品掉一半数量；装备类（equip_slot 非空）不掉。
+func _drop_inventory_on_death(pos: Vector2) -> void:
+	var parent := get_parent()
+	for slot in inventory.slots:
+		if slot.item == null or slot.amount <= 0:
+			continue
+		if not slot.item.equip_slot.is_empty():
+			continue
+		var drop_amount: int = int(slot.amount) / 2
+		if drop_amount <= 0:
+			continue
+		var drop: DropItem = DropItemScene.instantiate()
+		drop.position = pos + Vector2(randf_range(-16, 16), randf_range(-16, 16))
+		parent.add_child(drop)
+		drop.setup(slot.item, drop_amount)
+		inventory.remove_item(slot.item, drop_amount)

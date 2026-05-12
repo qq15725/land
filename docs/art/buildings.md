@@ -36,5 +36,6 @@ Minecraft pixel art, game asset, no background
 | `silo` | tall cylindrical silo made of grey metal block panels, conical top, square pixel rivets | 256×384 | `assets/sprites/buildings/silo.png` | ⏳ |
 | `mailbox` | small wooden mailbox block on a thin post, red pixel flag on side | 192×192 | `assets/sprites/buildings/mailbox.png` | ⏳ |
 | `animal_pen` | small wooden fenced pen with hay floor square inside, oak fence post blocks | 256×256 | `assets/sprites/buildings/animal_pen.png` | ⏳ |
+| `bed` | low wooden bed block, white pillow on top, red blanket pixel | 192×128 | `assets/sprites/buildings/bed.png` | ⏳ |
 
 > 围栏类（`wood_fence` / `iron_fence` / `wood_fence_gate`）无需独立 sprite，运行时按拼接结构自动绘制。

@@ -14,11 +14,13 @@ const PauseMenuScene := preload("res://scenes/ui/pause_menu.tscn")
 const SPAWN_RADIUS_TILES := 64           # 资源覆盖半径（tile）
 const ACTIVE_RADIUS_TILES := 64          # 玩家附近多少 tile 范围内的 chunk 保持 active
 const CHUNK_UPDATE_INTERVAL := 1.0       # 每 N 秒检查一次 chunk
+const AUTOSAVE_INTERVAL := 300.0         # 自动保存间隔（秒）
 const MIN_SPAWN_DIST := 80.0
 const CREATURE_SPAWN_RADIUS := 500.0
 const CREATURE_MIN_DIST := 200.0
 
 var _chunk_update_timer: float = 0.0
+var _autosave_timer: float = 0.0
 
 const TILE_SIZE := 16.0
 const PORTAL_RADIUS := 2        # 触发范围（格）
@@ -54,6 +56,7 @@ func _ready() -> void:
 	BuildingSystem.building_placed.connect(_on_building_placed)
 	TimeSystem.night_started.connect(_on_night_started)
 	TimeSystem.day_started.connect(_on_day_started)
+	TimeSystem.day_started.connect(func(_d): _autosave("新的一天"))
 	SoundSystem.play_world_bgm()
 
 func _load_map(map_id: String) -> void:
@@ -195,6 +198,15 @@ func _process(delta: float) -> void:
 	if _chunk_update_timer >= CHUNK_UPDATE_INTERVAL:
 		_chunk_update_timer = 0.0
 		_update_chunks()
+	_autosave_timer += delta
+	if _autosave_timer >= AUTOSAVE_INTERVAL:
+		_autosave_timer = 0.0
+		_autosave("自动保存")
+
+func _autosave(reason: String) -> void:
+	SaveSystem.save(GameManager.current_save_slot, self)
+	if _hud and _hud.has_method("show_toast"):
+		_hud.show_toast("✓ %s" % reason, 2.0)
 
 func _update_day_overlay() -> void:
 	if TimeSystem.is_night():

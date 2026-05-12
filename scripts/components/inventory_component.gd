@@ -69,6 +69,14 @@ func select_slot(index: int) -> void:
 		selected_slot = index
 	selection_changed.emit(selected_slot)
 
+# 直接选中指定槽位（不 toggle）。给 hotbar 数字键用。
+func set_selected_slot(index: int) -> void:
+	if index < 0 or index >= slots.size():
+		selected_slot = -1
+	else:
+		selected_slot = index
+	selection_changed.emit(selected_slot)
+
 func get_selected_item() -> ItemData:
 	if selected_slot < 0 or selected_slot >= slots.size():
 		return null
