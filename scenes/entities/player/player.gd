@@ -4,7 +4,12 @@ extends CharacterBody2D
 const SPEED := 150.0
 const ATTACK_DAMAGE := 15.0
 const ATTACK_COOLDOWN := 0.5
-const KNOCKBACK_FORCE := 180.0
+const KNOCKBACK_FORCE := 280.0
+const HIT_STOP_DURATION := 0.06
+const HIT_STOP_SCALE := 0.05
+const COMBO_TIMEOUT := 1.5
+const CRIT_CHANCE := 0.15
+const CRIT_MULT := 2.0
 
 const SPRITE_PATH := "res://assets/sprites/characters/player.png"
 const FRAME_W := 128
@@ -29,6 +34,8 @@ var _sync_anim: String = "walk_down"
 
 var _attack_timer: float = 0.0
 var _is_dead: bool = false
+var _combo_count: int = 0
+var _combo_timer: float = 0.0
 var _click_target: Vector2 = Vector2.ZERO
 var _click_moving: bool = false
 var _last_anim: String = "walk_down"
@@ -117,6 +124,10 @@ func _physics_process(delta: float) -> void:
 	if _is_dead:
 		return
 	_attack_timer = maxf(0.0, _attack_timer - delta)
+	if _combo_timer > 0.0:
+		_combo_timer -= delta
+		if _combo_timer <= 0.0:
+			_combo_count = 0
 	var key_dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var move_dir: Vector2
 	if key_dir.length() > 0.0:
@@ -237,13 +248,20 @@ func do_attack() -> void:
 	_attack_timer = ATTACK_COOLDOWN * maxf(0.2, 1.0 - speed_mod)
 	_flash_attack()
 
-	var total_damage := ATTACK_DAMAGE + inventory.total_damage_bonus()
+	var base_damage := ATTACK_DAMAGE + inventory.total_damage_bonus()
+	var hit_any := false
 	for body in attack_area.get_overlapping_bodies():
 		if body is Creature:
 			var creature := body as Creature
-			creature.take_damage_from(self, total_damage)
+			var is_crit := randf() < CRIT_CHANCE
+			var dmg: float = base_damage * (CRIT_MULT if is_crit else 1.0)
+			creature.take_damage_from(self, dmg)
 			var kb_dir := (creature.global_position - global_position).normalized()
-			creature.velocity += kb_dir * KNOCKBACK_FORCE
+			creature.velocity += kb_dir * KNOCKBACK_FORCE * (1.5 if is_crit else 1.0)
+			DamageNumber.spawn(get_parent(), creature.global_position + Vector2(0, -16), dmg, is_crit)
+			hit_any = true
+	if hit_any:
+		_on_hit_landed()
 
 
 func _flash_attack() -> void:
@@ -251,6 +269,19 @@ func _flash_attack() -> void:
 	await get_tree().create_timer(0.1).timeout
 	if is_instance_valid(self) and not _is_dead:
 		visual.modulate = Color.WHITE
+
+func _on_hit_landed() -> void:
+	_combo_count += 1
+	_combo_timer = COMBO_TIMEOUT
+	if _combo_count >= 2:
+		EventBus.combo_hit.emit(_combo_count)
+	_hit_stop()
+
+func _hit_stop() -> void:
+	Engine.time_scale = HIT_STOP_SCALE
+	# ignore_time_scale=true 让 timer 按真实时间走，不受减速影响
+	await get_tree().create_timer(HIT_STOP_DURATION, true, false, true).timeout
+	Engine.time_scale = 1.0
 
 
 const DropItemScene := preload("res://scenes/entities/drop_item/drop_item.tscn")

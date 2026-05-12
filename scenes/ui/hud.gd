@@ -105,6 +105,7 @@ func setup(health: HealthComponent, inventory: InventoryComponent) -> void:
 	inventory.equipment_changed.connect(func(_t): _refresh_durability())
 	EventBus.item_sold.connect(_on_item_sold)
 	EventBus.skill_leveled_up.connect(func(_id, _lv): _refresh_xp())
+	EventBus.combo_hit.connect(_on_combo_hit)
 
 	_refresh_hotbar()
 	_refresh_xp()
@@ -679,6 +680,9 @@ func _set_bar(bar: Dictionary, cur: float, maximum: float, label_text: String = 
 
 func _on_item_sold(item: ItemData, amount: int, gold_received: int) -> void:
 	show_toast("+%d G  (%s ×%d)" % [gold_received, item.display_name, amount], 1.6)
+
+func _on_combo_hit(count: int) -> void:
+	show_toast("%d  COMBO!" % count, 1.0)
 
 func show_toast(text: String, duration: float = 2.0) -> void:
 	_toast_label.text = text

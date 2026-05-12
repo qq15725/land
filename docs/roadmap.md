@@ -190,14 +190,14 @@
 - [ ] B4 成就 / 图鉴（收集进度、击杀统计、合成种类）
 - [ ] B5 节日 / 季节事件（春樱 / 秋丰收 / 冬雪人）
 - [ ] B6 PvE 平衡 + Boss / 副本（怪物难度递增曲线，季节性 Boss）
-- [ ] B7 战斗反馈 [愿景图卖点]（伤害飘字 + 击退强化 + hit-stop + 命中粒子 + 连击 combo 计数）
+- [x] B7 战斗反馈（DamageNumber 飘字 + hit-stop 60ms + KNOCKBACK ×1.5 + 15% 暴击 ×2 倍伤 + combo 计数→HUD toast）
 
 ### C. 质量打磨 / 已知 bug
 > 存量问题清理。
 
-- [ ] C1 `trading_post._activated` 状态不存档 → 读档后商人不再来
-- [ ] C2 `animal._is_fed` / `_produce_timer` 不存档 → 读档后动物喂食状态丢失
-- [ ] C3 UI 按钮无音效（`ui_click` 数据已就绪，但没有触发点）
+- [x] C1 `trading_post._activated` 存档（加 get_save_state/load_save_state，读档自动重激活）
+- [x] C2 `animal._is_fed` / `_produce_timer` 存档（由 animal_pen 收集子 animal 状态，读档延迟一帧喂回）
+- [x] C3 UI 按钮音效（SoundSystem 监听 SceneTree.node_added，所有 Button.pressed 自动播 ui_click）
 - [ ] C4 性能 stress test（高密度资源/怪物 + chunk 边界）
 - [ ] C5 移动端控制完整性（`mobile_controls.gd` 验证 + 适配）
 - [ ] C6 升级 / 装备变更 / 收获 / 放置粒子反馈
@@ -216,13 +216,13 @@
 > 文档：[`art/hud.md`](art/hud.md)。参考图：[`references/hud.png`](references/hud.png) + [`references/main.png`](references/main.png)。
 > 当前 HUD 只有左上 HP/金币/时间 + 底部 9 格 hotbar，远低于愿景图密度。
 
-- [ ] E1 角色信息条（左上：头像 + 名字 + Lv + HP 条 + XP 条）
-- [ ] E2 快捷栏强化（外层 9-patch 容器 + 上方经验/技能进度条 + 等级徽章 + 亮黄选中边框 + 数字徽章背景）
-- [ ] E3 小地图 + 指南针 + 坐标（右上，圆形遮罩 + 实时玩家朝向）
-- [ ] E4 状态 Buff 条（底部偏左，状态图标 + 持续时间小条；接通护甲/移速/回血等装备效果）
-- [ ] E5 资源计数行（底部偏右，金币 + 主要资源 + 背包快捷按钮）
-- [ ] E6 任务追踪条（顶部居中，单条当前任务 + 进度数字。需先有任务系统骨架，可与"长期搁置"任务系统一并启动）
-- [ ] E7 顶右菜单按钮组（角色 / 地图 / 设置 3 个圆角按钮，作为面板入口替代键盘快捷键）
+- [~] E1 角色信息条（头像+名字+Lv+HP/XP/耐力 三条，结构已搭；HP/XP 已接通；**耐力系统未实现** 固定 100/100 占位）
+- [x] E2 快捷栏强化（9-patch 容器 + 经验条 + 等级徽章 + 亮黄选中边框）
+- [x] E3 小地图实绘（Minimap 控件：玩家黄点 + 朝向三角 + 附近建筑/农田/怪物色点）
+- [ ] E4 状态 Buff 条（**依赖 Buff 系统**，未实现）
+- [x] E5 资源计数行（金币 + 当前选中物品 + 基地占位）
+- [ ] E6 任务追踪条（**依赖任务系统**，未实现）
+- [x] E7 顶右菜单按钮组（👤 角色 / 🗺 地图 / ⚙ 设置，模拟键盘动作打开对应面板）
 
 ### G. 多人架构改造 ★ 主线 / F 前置
 > **决策已定**：支持局域网多人联机，传输层用 ENet host-authoritative（房主即权威）。单机视为 1 人房间，统一走多人代码路径，不维护两套实现。

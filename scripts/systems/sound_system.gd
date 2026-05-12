@@ -59,6 +59,13 @@ func _ready() -> void:
 	TimeSystem.day_started.connect(func(_d): _refresh_world_bgm())
 	TimeSystem.night_started.connect(func(_d): _refresh_world_bgm())
 
+	# C3：全局监听 Button 节点，自动连 pressed → ui_click
+	get_tree().node_added.connect(_on_node_added)
+
+func _on_node_added(node: Node) -> void:
+	if node is Button:
+		(node as Button).pressed.connect(func(): play("ui_click"))
+
 func play(id: String) -> void:
 	var stream: AudioStream = _streams.get(id)
 	if stream == null:

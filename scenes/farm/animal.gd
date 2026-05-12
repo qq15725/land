@@ -116,3 +116,17 @@ func _spawn_produce() -> void:
 	drop.amount = data.produce_amount
 	get_parent().add_child(drop)
 	drop.global_position = global_position + Vector2(randf_range(-15.0, 15.0), randf_range(-15.0, 15.0))
+
+# ─── 存档 ────────────────────────────────────────────────────────────────
+
+func get_save_state() -> Dictionary:
+	return {
+		"is_fed": _is_fed,
+		"produce_timer": _produce_timer,
+	}
+
+func load_save_state(state: Dictionary) -> void:
+	_is_fed = bool(state.get("is_fed", false))
+	_produce_timer = float(state.get("produce_timer", 0.0))
+	if data and is_inside_tree():
+		hint_label.text = "已喂食..." if _is_fed else "[E] 喂食"
