@@ -63,7 +63,8 @@ func _collect(world: Node2D) -> Dictionary:
 		"money": player.inventory.gold,
 		"inventory": _save_inventory(player.inventory),
 		"equipped": _save_equipped(player.inventory),
-		"skills": SkillSystem.export_state(),
+		"skills": player.skills.export_state() if player.skills else {},
+		"network_registry": NetworkRegistry.export_state(),
 		"chunk_snapshots": ChunkManager.export_snapshots(),
 		"buildings": _save_buildings(world),
 	}
@@ -92,7 +93,9 @@ func _apply(data: Dictionary, world: Node2D) -> void:
 
 	_load_inventory(player.inventory, data.get("inventory", []))
 	_load_equipped(player.inventory, data.get("equipped", {}))
-	SkillSystem.import_state(data.get("skills", {}))
+	if player.skills:
+		player.skills.import_state(data.get("skills", {}))
+	NetworkRegistry.import_state(data.get("network_registry", {}))
 	# 新存档使用 chunk_snapshots；旧存档 resource_nodes 兜底
 	ChunkManager.clear_state()
 	if data.has("chunk_snapshots"):

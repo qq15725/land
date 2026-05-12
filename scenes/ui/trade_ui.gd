@@ -221,25 +221,17 @@ func _make_chip(item: ItemData, amount: int) -> Control:
 	return icon
 
 func _do_trade(entry: Dictionary) -> void:
-	if not _player_inventory.has_item(entry["give_item"], entry["give_amount"]):
+	if not _merchant_data:
 		return
-	var leftover := _player_inventory.add_item(entry["receive_item"], entry["receive_amount"])
-	if leftover > 0:
+	var idx: int = _merchant_data.trades.find(entry)
+	if idx < 0:
 		return
-	_player_inventory.remove_item(entry["give_item"], entry["give_amount"])
-	EventBus.trade_completed.emit(entry["give_item"], entry["receive_item"])
-	_refresh()
+	PlayerActions.request_trade(_merchant_data.id, idx)
+	# 实际背包变化触发 inventory.changed → _on_inventory_changed → _refresh
 
 func _do_sell(item: ItemData, amount: int) -> void:
-	if amount <= 0 or item.sell_price <= 0:
-		return
-	if not _player_inventory.has_item(item, amount):
-		return
-	_player_inventory.remove_item(item, amount)
-	var revenue: int = item.sell_price * amount
-	_player_inventory.add_gold(revenue)
-	EventBus.item_sold.emit(item, amount, revenue)
-	_refresh()
+	PlayerActions.request_sell(item.id, amount)
+	# 同上，刷新由 inventory.changed 触发
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel") and visible:

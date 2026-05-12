@@ -44,9 +44,11 @@ func _make_placeholder_thumb(seed_id: String) -> ImageTexture:
 func get_all_buildings() -> Array:
 	return ItemDatabase.get_all_buildings()
 
-func can_afford(building: BuildingData, inventory: InventoryComponent) -> bool:
+func can_afford(building: BuildingData, player: Player) -> bool:
+	if player == null or player.inventory == null:
+		return false
 	for cost in building.cost:
-		if not inventory.has_item(cost["item"], cost["amount"]):
+		if not player.inventory.has_item(cost["item"], cost["amount"]):
 			return false
 	return true
 
@@ -60,13 +62,14 @@ func exit_build_mode() -> void:
 	is_building = false
 	build_mode_exited.emit()
 
-func place_building(pos: Vector2, inventory: InventoryComponent) -> bool:
+# 仅 server 应该调用（PlayerActions 已经做权威性判断）。
+func place_building(pos: Vector2, player: Player) -> bool:
 	if not is_building or current_building == null:
 		return false
-	if not can_afford(current_building, inventory):
+	if not can_afford(current_building, player):
 		return false
 	for cost in current_building.cost:
-		inventory.remove_item(cost["item"], cost["amount"])
+		player.inventory.remove_item(cost["item"], cost["amount"])
 	building_placed.emit(current_building, pos)
 	exit_build_mode()
 	return true

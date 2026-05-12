@@ -8,6 +8,7 @@ var amount: int = 1
 @onready var count_label: Label = $CountLabel
 
 func _ready() -> void:
+	NetworkRegistry.attach(self)
 	body_entered.connect(_on_body_entered)
 	_refresh_visual()
 
@@ -30,7 +31,13 @@ func _refresh_visual() -> void:
 func _on_body_entered(body: Node2D) -> void:
 	if not body is Player:
 		return
-	var player := body as Player
+	# 客户端不直接改背包：把意图发给 server，由 server 走 try_pickup 仲裁
+	PlayerActions.request_pickup(NetworkRegistry.get_id(self))
+
+# server 上执行实际拾取逻辑。
+func try_pickup(player: Player) -> void:
+	if item == null or amount <= 0:
+		return
 	var before := amount
 	var leftover: int = player.inventory.add_item(item, amount)
 	var picked := before - leftover

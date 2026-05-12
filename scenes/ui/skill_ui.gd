@@ -74,7 +74,7 @@ func _make_row(skill: SkillData) -> Control:
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(info)
 
-	var p := SkillSystem.get_progress(skill.id)
+	var p: Dictionary = _local_progress(skill.id)
 	var name_row := HBoxContainer.new()
 	name_row.add_theme_constant_override("separation", 8)
 	info.add_child(name_row)
@@ -110,6 +110,14 @@ func _make_row(skill: SkillData) -> Control:
 # 借用物品图标表展示技能图标（直到有独立的技能图标 sheet）。
 func _make_skill_icon_atlas(skill: SkillData) -> Texture2D:
 	return ItemDatabase.get_icon_at_grid(skill.icon_grid)
+
+# 取本地玩家的技能进度（G4 后数据下沉到 player.skills 组件）。
+func _local_progress(skill_id: String) -> Dictionary:
+	var players := get_tree().get_nodes_in_group("player")
+	if players.is_empty():
+		return {}
+	var p := players[0] as Player
+	return p.skills.get_progress(skill_id) if p and p.skills else {}
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("skill_menu"):

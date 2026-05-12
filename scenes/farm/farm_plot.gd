@@ -13,6 +13,7 @@ var _current_crop: CropData = null
 var _grow_timer: float = 0.0
 
 func _ready() -> void:
+	NetworkRegistry.attach(self)
 	hint_label.hide()
 	interact_area.body_entered.connect(_on_body_entered)
 	interact_area.body_exited.connect(_on_body_exited)
@@ -54,7 +55,7 @@ func interact(player: Player) -> void:
 		State.READY:
 			player.inventory.add_item(_current_crop.output_item, _current_crop.output_amount)
 			HitParticles.spawn(get_parent(), global_position, Color(1.0, 0.85, 0.1))
-			EventBus.crop_harvested.emit(_current_crop)
+			EventBus.crop_harvested.emit(_current_crop, player)
 			_current_crop = null
 			_state = State.EMPTY
 			_apply_state_visual()

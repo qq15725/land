@@ -18,6 +18,8 @@ const ANIM_FPS := 8.0
 @onready var visual: AnimatedSprite2D = $Visual
 @onready var attack_area: Area2D = $AttackArea
 
+var skills: PlayerSkills
+
 var _attack_timer: float = 0.0
 var _is_dead: bool = false
 var _click_target: Vector2 = Vector2.ZERO
@@ -28,6 +30,10 @@ const CLICK_STOP_DIST := 6.0
 
 
 func _ready() -> void:
+	NetworkRegistry.attach(self)
+	skills = PlayerSkills.new()
+	skills.name = "PlayerSkills"
+	add_child(skills)
 	health.died.connect(_on_died)
 	health.damaged.connect(func(amount): EventBus.player_damaged.emit(amount))
 	health.died.connect(func(): EventBus.player_died.emit())
@@ -111,7 +117,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		var key := event as InputEventKey
 		var code := key.physical_keycode
 		if code >= KEY_1 and code <= KEY_9:
-			inventory.set_selected_slot(code - KEY_1)
+			PlayerActions.request_select_hotbar(code - KEY_1)
 			get_viewport().set_input_as_handled()
 			return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
@@ -119,11 +125,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		_click_moving = true
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("interact"):
-		_try_interact()
+		PlayerActions.request_interact()
 	elif event.is_action_pressed("use_item"):
-		_use_selected_item()
+		PlayerActions.request_use_selected_item()
 	elif event.is_action_pressed("attack"):
-		_try_attack()
+		PlayerActions.request_attack()
 	elif OS.get_name() == "Android" and event is InputEventScreenTouch:
 		var touch := event as InputEventScreenTouch
 		if touch.pressed:
@@ -134,7 +140,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				get_viewport().set_input_as_handled()
 
 
-func _try_interact() -> void:
+# 由 PlayerActions 在 server 上调用（单机时也走相同路径）。
+func do_interact() -> void:
 	var areas := interaction_area.get_overlapping_areas()
 	if areas.is_empty():
 		return
@@ -150,7 +157,7 @@ func _try_interact() -> void:
 		parent.interact(self)
 
 
-func _use_selected_item() -> void:
+func do_use_selected_item() -> void:
 	var item := inventory.get_selected_item()
 	if not item:
 		return
@@ -160,7 +167,7 @@ func _use_selected_item() -> void:
 		EventBus.item_used.emit(item)
 
 
-func _try_attack() -> void:
+func do_attack() -> void:
 	if _attack_timer > 0.0:
 		return
 	var weapon := inventory.get_equipped("weapon")
@@ -179,7 +186,7 @@ func _try_attack() -> void:
 	for body in attack_area.get_overlapping_bodies():
 		if body is Creature:
 			var creature := body as Creature
-			creature.health.take_damage(total_damage)
+			creature.take_damage_from(self, total_damage)
 			var kb_dir := (creature.global_position - global_position).normalized()
 			creature.velocity += kb_dir * KNOCKBACK_FORCE
 

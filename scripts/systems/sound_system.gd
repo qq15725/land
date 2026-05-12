@@ -50,7 +50,7 @@ func _ready() -> void:
 	EventBus.item_picked_up.connect(func(_i, _a): play("pickup"))
 	EventBus.player_damaged.connect(func(_a): play("hurt"))
 	EventBus.player_died.connect(func(): play("death"))
-	EventBus.resource_depleted.connect(func(_n): play("collect"))
+	EventBus.resource_depleted.connect(func(_n, _p): play("collect"))
 	EventBus.item_crafted.connect(func(_r): play("craft"))
 	EventBus.item_used.connect(func(_i): play("use"))
 	EventBus.trade_completed.connect(func(_g, _r): play("trade"))

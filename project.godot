@@ -19,6 +19,8 @@ config/icon="res://icon.svg"
 
 EventBus="*res://scripts/systems/event_bus.gd"
 Network="*res://scripts/systems/network_system.gd"
+NetworkRegistry="*res://scripts/systems/network_registry.gd"
+PlayerActions="*res://scripts/systems/player_actions.gd"
 GameManager="*res://scripts/systems/game_manager.gd"
 ItemDatabase="*res://scripts/systems/item_database.gd"
 CraftingSystem="*res://scripts/systems/crafting_system.gd"

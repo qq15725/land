@@ -407,18 +407,20 @@ func _refresh_hotbar() -> void:
 			icon.clear()
 		sel.visible = i == _inventory.selected_slot
 
-# 玩家总等级 = 4 个技能等级之和
+# 玩家总等级 = 4 个技能等级之和（从本地 player.skills 组件读取）
 func _refresh_xp() -> void:
 	var total_level := 0
 	var total_into := 0
 	var total_span := 0
 	var total_xp := 0
-	for sd in SkillSystem.get_all_skills():
-		var p: Dictionary = SkillSystem.get_progress(sd.id)
-		total_level += int(p.get("level", 0))
-		total_xp += int(p.get("xp", 0))
-		total_into += int(p.get("into_level", 0))
-		total_span += int(p.get("span", 1))
+	if _player and _player is Player and (_player as Player).skills:
+		var ps: PlayerSkills = (_player as Player).skills
+		for sd in SkillSystem.get_all_skills():
+			var p: Dictionary = ps.get_progress(sd.id)
+			total_level += int(p.get("level", 0))
+			total_xp += int(p.get("xp", 0))
+			total_into += int(p.get("into_level", 0))
+			total_span += int(p.get("span", 1))
 	var lv := maxi(1, total_level)
 	_level_lbl.text = "Lv. %d" % lv
 	_hotbar_level_lbl.text = str(lv)

@@ -236,7 +236,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			var place_pos := get_global_mouse_position()
 			if BuildingSystem.current_building and BuildingSystem.current_building.connects:
 				place_pos = place_pos.snapped(Vector2(TILE_SIZE, TILE_SIZE))
-			BuildingSystem.place_building(place_pos, player.inventory)
+			PlayerActions.request_place_building(place_pos)
 			get_viewport().set_input_as_handled()
 		elif mb.pressed and mb.button_index == MOUSE_BUTTON_RIGHT:
 			BuildingSystem.exit_build_mode()

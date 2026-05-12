@@ -25,6 +25,7 @@ var _frame_height: int = 0
 var _frame_count: int = 1  # sprite 是否真的有 3 帧
 
 func _ready() -> void:
+	NetworkRegistry.attach(self)
 	if not resource_id.is_empty():
 		var data: ResourceNodeData = ItemDatabase.get_resource_node(resource_id)
 		if data:
@@ -112,16 +113,16 @@ func interact(player: Player) -> void:
 		if held == null or held.tool_type != tool_required:
 			hint_label.text = "需要 %s" % _tool_label(tool_required)
 			return
-	# 等级额外掉落概率（按资源对应技能）
+	# 等级额外掉落概率（按资源对应技能，使用采集者的技能等级）
 	var bonus := 0
 	var skill_id: String = SkillSystem.RESOURCE_TO_SKILL.get(resource_id, "")
-	if not skill_id.is_empty() and randf() < SkillSystem.bonus_drop_chance(skill_id):
+	if not skill_id.is_empty() and player.skills and randf() < player.skills.bonus_drop_chance(skill_id):
 		bonus = 1
 	var leftover := player.inventory.add_item(item, drop_amount + bonus)
 	if leftover > 0:
 		_spawn_drops(leftover)
 	HitParticles.spawn(get_parent(), global_position, item.color)
-	_play_break_and_deplete()
+	_play_break_and_deplete(player)
 
 func _tool_label(tool: String) -> String:
 	match tool:
@@ -129,10 +130,11 @@ func _tool_label(tool: String) -> String:
 		"pickaxe": return "镐子"
 		_: return tool
 
-func _play_break_and_deplete() -> void:
+func _play_break_and_deplete(player: Player = null) -> void:
 	depleted_flag = true
 	hint_label.hide()
 	depleted.emit()
+	EventBus.resource_depleted.emit(self, player)
 
 	await _flash_hit()
 	if not is_inside_tree():

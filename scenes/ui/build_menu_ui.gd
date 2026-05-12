@@ -76,7 +76,7 @@ func _refresh() -> void:
 			_add_building_entry(building)
 
 func _add_building_entry(building: BuildingData) -> void:
-	var can_afford := BuildingSystem.can_afford(building, _inventory)
+	var can_afford := BuildingSystem.can_afford(building, _inventory.get_parent() as Player)
 
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)

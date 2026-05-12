@@ -10,6 +10,7 @@ var visual: Sprite2D = null
 var durability: float
 
 func _ready() -> void:
+	NetworkRegistry.attach(self)
 	durability = max_durability
 	hint_label = get_node_or_null("HintLabel") as Label
 	interact_area = get_node_or_null("InteractArea") as Area2D

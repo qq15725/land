@@ -20,8 +20,15 @@ var _wander_target: Vector2 = Vector2.ZERO
 var _spawn_pos: Vector2 = Vector2.ZERO
 var _attack_timer: float = 0.0
 var _wander_timer: float = 0.0
+var _last_damager: Player = null
+
+# 由攻击者（Player）调用。记录归属，再走 HealthComponent 扣血。
+func take_damage_from(player: Player, amount: float) -> void:
+	_last_damager = player
+	health.take_damage(amount)
 
 func _ready() -> void:
+	NetworkRegistry.attach(self)
 	if not data:
 		return
 	health.max_health = data.max_health
@@ -179,7 +186,7 @@ func _on_died() -> void:
 	velocity = Vector2.ZERO
 	set_physics_process(false)
 	_spawn_drops()
-	EventBus.creature_killed.emit(data)
+	EventBus.creature_killed.emit(data, _last_damager)
 	visual.modulate = Color(0.4, 0.4, 0.4, 0.5)
 	await get_tree().create_timer(1.5).timeout
 	queue_free()

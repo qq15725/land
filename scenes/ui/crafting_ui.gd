@@ -64,7 +64,7 @@ func _refresh() -> void:
 
 func _add_recipe_entry(recipe: RecipeData) -> void:
 	var accessible := recipe.required_station == "" or recipe.required_station == _current_station
-	var craftable := accessible and CraftingSystem.can_craft(recipe, _inventory)
+	var craftable := accessible and CraftingSystem.can_craft(recipe, _inventory.get_parent() as Player)
 
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
@@ -112,8 +112,8 @@ func _station_name(station: String) -> String:
 		_: return "需要 " + station
 
 func _on_craft(recipe: RecipeData) -> void:
-	if CraftingSystem.craft(recipe, _inventory):
-		_refresh()
+	PlayerActions.request_craft(recipe.id)
+	# 刷新交给 inventory.changed 信号触发（_inventory 在 setup 里已连）
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("craft"):

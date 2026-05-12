@@ -17,6 +17,7 @@ var _is_fed: bool = false
 var _produce_timer: float = 0.0
 
 func _ready() -> void:
+	NetworkRegistry.attach(self)
 	_pen_center = global_position
 	_wander_target = global_position
 	hint_label.hide()
