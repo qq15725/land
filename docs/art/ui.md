@@ -1,17 +1,17 @@
 # 美术：游戏内 UI
 
-风格：Minecraft 方块 UI 风格，深灰色石头质感背景，方形描边，无圆角，像素格子感。在 Godot 中通过 `StyleBoxTexture`（9-patch）或 `Theme` 全局应用。
+风格：Minecraft 方块 UI 风格，深灰色石头质感背景，方形描边，无圆角，像素格子感。
 
 ## 格式约定
 
-| 元素 | 源文件尺寸 | Godot 用途 |
-|------|-----------|-----------|
-| 面板背景（9-patch） | 128×128 px，角 32px | `PanelContainer` / `StyleBoxTexture` |
-| 按钮（3 状态竖排） | 192×64 px × 3（共 192×192） | `Button` normal / hover / pressed |
+| 元素 | 源文件尺寸 | 视觉用途 |
+|------|-----------|---------|
+| 面板背景（9-patch） | 128×128 px，角 32px | 拖拽面板、对话框背景 |
+| 按钮（3 状态竖排） | 192×64 px × 3（共 192×192） | normal / hover / pressed 三态 |
 | 物品格子 | 80×80 px | 背包 / 储物箱格子背景 |
-| 血量条背景 | 384×48 px | `ProgressBar` under texture |
-| 血量条填充 | 384×48 px | `ProgressBar` fill texture |
-| 分隔线 | 64×16 px（可横向拉伸） | `HSeparator` |
+| 血量条背景 | 384×48 px | HUD 血量条底 |
+| 血量条填充 | 384×48 px | HUD 血量条填充 |
+| 分隔线 | 64×16 px（可横向拉伸） | 面板分隔线 |
 | 标题栏背景 | 128×64 px（可横向拉伸） | 面板顶部拖拽区域 |
 | 时间 / 昼夜图标 | 64×64 px × 2（太阳 + 月亮） | HUD 昼夜状态 |
 | 当前物品框 | 208×208 px | HUD 选中物品显示框 |
@@ -64,16 +64,3 @@ ROW 7 — Current item frame (208x208 px):
 
 Minecraft pixel art UI, clean edges, consistent dark grey palette, transparent background
 ```
-
-## 应用方式（Godot）
-
-| 元素 | 应用节点 | 方式 |
-|------|----------|------|
-| 面板背景 | `PanelContainer` | `StyleBoxTexture`，9-patch 边距 32px |
-| 按钮 | `Button` | `StyleBoxTexture`，分别对应 normal/hover/pressed（每段 192×64 区域） |
-| 物品格子 | 背包 `Button` | `StyleBoxTexture`，`add_theme_stylebox_override` |
-| 血量条 | `ProgressBar` | `under` / `fill` 纹理属性 |
-| 分隔线 | `HSeparator` | `StyleBoxTexture` |
-| 标题栏 | `DraggablePanel` 标题行背景 | `StyleBoxTexture`，`h_axis_stretch_mode = TILE` |
-| 昼夜图标 | HUD `TextureRect` | 根据 `TimeSystem` 切换 sun / moon 帧 |
-| 当前物品框 | HUD 选中格 | `TextureRect` 叠在格子背景上 |

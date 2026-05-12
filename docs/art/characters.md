@@ -1,20 +1,19 @@
 # 美术：角色与生物
 
-**源文件**：单帧 128×256 px，精灵表 **512×1024 px**（4列 × 4行），透明背景，PNG 导出。
-**游戏内**：AnimatedSprite2D `scale = Vector2(0.125, 0.125)`，渲染为 **16×32 px 世界坐标**（1格宽×2格高），屏幕显示 64×128 px（Camera zoom=4.0）。
+**源文件**：单帧 128×256 px，精灵表 **512×1024 px**（4 列 × 4 行），透明背景，PNG 导出。
 
 ## 行走动画布局
 
 ```
-行0（walk_down）：  [帧0] [帧1] [帧2] [帧3]   ← 面朝下行走
-行1（walk_up）：    [帧0] [帧1] [帧2] [帧3]   ← 面朝上行走
-行2（walk_left）：  [帧0] [帧1] [帧2] [帧3]   ← 面朝左行走
-行3（walk_right）： [帧0] [帧1] [帧2] [帧3]   ← 面朝右行走
+行 0（walk_down）：  [帧0] [帧1] [帧2] [帧3]   ← 面朝下行走
+行 1（walk_up）：    [帧0] [帧1] [帧2] [帧3]   ← 面朝上行走
+行 2（walk_left）：  [帧0] [帧1] [帧2] [帧3]   ← 面朝左行走
+行 3（walk_right）： [帧0] [帧1] [帧2] [帧3]   ← 面朝右行走
 ```
 
-> 若生成工具难以区分左右，可只生成左向，右向在 Godot 中水平翻转（`flip_h = true`）。
+> 若生成工具难以区分左右，可只生成左向，右向水平翻转复用。
 
-## 提示词模板（角色/NPC）
+## 提示词模板（角色 / NPC）
 
 ```
 Minecraft-inspired pixel art sprite sheet, transparent background,
@@ -59,16 +58,14 @@ Minecraft pixel art, game asset, no background, clean sprite sheet grid
 
 | id | 描述 | 源文件尺寸 | 文件路径 | 状态 |
 |----|------|-----------|----------|------|
-| `player` | blocky farmer, square head, blue overall pants, brown shirt, simple pixel face | 512×1024 | `assets/sprites/characters/player.png` | ✅ 已接入 |
-| `merchant` | blocky traveling merchant, wide flat hat, long coat, rectangular backpack | 512×1024 | `assets/sprites/characters/merchant.png` | ✅ 已接入 |
-| `slime` | green cube slime, square body, pixel dot eyes, bouncy block movement | 512×1024 | `assets/sprites/characters/slime.png` | ✅ 已接入 |
-| `skeleton` | white rectangular skeleton, block skull head, stick-like limbs made of thin rectangles | 512×1024 | `assets/sprites/characters/skeleton.png` | ✅ 已接入 |
-| `chicken` | small white blocky chicken, square body, rectangular beak, stubby block legs | 512×1024 | `assets/sprites/characters/chicken.png` | ✅ 已接入 |
-| `cow` | blocky cow, white body with brown pixel patches, pink square nose, stubby block legs | 512×1024 | `assets/animals/cow.png` | ⏳ 待生成 |
-| `pig` | blocky pink pig, round-ish square body, pixel snout, four stubby block legs | 512×1024 | `assets/animals/pig.png` | ⏳ 待生成 |
-| `sheep` | blocky white woolly sheep, fluffy square block body, small head, four block legs | 512×1024 | `assets/animals/sheep.png` | ⏳ 待生成 |
-| `wolf` | blocky grey wolf, lean rectangular body, pixel teeth, sharp triangular ears made of squares | 512×1024 | `assets/creatures/wolf.png` | ⏳ 待生成 |
-| `zombie` | green-skinned blocky humanoid zombie, torn shirt, dragging walk pose | 512×1024 | `assets/creatures/zombie.png` | ⏳ 待生成 |
-| `bat` | small black bat with pixel wings, glowing red dot eyes, hovering in place | 512×1024 | `assets/creatures/bat.png` | ⏳ 待生成 |
-
-> 占位策略：缺失 PNG 时 `creature.gd` / `animal.gd` 加载会失败但不报错，节点保留但 sprite 透明。先以纯色 modulate 区分。建议用上方提示词在 AI 中生成 6 张 512×1024 sprite sheet 后放入对应路径。
+| `player` | blocky farmer, square head, blue overall pants, brown shirt, simple pixel face | 512×1024 | `assets/sprites/characters/player.png` | ✅ |
+| `merchant` | blocky traveling merchant, wide flat hat, long coat, rectangular backpack | 512×1024 | `assets/sprites/characters/merchant.png` | ✅ |
+| `slime` | green cube slime, square body, pixel dot eyes, bouncy block movement | 512×1024 | `assets/sprites/characters/slime.png` | ✅ |
+| `skeleton` | white rectangular skeleton, block skull head, stick-like limbs made of thin rectangles | 512×1024 | `assets/sprites/characters/skeleton.png` | ✅ |
+| `chicken` | small white blocky chicken, square body, rectangular beak, stubby block legs | 512×1024 | `assets/sprites/characters/chicken.png` | ✅ |
+| `cow` | blocky cow, white body with brown pixel patches, pink square nose, stubby block legs | 512×1024 | `assets/animals/cow.png` | ⏳ |
+| `pig` | blocky pink pig, round-ish square body, pixel snout, four stubby block legs | 512×1024 | `assets/animals/pig.png` | ⏳ |
+| `sheep` | blocky white woolly sheep, fluffy square block body, small head, four block legs | 512×1024 | `assets/animals/sheep.png` | ⏳ |
+| `wolf` | blocky grey wolf, lean rectangular body, pixel teeth, sharp triangular ears made of squares | 512×1024 | `assets/creatures/wolf.png` | ⏳ |
+| `zombie` | green-skinned blocky humanoid zombie, torn shirt, dragging walk pose | 512×1024 | `assets/creatures/zombie.png` | ⏳ |
+| `bat` | small black bat with pixel wings, glowing red dot eyes, hovering in place | 512×1024 | `assets/creatures/bat.png` | ⏳ |

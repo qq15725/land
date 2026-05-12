@@ -1,13 +1,11 @@
 # 美术：物品图标
 
-物品图标统一打包成一张 sprite sheet，按 **8 列 × 5 行** grid 排列。Godot 自动按 `icons.png.width / 8` 推断单格尺寸，所以**占位与正式版尺寸可以不同**，只要保持 8×5 网格即可：
+物品图标统一打包成一张 sprite sheet，**8 列 × 5 行** grid 排列。占位与正式版尺寸均可，只要保持 8×5 网格：
 
-- 占位（已存在 8×4 旧版）：`256×128 px` → 单格 `32×32 px`，第 5 行越界会自动回退到纯色 icon
-- 正式版：`512×320 px` → 单格 `64×64 px`，扩到 5 行装下全部物品
+- 占位：`256×128 px`，单格 `32×32 px`（仅装下 4 行，第 5 行空）
+- 正式版：`512×320 px`，单格 `64×64 px`（装下全部 40 格）
 
-每个物品在 `data/items.json` 中通过 `icon_grid: [col, row]` 指定自己在网格中的坐标。
-
-代码切割位置：`scripts/systems/item_database.gd` `get_item_icon(item)`。
+文件：`assets/sprites/items/icons.png`
 
 ## 提示词模板
 
@@ -25,8 +23,6 @@ Minecraft pixel art, game asset icons, clean grid, transparent background
 ```
 
 ## 当前图标分布（8 列 × 5 行）
-
-`assets/sprites/items/icons.png` 中每个物品的网格坐标如下（与 `data/items.json` 一致）：
 
 | (col, row) | id | 描述 |
 |------------|----|------|
@@ -73,6 +69,6 @@ Minecraft pixel art, game asset icons, clean grid, transparent background
 
 ## 替换流程
 
-1. 在 AI 中用上方提示词生成，确保 8×4 网格、无 padding、透明背景。
-2. 直接覆盖 `assets/sprites/items/icons.png`。
-3. 不需要改代码（自动识别尺寸）。如果加新物品，在 `data/items.json` 给它分配一个空格 `icon_grid`。
+1. 用上方提示词生成，确保 8×5 网格、无 padding、透明背景。
+2. 覆盖 `assets/sprites/items/icons.png`。
+3. 新增物品时在表中分配未占用的 `(col, row)`。

@@ -18,22 +18,26 @@ no extra objects, no cropped sprite, no inconsistent frame sizes
 
 ## 精灵表格式约定
 
-> 所有尺寸为**源文件尺寸**（4 倍高清），Godot 场景缩放参考下表。**Camera2D zoom = 4.0**，格子 = 64×64 屏幕像素，对齐星露谷物语比例。
+所有尺寸为**源文件尺寸**（4 倍高清），最终游戏内会按 1/4 比例显示。
 
-| 类型 | 单帧源尺寸 | 场景 scale | 游戏世界渲染尺寸 | 屏幕像素（zoom×4） | 精灵表布局 | 动画说明 |
-|------|-----------|-----------|----------------|------------------|-----------|----------|
-| 角色 / 怪物 | 128×256 px | 0.125 | 16×32 px（1×2 格） | 64×128 px | 4列 × 4行 | 每行一个方向：下/上/左/右，每行4帧 |
-| 可破坏环境物件 | 视物件而定 | 0.25 | 原尺寸 ÷ 4 | 原尺寸 | 1列 × 3行 | 行0正常，行1受损，行2枯竭 |
-| 静态环境物件 | 视物件而定 | 0.25 | 原尺寸 ÷ 4 | 原尺寸 | 单帧静态 | 无动画 |
-| 建筑 | 192×192 / 256×256 等 | 0.25 | 48×48 / 64×64 px | 192×192 / 256×256 px | 单帧静态 | 无动画 |
-| 物品图标 | 64×64 px | — | 16×16 px（UI） | — | grid 排列 | 无动画 |
+| 类型 | 单帧源尺寸 | 精灵表布局 | 动画说明 |
+|------|-----------|-----------|----------|
+| 角色 / 怪物 | 128×256 px | 4 列 × 4 行（512×1024 px） | 每行一个方向：下/上/左/右，每行 4 帧 |
+| 可破坏环境物件 | 视物件而定 | 1 列 × 3 行 | 行 0 正常，行 1 受损，行 2 枯竭 |
+| 静态环境物件 | 视物件而定 | 单帧静态 | 无动画 |
+| 建筑 | 192×192 / 256×256 等 | 单帧静态 | 无动画 |
+| 物品图标 | 32×32 / 64×64 px | grid 排列 | 无动画 |
 
-**文件命名规范**（与 JSON 中 `sprite` 字段对应）：
+**文件命名规范**：
+
 ```
-assets/sprites/characters/{id}.png     # 角色/怪物
-assets/sprites/environment/{id}.png    # 环境物件
+assets/sprites/characters/{id}.png     # 角色 / NPC
+assets/animals/{id}.png                # 圈养动物
+assets/creatures/{id}.png              # 敌对怪物
+assets/resources/{id}.png              # 可采集环境物件
+assets/sprites/environment/{id}.png    # 装饰物件 / 地砖
 assets/sprites/buildings/{id}.png      # 建筑
-assets/sprites/items/{id}.png          # 物品图标（整张图标表）
+assets/sprites/items/icons.png         # 物品图标整张表
 ```
 
 ---
@@ -42,17 +46,14 @@ assets/sprites/items/{id}.png          # 物品图标（整张图标表）
 
 | 类型 | 文档 | 说明 |
 |------|------|------|
-| 角色与生物 | [art/characters.md](art/characters.md) | 玩家、NPC、怪物帧动画精灵表 |
+| 角色与生物 | [art/characters.md](art/characters.md) | 玩家、NPC、怪物、动物帧动画精灵表 |
 | 地砖 Autotile | [art/tiles.md](art/tiles.md) | 掩码系统，变体列，生成提示词 |
-| 环境物件 | [art/environment.md](art/environment.md) | 树、石、草丛、蘑菇等可采集/装饰物件（含 3 帧采集动画） |
+| 环境物件 | [art/environment.md](art/environment.md) | 树、石、草丛、蘑菇等可采集/装饰物件 |
 | 建筑 | [art/buildings.md](art/buildings.md) | 工作台、箱子、贸易站等可建造建筑 |
-| 物品图标 | [art/items.md](art/items.md) | 背包 UI 图标表（8×4 grid，25 个物品） |
+| 物品图标 | [art/items.md](art/items.md) | 背包 UI 图标表（8×5 grid） |
 | 游戏内 UI | [art/ui.md](art/ui.md) | HUD、面板、按钮、血量条等游戏内界面 |
 | 主菜单美术 | [art/main_menu.md](art/main_menu.md) | 背景、标题 Logo、存档槽、菜单按钮 |
-| 音效 | [../sounds.md](../sounds.md) | 事件 → 音效映射、风格描述、占位策略 |
 
 ## 字体
 
-可选项：在 `assets/fonts/pixel.ttf` 放一个像素字体，`UIStyle` 自动接入到 Theme。文件不存在时使用 Godot 默认字体。
-
-推荐字体方向：等宽像素字体（如 Press Start 2P、Pixeled、Determination Mono Web），支持中文则需要包含 CJK 字形或单独中文像素字体（如 Zpix）。
+可选项：在 `assets/fonts/pixel.ttf` 放置像素字体（如 Press Start 2P / Pixeled / Determination Mono Web，中文像素字体如 Zpix）。
