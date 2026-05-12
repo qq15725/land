@@ -60,7 +60,6 @@ func _collect(world: Node2D) -> Dictionary:
 		"player_hp": player.health.current_health,
 		"inventory": _save_inventory(player.inventory),
 		"resource_nodes": _save_resource_nodes(world),
-		"farm_plots": _save_farm_plots(world),
 		"buildings": _save_buildings(world),
 	}
 	return data
@@ -86,8 +85,7 @@ func _apply(data: Dictionary, world: Node2D) -> void:
 
 	_load_inventory(player.inventory, data.get("inventory", []))
 	await _load_resource_nodes(world, data.get("resource_nodes", []))
-	await _load_buildings(world, data.get("buildings", []))
-	_load_farm_plots(world, data.get("farm_plots", []))
+	await _load_buildings(world, data.get("buildings", []), data.get("farm_plots", []))
 
 # --- 背包 ---
 
@@ -144,54 +142,80 @@ func _load_resource_nodes(world: Node2D, data: Array) -> void:
 		if entry.get("depleted", false):
 			node.restore_from_save(entry.get("regen_timer", 0.0))
 
-# --- 建筑 ---
-
-func _load_buildings(world: Node2D, data: Array) -> void:
-	var layer: Node2D = world.get_node("YSortLayer")
-	for node in layer.get_children():
-		if node is BuildingBase and not node is FarmPlot:
-			node.queue_free()
-	await world.get_tree().process_frame
-	for entry in data:
-		var scene_path: String = entry.get("type", "")
-		if scene_path.is_empty() or not ResourceLoader.exists(scene_path):
-			continue
-		var node := (load(scene_path) as PackedScene).instantiate() as Node2D
-		node.global_position = Vector2(entry.get("x", 0.0), entry.get("y", 0.0))
-		layer.add_child(node)
-
-# --- 农田 ---
-
-func _save_farm_plots(world: Node2D) -> Array:
-	var result := []
-	for node in world.get_node("YSortLayer").get_children():
-		if node is FarmPlot:
-			var entry := {
-				"x": node.global_position.x,
-				"y": node.global_position.y,
-				"state": node.get_save_state(),
-			}
-			result.append(entry)
-	return result
-
-func _load_farm_plots(world: Node2D, data: Array) -> void:
-	var layer: Node2D = world.get_node("YSortLayer")
-	var plots := []
-	for node in layer.get_children():
-		if node is FarmPlot:
-			plots.append(node)
-	for i in mini(data.size(), plots.size()):
-		plots[i].load_save_state(data[i].get("state", {}))
-
-# --- 建筑 ---
+# --- 建筑（含 FarmPlot，统一路径） ---
 
 func _save_buildings(world: Node2D) -> Array:
 	var result := []
 	for node in world.get_node("YSortLayer").get_children():
-		if node is BuildingBase and not node is FarmPlot:
-			result.append({
-				"type": node.scene_file_path,
-				"x": node.global_position.x,
-				"y": node.global_position.y,
-			})
+		var id := _resolve_building_id(node)
+		if id.is_empty():
+			continue
+		var entry := {
+			"id": id,
+			"x": node.global_position.x,
+			"y": node.global_position.y,
+		}
+		if node.has_method("get_save_state"):
+			entry["state"] = node.get_save_state()
+		result.append(entry)
 	return result
+
+# 第二个参数仅用于兼容旧存档（farm_plots 数组）。
+func _load_buildings(world: Node2D, data: Array, legacy_farm_plots: Array = []) -> void:
+	var layer: Node2D = world.get_node("YSortLayer")
+	for node in layer.get_children():
+		if node is BuildingBase or node is FarmPlot or node is Animal:
+			node.queue_free()
+	await world.get_tree().process_frame
+
+	for entry in data:
+		var bd := _entry_to_building_data(entry)
+		if bd == null:
+			continue
+		var node := _spawn_building(layer, bd, Vector2(entry.get("x", 0.0), entry.get("y", 0.0)))
+		if node and entry.has("state") and node.has_method("load_save_state"):
+			node.load_save_state(entry["state"])
+
+	# 旧存档：buildings 不含 FarmPlot，需要从 legacy farm_plots 字段补建。
+	if not legacy_farm_plots.is_empty():
+		var bd := ItemDatabase.get_building("farm_plot")
+		if bd:
+			for entry in legacy_farm_plots:
+				var node := _spawn_building(layer, bd, Vector2(entry.get("x", 0.0), entry.get("y", 0.0)))
+				if node and entry.has("state") and node.has_method("load_save_state"):
+					node.load_save_state(entry["state"])
+
+func _resolve_building_id(node: Node) -> String:
+	if node is BuildingBase:
+		var bb := node as BuildingBase
+		if bb.building_data:
+			return bb.building_data.id
+	if node is FarmPlot:
+		var fp := node as FarmPlot
+		if fp.building_data:
+			return fp.building_data.id
+		return "farm_plot"
+	return ""
+
+# 兼容旧存档（"type": scene_path）和新格式（"id": building_id）。
+func _entry_to_building_data(entry: Dictionary) -> BuildingData:
+	var id: String = entry.get("id", "")
+	if not id.is_empty():
+		return ItemDatabase.get_building(id)
+	var scene_path: String = entry.get("type", "")
+	if scene_path.is_empty():
+		return null
+	for b in ItemDatabase.get_all_buildings():
+		if b.scene_path == scene_path:
+			return b
+	return null
+
+func _spawn_building(layer: Node2D, bd: BuildingData, pos: Vector2) -> Node2D:
+	if bd.scene_path.is_empty() or not ResourceLoader.exists(bd.scene_path):
+		return null
+	var node := (load(bd.scene_path) as PackedScene).instantiate() as Node2D
+	node.global_position = pos
+	layer.add_child(node)
+	if node.has_method("on_placed"):
+		node.on_placed(bd)
+	return node
