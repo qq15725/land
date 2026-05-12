@@ -15,13 +15,28 @@ const SPRITE_PATH := "res://assets/sprites/characters/player.png"
 const FRAME_W := 128
 const FRAME_H := 256
 const FRAME_COLS := 4
-const ANIM_FPS := 8.0
+const ANIM_FPS := 12.0
+
+# 2.5D 视觉增强参数
+const VISUAL_BASE_Y := -16.0
+const WALK_BOB_AMP := 1.2        # 走路 Y 轴起伏振幅
+const WALK_BOB_FREQ := 12.0      # 走路起伏频率
+const IDLE_FLOAT_AMP := 0.5
+const IDLE_FLOAT_FREQ := 2.5
+const SHADOW_ALPHA := 0.35
+const CAM_SHAKE_DECAY := 8.0     # 攻击命中屏幕震动衰减速度
 
 @onready var inventory: InventoryComponent = $InventoryComponent
 @onready var health: HealthComponent = $HealthComponent
 @onready var interaction_area: Area2D = $InteractionArea
 @onready var visual: AnimatedSprite2D = $Visual
 @onready var attack_area: Area2D = $AttackArea
+@onready var camera: Camera2D = $Camera2D
+
+var _shadow: Node2D
+var _bob_time: float = 0.0
+var _is_moving: bool = false
+var _cam_shake_amp: float = 0.0
 
 var skills: PlayerSkills
 var peer_id: int = Network.SERVER_PEER_ID
@@ -52,13 +67,49 @@ func _ready() -> void:
 	skills.name = "PlayerSkills"
 	add_child(skills)
 	_setup_synchronizer()
+	_setup_shadow()
+	_setup_camera()
 	health.died.connect(_on_died)
 	health.damaged.connect(func(amount): EventBus.player_damaged.emit(amount))
 	health.died.connect(func(): EventBus.player_died.emit())
+	health.damaged.connect(func(_a): _camera_shake(2.0))
 	inventory.equipment_changed.connect(_on_equipment_changed)
 	add_to_group("player")
 	_setup_sprite_frames()
 	_on_equipment_changed("")
+
+# 脚下椭圆软阴影：Y-sort 不参与，z_index 低于 visual
+func _setup_shadow() -> void:
+	_shadow = Node2D.new()
+	_shadow.name = "Shadow"
+	_shadow.z_index = -1
+	_shadow.position = Vector2(0, -2)
+	add_child(_shadow)
+	move_child(_shadow, 0)
+	# 用 Polygon2D 画椭圆（足够顺滑的近似多边形）
+	var poly := Polygon2D.new()
+	var pts := PackedVector2Array()
+	var rx := 8.0
+	var ry := 3.0
+	var n := 16
+	for i in n:
+		var a := float(i) / n * TAU
+		pts.append(Vector2(cos(a) * rx, sin(a) * ry))
+	poly.polygon = pts
+	poly.color = Color(0, 0, 0, SHADOW_ALPHA)
+	_shadow.add_child(poly)
+
+func _setup_camera() -> void:
+	if not camera:
+		return
+	camera.position_smoothing_enabled = true
+	camera.position_smoothing_speed = 8.0
+	camera.drag_horizontal_enabled = true
+	camera.drag_vertical_enabled = true
+	camera.drag_left_margin = 0.08
+	camera.drag_right_margin = 0.08
+	camera.drag_top_margin = 0.08
+	camera.drag_bottom_margin = 0.08
 
 func _setup_synchronizer() -> void:
 	# 多人下：远程玩家头顶显示名字标签
@@ -143,6 +194,7 @@ func _physics_process(delta: float) -> void:
 	velocity = move_dir * SPEED
 	move_and_slide()
 	_update_animation(move_dir)
+	_update_bobbing(delta, move_dir)
 
 
 func _update_animation(move_dir: Vector2) -> void:
@@ -162,14 +214,36 @@ func _update_animation(move_dir: Vector2) -> void:
 	elif not visual.is_playing():
 		visual.play(anim)
 
-# 远程同步动画：非 authority 端从 _sync_anim 收到更新后切换动画
-func _process(_delta: float) -> void:
+# 远程同步动画 + 摄像机震动衰减（每帧跑）
+func _process(delta: float) -> void:
+	# 摄像机抖动衰减（只对 authority 玩家有效，因为 camera 是 player 的子节点）
+	if is_multiplayer_authority() and camera:
+		if _cam_shake_amp > 0.01:
+			camera.offset = Vector2(randf_range(-_cam_shake_amp, _cam_shake_amp), randf_range(-_cam_shake_amp, _cam_shake_amp))
+			_cam_shake_amp = move_toward(_cam_shake_amp, 0.0, CAM_SHAKE_DECAY * delta)
+		else:
+			camera.offset = Vector2.ZERO
+
 	if is_multiplayer_authority():
 		return
 	if _sync_anim != _last_anim:
 		_last_anim = _sync_anim
 		if visual.sprite_frames and visual.sprite_frames.has_animation(_sync_anim):
 			visual.play(_sync_anim)
+
+# 走路时身体 Y 轴 sin 浮动；静止时改慢呼吸
+func _update_bobbing(delta: float, move_dir: Vector2) -> void:
+	_bob_time += delta
+	_is_moving = move_dir.length() > 0.01
+	var y_off: float
+	if _is_moving:
+		y_off = sin(_bob_time * WALK_BOB_FREQ) * WALK_BOB_AMP
+	else:
+		y_off = sin(_bob_time * IDLE_FLOAT_FREQ) * IDLE_FLOAT_AMP
+	visual.position.y = VISUAL_BASE_Y + y_off
+
+func _camera_shake(amplitude: float) -> void:
+	_cam_shake_amp = maxf(_cam_shake_amp, amplitude)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -276,6 +350,7 @@ func _on_hit_landed() -> void:
 	if _combo_count >= 2:
 		EventBus.combo_hit.emit(_combo_count)
 	_hit_stop()
+	_camera_shake(3.5)
 
 func _hit_stop() -> void:
 	Engine.time_scale = HIT_STOP_SCALE
