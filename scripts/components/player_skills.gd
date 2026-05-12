@@ -29,9 +29,10 @@ func add_xp(skill_id: String, amount: int) -> void:
 	if after > before:
 		EventBus.skill_leveled_up.emit(skill_id, after)
 
-func _on_resource_depleted(node: Node, player: Node) -> void:
-	if player != get_parent():
+func _on_resource_depleted(resource_id: int, player_id: int) -> void:
+	if player_id != NetworkRegistry.get_id(get_parent()):
 		return
+	var node := NetworkRegistry.get_node_by_id(resource_id)
 	if node == null:
 		return
 	var rid: String = node.get("resource_id") if node else ""
@@ -40,13 +41,13 @@ func _on_resource_depleted(node: Node, player: Node) -> void:
 		return
 	add_xp(sid, 10)
 
-func _on_crop_harvested(_crop: CropData, player: Node) -> void:
-	if player != get_parent():
+func _on_crop_harvested(_crop: CropData, player_id: int) -> void:
+	if player_id != NetworkRegistry.get_id(get_parent()):
 		return
 	add_xp("farming", 25)
 
-func _on_creature_killed(creature: CreatureData, player: Node) -> void:
-	if player != get_parent() or creature == null:
+func _on_creature_killed(creature: CreatureData, player_id: int) -> void:
+	if creature == null or player_id != NetworkRegistry.get_id(get_parent()):
 		return
 	var amount := int(creature.max_health * 0.5)
 	add_xp("combat", maxi(5, amount))

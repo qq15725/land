@@ -175,6 +175,15 @@ func _build_right() -> Control:
 	btn_row.add_theme_constant_override("separation", 12)
 	inner.add_child(btn_row)
 
+	# 联机入口
+	var host_btn := _make_action_btn("⌂  创建房间", "res://assets/sprites/ui/btn_green.png")
+	host_btn.pressed.connect(_on_host_pressed)
+	btn_row.add_child(host_btn)
+
+	var join_btn := _make_action_btn("→  加入房间", "res://assets/sprites/ui/btn_green.png")
+	join_btn.pressed.connect(_on_join_pressed)
+	btn_row.add_child(join_btn)
+
 	_update_btn = _make_action_btn("⚙  检查更新", "res://assets/sprites/ui/btn_green.png")
 	_update_btn.pressed.connect(_on_check_update_pressed)
 	btn_row.add_child(_update_btn)
@@ -465,3 +474,83 @@ func _on_update_available(version: String, changelog: String) -> void:
 func _start_game(slot: int) -> void:
 	GameManager.current_save_slot = slot
 	get_tree().change_scene_to_packed(WorldScene)
+
+# ─── 联机入口 ────────────────────────────────────────────────────────────
+
+func _on_host_pressed() -> void:
+	_show_room_dialog("创建房间", true)
+
+func _on_join_pressed() -> void:
+	_show_room_dialog("加入房间", false)
+
+func _show_room_dialog(title: String, is_host: bool) -> void:
+	var dlg := AcceptDialog.new()
+	dlg.title = title
+	dlg.dialog_hide_on_ok = false
+	add_child(dlg)
+
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 8)
+	dlg.add_child(vb)
+
+	var ip_input: LineEdit = null
+	if not is_host:
+		var ip_row := HBoxContainer.new()
+		ip_row.add_theme_constant_override("separation", 8)
+		vb.add_child(ip_row)
+		var ip_lbl := Label.new()
+		ip_lbl.text = "主机 IP"
+		ip_lbl.custom_minimum_size = Vector2(80, 0)
+		ip_row.add_child(ip_lbl)
+		ip_input = LineEdit.new()
+		ip_input.text = "127.0.0.1"
+		ip_input.custom_minimum_size = Vector2(200, 0)
+		ip_row.add_child(ip_input)
+
+	var port_row := HBoxContainer.new()
+	port_row.add_theme_constant_override("separation", 8)
+	vb.add_child(port_row)
+	var port_lbl := Label.new()
+	port_lbl.text = "端口"
+	port_lbl.custom_minimum_size = Vector2(80, 0)
+	port_row.add_child(port_lbl)
+	var port_input := LineEdit.new()
+	port_input.text = str(Network.DEFAULT_PORT)
+	port_input.custom_minimum_size = Vector2(120, 0)
+	port_row.add_child(port_input)
+
+	var upnp_check: CheckBox = null
+	if is_host:
+		upnp_check = CheckBox.new()
+		upnp_check.text = "尝试 UPnP 端口转发（跨网联机）"
+		upnp_check.button_pressed = false
+		vb.add_child(upnp_check)
+
+	var status := Label.new()
+	status.text = ""
+	status.add_theme_color_override("font_color", Color(0.95, 0.55, 0.3))
+	vb.add_child(status)
+
+	dlg.confirmed.connect(func():
+		var port: int = int(port_input.text)
+		if is_host:
+			var err := Network.start_host(port)
+			if err != OK:
+				status.text = "监听失败（错误码 %d）" % err
+				return
+			if upnp_check and upnp_check.button_pressed:
+				var ext_ip := Network.try_open_upnp(port)
+				if not ext_ip.is_empty():
+					status.text = "UPnP 开启成功，外网 IP: %s" % ext_ip
+			_start_game(0)
+		else:
+			var addr: String = ip_input.text.strip_edges() if ip_input else "127.0.0.1"
+			var err := Network.join(addr, port)
+			if err != OK:
+				status.text = "连接失败（错误码 %d）" % err
+				return
+			status.text = "连接中..."
+			Network.connection_succeeded.connect(func(): _start_game(0), CONNECT_ONE_SHOT)
+			Network.connection_failed.connect(func(): status.text = "连接失败：超时", CONNECT_ONE_SHOT)
+	)
+	dlg.popup_centered()

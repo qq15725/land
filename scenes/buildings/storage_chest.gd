@@ -4,4 +4,4 @@ extends BuildingBase
 @onready var storage: InventoryComponent = $InventoryComponent
 
 func interact(_player: Player) -> void:
-	EventBus.open_storage.emit(storage)
+	EventBus.open_storage.emit(NetworkRegistry.get_id(self))

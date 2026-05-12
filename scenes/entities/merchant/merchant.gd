@@ -68,7 +68,7 @@ func _physics_process(delta: float) -> void:
 func interact(player: Player) -> void:
 	if not _arrived:
 		return
-	EventBus.open_trade.emit(data, player.inventory)
+	EventBus.open_trade.emit(data, NetworkRegistry.get_id(player))
 
 func _depart() -> void:
 	set_physics_process(false)

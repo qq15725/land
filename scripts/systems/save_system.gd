@@ -1,7 +1,31 @@
 extends Node
 
+# 存档系统（G7 拆 world / per-player）。
+#
+# 存档结构 v2：
+# {
+#   "version": 2,
+#   "saved_at": "...",
+#   "world": {
+#     "day", "phase", "phase_elapsed", "terrain_seed",
+#     "chunk_snapshots", "buildings", "network_registry"
+#   },
+#   "players": [
+#     {
+#       "peer_id", "pos", "hp", "money",
+#       "inventory", "equipped", "skills"
+#     },
+#     ...
+#   ]
+# }
+#
+# 单机：players 数组只有一个元素，peer_id = 1。
+# 多人（G8+）：每个加入过的玩家一份记录；读档时按 peer_id 分配。
+# 旧 v1 存档（顶层平铺单玩家字段）由 _apply_v1 兼容加载。
+
 const SAVE_DIR := "user://saves/"
 const MAX_SLOTS := 3
+const VERSION := 2
 
 func _ready() -> void:
 	DirAccess.make_dir_recursive_absolute(SAVE_DIR)
@@ -34,12 +58,26 @@ func get_slot_info(slot: int) -> Dictionary:
 	var result: Variant = JSON.parse_string(file.get_as_text())
 	if result == null:
 		return {}
+	var d := result as Dictionary
+	# v2: world.day / players[0].money；v1: 顶层
+	var ver := int(d.get("version", 1))
+	if ver >= 2:
+		var w: Dictionary = d.get("world", {})
+		var ps: Array = d.get("players", [])
+		var first: Dictionary = ps[0] if ps.size() > 0 else {}
+		return {
+			"day": w.get("day", 1),
+			"phase": w.get("phase", "day"),
+			"season": w.get("season", "春季"),
+			"money": first.get("money", 0),
+			"saved_at": d.get("saved_at", ""),
+		}
 	return {
-		"day": (result as Dictionary).get("day", 1),
-		"phase": (result as Dictionary).get("phase", "day"),
-		"season": (result as Dictionary).get("season", "春季"),
-		"money": (result as Dictionary).get("money", 0),
-		"saved_at": (result as Dictionary).get("saved_at", ""),
+		"day": d.get("day", 1),
+		"phase": d.get("phase", "day"),
+		"season": d.get("season", "春季"),
+		"money": d.get("money", 0),
+		"saved_at": d.get("saved_at", ""),
 	}
 
 func delete_slot(slot: int) -> void:
@@ -47,37 +85,93 @@ func delete_slot(slot: int) -> void:
 	if FileAccess.file_exists(path):
 		DirAccess.remove_absolute(path)
 
+# ─── 收集（save） ────────────────────────────────────────────────────────
+
 func _collect(world: Node2D) -> Dictionary:
-	var player: Player = world.get_node("YSortLayer/Player")
-	var ts: Variant = world.get("terrain_seed")
-	# 把当前 active chunk 状态同步到 ChunkManager._snapshots
 	ChunkManager.snapshot_active_chunks()
-	var data := {
+	var ts: Variant = world.get("terrain_seed")
+	return {
+		"version": VERSION,
 		"saved_at": Time.get_datetime_string_from_system(),
-		"day": TimeSystem.current_day,
-		"phase": "night" if TimeSystem.is_night() else "day",
-		"phase_elapsed": TimeSystem.phase_elapsed,
-		"terrain_seed": ts if ts is int else 0,
-		"player_pos": {"x": player.global_position.x, "y": player.global_position.y},
-		"player_hp": player.health.current_health,
-		"money": player.inventory.gold,
-		"inventory": _save_inventory(player.inventory),
-		"equipped": _save_equipped(player.inventory),
-		"skills": player.skills.export_state() if player.skills else {},
-		"network_registry": NetworkRegistry.export_state(),
-		"chunk_snapshots": ChunkManager.export_snapshots(),
-		"buildings": _save_buildings(world),
+		"world": {
+			"day": TimeSystem.current_day,
+			"phase": "night" if TimeSystem.is_night() else "day",
+			"phase_elapsed": TimeSystem.phase_elapsed,
+			"terrain_seed": ts if ts is int else 0,
+			"chunk_snapshots": ChunkManager.export_snapshots(),
+			"buildings": _save_buildings(world),
+			"network_registry": NetworkRegistry.export_state(),
+		},
+		"players": _collect_players(world),
 	}
-	return data
+
+func _collect_players(world: Node2D) -> Array:
+	var result: Array = []
+	for p in world.get_tree().get_nodes_in_group("player"):
+		var player := p as Player
+		var peer_id: int = int(player.get_meta("peer_id", Network.local_peer_id()))
+		result.append({
+			"peer_id": peer_id,
+			"pos": {"x": player.global_position.x, "y": player.global_position.y},
+			"hp": player.health.current_health,
+			"money": player.inventory.gold,
+			"inventory": _save_inventory(player.inventory),
+			"equipped": _save_equipped(player.inventory),
+			"skills": player.skills.export_state() if player.skills else {},
+		})
+	return result
+
+# ─── 应用（load） ────────────────────────────────────────────────────────
 
 func _apply(data: Dictionary, world: Node2D) -> void:
-	var player: Player = world.get_node("YSortLayer/Player")
+	var ver := int(data.get("version", 1))
+	if ver >= 2:
+		await _apply_v2(data, world)
+	else:
+		await _apply_v1(data, world)
 
-	TimeSystem.current_day = data.get("day", 1)
-	TimeSystem.phase_elapsed = data.get("phase_elapsed", 0.0)
-	TimeSystem.current_phase = TimeSystem.Phase.NIGHT if data.get("phase") == "night" else TimeSystem.Phase.DAY
+func _apply_v2(data: Dictionary, world: Node2D) -> void:
+	var world_data: Dictionary = data.get("world", {})
+	var players_data: Array = data.get("players", [])
+	_apply_world(world_data, world)
+	_apply_players(players_data, world)
+	await _load_buildings(world, world_data.get("buildings", []))
 
-	var seed_val: int = data.get("terrain_seed", 0)
+# 兼容 v1：顶层平铺单玩家字段
+func _apply_v1(data: Dictionary, world: Node2D) -> void:
+	var world_data := {
+		"day": data.get("day", 1),
+		"phase": data.get("phase", "day"),
+		"phase_elapsed": data.get("phase_elapsed", 0.0),
+		"terrain_seed": data.get("terrain_seed", 0),
+		"chunk_snapshots": data.get("chunk_snapshots", []),
+		"buildings": data.get("buildings", []),
+		"network_registry": data.get("network_registry", {}),
+	}
+	var player_data := {
+		"peer_id": Network.SERVER_PEER_ID,
+		"pos": data.get("player_pos", {}),
+		"hp": data.get("player_hp", 100),
+		"money": data.get("money", 0),
+		"inventory": data.get("inventory", []),
+		"equipped": data.get("equipped", {}),
+		"skills": data.get("skills", {}),
+	}
+	_apply_world(world_data, world)
+	_apply_players([player_data], world)
+	# v1 资源节点平铺存档兜底
+	if not world_data.has("chunk_snapshots") or (world_data["chunk_snapshots"] as Array).is_empty():
+		_migrate_legacy_resource_nodes(data.get("resource_nodes", []))
+	await _load_buildings(world, world_data.get("buildings", []), data.get("farm_plots", []))
+
+# ─── 子流程：world ───────────────────────────────────────────────────────
+
+func _apply_world(world_data: Dictionary, world: Node2D) -> void:
+	TimeSystem.current_day = world_data.get("day", 1)
+	TimeSystem.phase_elapsed = world_data.get("phase_elapsed", 0.0)
+	TimeSystem.current_phase = TimeSystem.Phase.NIGHT if world_data.get("phase") == "night" else TimeSystem.Phase.DAY
+
+	var seed_val: int = world_data.get("terrain_seed", 0)
 	if seed_val == 0:
 		seed_val = randi()
 	world.set("terrain_seed", seed_val)
@@ -85,26 +179,42 @@ func _apply(data: Dictionary, world: Node2D) -> void:
 	if tm:
 		WorldGenerator.generate(tm, seed_val)
 
-	var pos: Dictionary = data.get("player_pos", {})
-	player.global_position = Vector2(pos.get("x", 0.0), pos.get("y", 0.0))
-	player.health.current_health = data.get("player_hp", player.health.max_health)
-	player.inventory.gold = int(data.get("money", 0))
-	player.inventory.gold_changed.emit(player.inventory.gold)
-
-	_load_inventory(player.inventory, data.get("inventory", []))
-	_load_equipped(player.inventory, data.get("equipped", {}))
-	if player.skills:
-		player.skills.import_state(data.get("skills", {}))
-	NetworkRegistry.import_state(data.get("network_registry", {}))
-	# 新存档使用 chunk_snapshots；旧存档 resource_nodes 兜底
+	NetworkRegistry.import_state(world_data.get("network_registry", {}))
 	ChunkManager.clear_state()
-	if data.has("chunk_snapshots"):
-		ChunkManager.import_snapshots(data["chunk_snapshots"])
-	else:
-		_migrate_legacy_resource_nodes(data.get("resource_nodes", []))
-	await _load_buildings(world, data.get("buildings", []), data.get("farm_plots", []))
+	if world_data.has("chunk_snapshots"):
+		ChunkManager.import_snapshots(world_data["chunk_snapshots"])
 
-# --- 背包 ---
+# ─── 子流程：players ─────────────────────────────────────────────────────
+
+func _apply_players(players_data: Array, world: Node2D) -> void:
+	var players := world.get_tree().get_nodes_in_group("player")
+	if players.is_empty():
+		return
+	# 单机：第一条数据 → 唯一玩家；多人（G8+）：按 peer_id 匹配
+	if Network.is_singleplayer():
+		if players_data.size() > 0:
+			_apply_one_player(players[0] as Player, players_data[0])
+		return
+	for pd in players_data:
+		var pid: int = int(pd.get("peer_id", 0))
+		for p in players:
+			var player := p as Player
+			if int(player.get_meta("peer_id", 0)) == pid:
+				_apply_one_player(player, pd)
+				break
+
+func _apply_one_player(player: Player, pd: Dictionary) -> void:
+	var pos: Dictionary = pd.get("pos", {})
+	player.global_position = Vector2(pos.get("x", 0.0), pos.get("y", 0.0))
+	player.health.current_health = pd.get("hp", player.health.max_health)
+	player.inventory.gold = int(pd.get("money", 0))
+	player.inventory.gold_changed.emit(player.inventory.gold)
+	_load_inventory(player.inventory, pd.get("inventory", []))
+	_load_equipped(player.inventory, pd.get("equipped", {}))
+	if player.skills:
+		player.skills.import_state(pd.get("skills", {}))
+
+# ─── 背包 ────────────────────────────────────────────────────────────────
 
 func _save_inventory(inv: InventoryComponent) -> Array:
 	var result := []
@@ -142,12 +252,10 @@ func _load_equipped(inv: InventoryComponent, data: Dictionary) -> void:
 			inv.equipment_changed.emit(slot_type)
 	inv.changed.emit()
 
-# --- 资源节点（统一走 ChunkManager.snapshots） ---
+# ─── 资源节点（v1 旧存档兜底） ──────────────────────────────────────────
 
 const _ResourceNodeScene := preload("res://scenes/world/resource.tscn")
 
-# 旧存档把 ResourceNode 平铺在 resource_nodes 数组里。
-# 按位置归到对应 chunk 的 snapshot，world.gd._update_chunks 加载附近 chunk 时会从中还原。
 func _migrate_legacy_resource_nodes(data: Array) -> void:
 	for entry in data:
 		var rid: String = entry.get("resource_id", "")
@@ -165,7 +273,7 @@ func _migrate_legacy_resource_nodes(data: Array) -> void:
 			"chunk_y": chunk.y,
 		}])
 
-# --- 建筑（含 FarmPlot，统一路径） ---
+# ─── 建筑（含 FarmPlot） ────────────────────────────────────────────────
 
 func _save_buildings(world: Node2D) -> Array:
 	var result := []
@@ -183,7 +291,7 @@ func _save_buildings(world: Node2D) -> Array:
 		result.append(entry)
 	return result
 
-# 第二个参数仅用于兼容旧存档（farm_plots 数组）。
+# 第二个参数仅用于兼容旧 v1 存档的 farm_plots 数组
 func _load_buildings(world: Node2D, data: Array, legacy_farm_plots: Array = []) -> void:
 	var layer: Node2D = world.get_node("YSortLayer")
 	for node in layer.get_children():
@@ -199,7 +307,6 @@ func _load_buildings(world: Node2D, data: Array, legacy_farm_plots: Array = []) 
 		if node and entry.has("state") and node.has_method("load_save_state"):
 			node.load_save_state(entry["state"])
 
-	# 旧存档：buildings 不含 FarmPlot，需要从 legacy farm_plots 字段补建。
 	if not legacy_farm_plots.is_empty():
 		var bd := ItemDatabase.get_building("farm_plot")
 		if bd:
@@ -220,7 +327,6 @@ func _resolve_building_id(node: Node) -> String:
 		return "farm_plot"
 	return ""
 
-# 兼容旧存档（"type": scene_path）和新格式（"id": building_id）。
 func _entry_to_building_data(entry: Dictionary) -> BuildingData:
 	var id: String = entry.get("id", "")
 	if not id.is_empty():

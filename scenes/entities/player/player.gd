@@ -19,6 +19,13 @@ const ANIM_FPS := 8.0
 @onready var attack_area: Area2D = $AttackArea
 
 var skills: PlayerSkills
+var peer_id: int = Network.SERVER_PEER_ID
+var display_name: String = "冒险者"
+
+# 显式同步：position / hp / velocity / current_anim
+# 用 MultiplayerSynchronizer 自动 30Hz 广播
+var _sync: MultiplayerSynchronizer
+var _sync_anim: String = "walk_down"
 
 var _attack_timer: float = 0.0
 var _is_dead: bool = false
@@ -31,9 +38,13 @@ const CLICK_STOP_DIST := 6.0
 
 func _ready() -> void:
 	NetworkRegistry.attach(self)
+	set_meta("peer_id", peer_id)
+	# authority = 该玩家的 peer：自己控制移动/输入，其他人接收同步
+	set_multiplayer_authority(peer_id)
 	skills = PlayerSkills.new()
 	skills.name = "PlayerSkills"
 	add_child(skills)
+	_setup_synchronizer()
 	health.died.connect(_on_died)
 	health.damaged.connect(func(amount): EventBus.player_damaged.emit(amount))
 	health.died.connect(func(): EventBus.player_died.emit())
@@ -41,6 +52,34 @@ func _ready() -> void:
 	add_to_group("player")
 	_setup_sprite_frames()
 	_on_equipment_changed("")
+
+func _setup_synchronizer() -> void:
+	# 多人下：远程玩家头顶显示名字标签
+	if not is_multiplayer_authority():
+		var name_lbl := Label.new()
+		name_lbl.text = display_name + " #%d" % peer_id
+		name_lbl.position = Vector2(-30, -40)
+		name_lbl.add_theme_font_size_override("font_size", 10)
+		name_lbl.add_theme_color_override("font_color", Color(0.95, 0.92, 0.78))
+		name_lbl.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
+		name_lbl.add_theme_constant_override("shadow_offset_x", 1)
+		name_lbl.add_theme_constant_override("shadow_offset_y", 1)
+		add_child(name_lbl)
+
+	if Network.is_singleplayer():
+		return
+	_sync = MultiplayerSynchronizer.new()
+	_sync.name = "Sync"
+	var cfg := SceneReplicationConfig.new()
+	# 同步路径：相对于挂载点（Player）
+	cfg.add_property(NodePath(":global_position"))
+	cfg.property_set_replication_mode(NodePath(":global_position"), SceneReplicationConfig.REPLICATION_MODE_ON_CHANGE)
+	cfg.add_property(NodePath(":_sync_anim"))
+	cfg.property_set_replication_mode(NodePath(":_sync_anim"), SceneReplicationConfig.REPLICATION_MODE_ON_CHANGE)
+	cfg.add_property(NodePath("HealthComponent:current_health"))
+	cfg.property_set_replication_mode(NodePath("HealthComponent:current_health"), SceneReplicationConfig.REPLICATION_MODE_ON_CHANGE)
+	_sync.replication_config = cfg
+	add_child(_sync)
 
 
 func _on_equipment_changed(_slot_type: String) -> void:
@@ -72,6 +111,9 @@ func _setup_sprite_frames() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	# 仅 authority（拥有该玩家的 peer）跑物理；其他人通过 sync 接收位置
+	if not is_multiplayer_authority():
+		return
 	if _is_dead:
 		return
 	_attack_timer = maxf(0.0, _attack_timer - delta)
@@ -104,12 +146,25 @@ func _update_animation(move_dir: Vector2) -> void:
 		anim = "walk_down" if move_dir.y > 0 else "walk_up"
 	if anim != _last_anim:
 		_last_anim = anim
+		_sync_anim = anim
 		visual.play(anim)
 	elif not visual.is_playing():
 		visual.play(anim)
 
+# 远程同步动画：非 authority 端从 _sync_anim 收到更新后切换动画
+func _process(_delta: float) -> void:
+	if is_multiplayer_authority():
+		return
+	if _sync_anim != _last_anim:
+		_last_anim = _sync_anim
+		if visual.sprite_frames and visual.sprite_frames.has_animation(_sync_anim):
+			visual.play(_sync_anim)
+
 
 func _unhandled_input(event: InputEvent) -> void:
+	# 只有 local（authority）玩家响应输入
+	if not is_multiplayer_authority():
+		return
 	if _is_dead:
 		return
 	# 数字键 1-9 直接选 hotbar 槽位

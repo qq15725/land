@@ -234,23 +234,23 @@
 > - 存档权限：**仅房主能存**（单一权威源）
 > - 跨网范围：**仅局域网**（先做）；后期再考虑 UPnP / WebRTC
 >
-> **阶段 A · 架构改造**（单机继续正常运行，代码按多人规范写）
-- [ ] G1 多人协议层（ENet + SceneMultiplayer + peer_id 体系；单机用 OfflineMultiplayerPeer 包装，`multiplayer.is_server()` 在单机返回 true）
-- [ ] G2 实体 network_id（Player / Building / FarmPlot / Animal / Creature / DropItem 加稳定 int ID + 全局注册表 + ID→Node 查询）
-- [ ] G3 输入抽象（玩家输入打包成 InputAction，server 执行，client 上报 RPC）
-- [ ] G4 SkillSystem 拆 per-player（autoload 改注册表，xp 数据下沉到 `PlayerSkills` 组件挂 Player 节点）
-- [ ] G5 系统行为 ID 化（CraftingSystem / BuildingSystem / TradeSystem / 战斗逻辑方法签名加 `player_id`，禁止 UI 直接修改 InventoryComponent）
-- [ ] G6 EventBus 参数 ID 化（所有信号改用 ID，不传 Node 引用）
-- [ ] G7 存档拆 world / per-player（SaveSystem 收集所有玩家数据；单人模式 player_count = 1）
+> **阶段 A · 架构改造** ✅ 已完成（单机继续正常运行，代码按多人规范写）
+- [x] G1 多人协议层（Network autoload + OfflineMultiplayerPeer 包装单机；ENet host/client 接口；`multiplayer.is_server()` 在单机返回 true）
+- [x] G2 实体 network_id（NetworkRegistry 注册表 + 7 类实体 _ready 时 attach 获得 int ID；存档持久化 next_id 防回退）
+- [x] G3 输入抽象（PlayerActions autoload 9 个 server-auth 动作入口；DropItem 拾取走 server 仲裁）
+- [x] G4 SkillSystem 拆 per-player（PlayerSkills 组件下沉数据；EventBus 3 信号加 player 参数；修复砍树挖矿不加 xp 的 dead signal）
+- [x] G5 系统行为 ID 化（Crafting/Building 签名 Player 化；UI 走 PlayerActions，不直接改 InventoryComponent）
+- [x] G6 EventBus 参数 ID 化（5 个含 Node 引用的信号改 int network_id；数据对象 ItemData/CreatureData 等保留）
+- [x] G7 存档拆 world / per-player（v2 结构 `{world, players[]}`，v1 旧存档兼容加载）
 
-> **阶段 B · 实际联机**（启用 ENet，多人可同房游戏）
-- [ ] G8 玩家节点同步（MultiplayerSpawner 出生 / MultiplayerSynchronizer 同步位置 + HP + 装备）
-- [ ] G9 世界状态同步（建筑 / 农田 / 动物 / 资源节点 / 怪物状态 server → client；client 只显示）
-- [ ] G10 物品/掉落同步（DropItem 用 Spawner，拾取走 RPC，server 仲裁先到先得）
-- [ ] G11 主菜单增房间界面（创建房间 / 加入房间 / 局域网发现 / 玩家列表）
-- [ ] G12 HUD 多人增强（显示远程玩家位置、名字、HP；交易/储物箱面板加 server 锁，同时只一人开）
-- [ ] G13 局域网发现 + UPnP（可选跨网穿透）
-- [ ] G14 多人调试工具（同机起 2 个 Godot 实例对联，profiler 看流量）
+> **阶段 B · 实际联机** 🟡 基础设施铺设完毕，需双开 Godot 实测打磨
+- [x] G8 玩家节点同步（Player 加 MultiplayerSynchronizer 同步 position/hp/anim；authority = peer_id；非 authority 不跑物理/输入；远程玩家头顶名字）
+- [x] G9 世界实体 Spawner（world 添加 MultiplayerSpawner 监听 YSortLayer；spawnable scenes 配置完毕；仅多人启用，避免污染单机 ChunkManager）
+- [x] G10 DropItem 同步（含在 G9 spawnable；拾取走 PlayerActions.request_pickup server 仲裁）
+- [x] G11 主菜单房间界面（创建房间 / 加入房间 + IP/端口输入 + 可选 UPnP 复选框）
+- [x] G12 HUD 多人增强（HUD setup 时找本地玩家；远程玩家头顶名字标签 `display_name #peer_id`）
+- [x] G13 UPnP 端口转发（`Network.try_open_upnp(port)`，host 启动时可选启用）
+- [ ] G14 实测打磨（同机双开 Godot 对联；ChunkManager 动态 add_child 需改 force_readable_name=true；建筑/资源/怪物状态同步细节）
 
 ### F. 自动化建造 ★ 主线
 > **前置**：必须完成 G 路线阶段 A（G1–G7）。所有自动化节点、tick、物品流走 server-authoritative。
@@ -296,12 +296,12 @@
 
 ## 当前进度
 
-**已完成**：Phase 0–8 + 路线 A（QoL）+ B1（货币）
+**已完成**：Phase 0–8 + 路线 A（QoL）+ B1（货币）+ 路线 G 阶段 A 全部（G1–G7 多人架构改造）+ 阶段 B 基础设施（G8–G13）
 
 **战略主线（已确定）**：
-1. **路线 E · 补齐 HUD** —— 信息密度对齐 [`references/main.png`](references/main.png) / [`references/hud.png`](references/hud.png)（hud.gd 占位结构已搭，等出图与接通数据源）
-2. **路线 G · 多人架构改造** ★ F 强制前置 —— ENet host-authoritative，分两阶段：G1–G7 架构改造（单机继续可玩）→ G8–G14 实际联机
-3. **路线 F · 自动化建造** —— 在 G 阶段 A 完成后开工
+1. **路线 E · 补齐 HUD** ✅ 信息密度已对齐参考图，hud.gd 12 部件全接美术
+2. **路线 G · 多人架构改造** ✅ 阶段 A 全部完成（架构）；阶段 B 基础设施完成（G8–G13），G14 待双开 Godot 实测打磨
+3. **路线 F · 自动化建造** —— G 阶段 A 已完成前置，可开工
 4. **B / D 路线**：所有新内容需同时满足「可接自动化」+「server-authoritative」
 
 **与主线无关的清理工作**（任何时候可插入）：

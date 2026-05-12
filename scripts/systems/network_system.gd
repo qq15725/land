@@ -89,6 +89,22 @@ func close() -> void:
 	_close_current_peer()
 	_enter_singleplayer()
 
+# 尝试通过 UPnP 在路由器上开放端口，返回外网 IP（成功）或空字符串（失败）
+func try_open_upnp(port: int = DEFAULT_PORT) -> String:
+	var upnp := UPNP.new()
+	var err := upnp.discover()
+	if err != UPNP.UPNP_RESULT_SUCCESS:
+		push_warning("[Network] UPnP discover 失败: %d" % err)
+		return ""
+	if not upnp.get_gateway() or not upnp.get_gateway().is_valid_gateway():
+		push_warning("[Network] UPnP 未找到合法网关")
+		return ""
+	var map_err := upnp.add_port_mapping(port, port, "Land Server", "UDP")
+	if map_err != UPNP.UPNP_RESULT_SUCCESS:
+		push_warning("[Network] UPnP 端口映射失败: %d" % map_err)
+		return ""
+	return upnp.query_external_address()
+
 func _enter_singleplayer() -> void:
 	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 	mode = Mode.SINGLEPLAYER

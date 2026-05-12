@@ -87,7 +87,11 @@ func _build_layout() -> void:
 func setup(_player_inv: InventoryComponent) -> void:
 	_player_inventory = _player_inv
 
-func _on_open_trade(merchant: MerchantData, player_inv: InventoryComponent) -> void:
+func _on_open_trade(merchant: MerchantData, player_id: int) -> void:
+	var player := NetworkRegistry.get_node_by_id(player_id) as Player
+	if player == null:
+		return
+	var player_inv: InventoryComponent = player.inventory
 	if _player_inventory != player_inv:
 		if _player_inventory:
 			if _player_inventory.gold_changed.is_connected(_on_gold_changed):

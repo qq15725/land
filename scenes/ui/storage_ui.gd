@@ -66,7 +66,11 @@ func _build_layout() -> void:
 func setup(player_inventory: InventoryComponent) -> void:
 	_player_inventory = player_inventory
 
-func _on_open_storage(storage: InventoryComponent) -> void:
+func _on_open_storage(storage_id: int) -> void:
+	var chest := NetworkRegistry.get_node_by_id(storage_id)
+	if chest == null or not "storage" in chest:
+		return
+	var storage: InventoryComponent = chest.storage
 	if _storage_inventory != null and _storage_inventory.changed.is_connected(_refresh):
 		_storage_inventory.changed.disconnect(_refresh)
 	_storage_inventory = storage

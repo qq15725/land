@@ -2,6 +2,7 @@ extends Node2D
 
 const CreatureScene := preload("res://scenes/entities/creature/creature.tscn")
 const ResourceNodeScene := preload("res://scenes/world/resource.tscn")
+const PlayerScene := preload("res://scenes/entities/player/player.tscn")
 const HUDScene := preload("res://scenes/ui/hud.tscn")
 const InventoryUIScene := preload("res://scenes/ui/inventory_ui.tscn")
 const CraftingUIScene := preload("res://scenes/ui/crafting_ui.tscn")
@@ -10,6 +11,17 @@ const StorageUIScene := preload("res://scenes/ui/storage_ui.tscn")
 const TradeUIScene := preload("res://scenes/ui/trade_ui.tscn")
 const SkillUIScene := preload("res://scenes/ui/skill_ui.tscn")
 const PauseMenuScene := preload("res://scenes/ui/pause_menu.tscn")
+
+# 所有动态 spawn 的 scene 路径，server 端 add_child 后 MultiplayerSpawner
+# 会自动通知 client 端 spawn 对应 scene（同节点路径下）。
+const SPAWNABLE_SCENES: PackedStringArray = [
+	"res://scenes/entities/player/player.tscn",
+	"res://scenes/entities/creature/creature.tscn",
+	"res://scenes/entities/drop_item/drop_item.tscn",
+	"res://scenes/world/resource.tscn",
+	"res://scenes/farm/farm_plot.tscn",
+	"res://scenes/farm/animal.tscn",
+]
 
 const SPAWN_RADIUS_TILES := 64           # 资源覆盖半径（tile）
 const ACTIVE_RADIUS_TILES := 64          # 玩家附近多少 tile 范围内的 chunk 保持 active
@@ -45,6 +57,9 @@ func _ready() -> void:
 	add_to_group("world")
 	ChunkManager.clear_state()
 	_setup_terrain()
+	_setup_multiplayer_spawner()
+	# 静态 Player 节点 = 本地 host 的玩家（peer_id = 自己的 peer_id）
+	player.peer_id = Network.local_peer_id()
 	_setup_ui()
 	if SaveSystem.slot_exists(GameManager.current_save_slot):
 		await SaveSystem.load_save(GameManager.current_save_slot, self)
@@ -58,6 +73,62 @@ func _ready() -> void:
 	TimeSystem.day_started.connect(_on_day_started)
 	TimeSystem.day_started.connect(func(_d): _autosave("新的一天"))
 	SoundSystem.play_world_bgm()
+	# 多人：监听玩家进出
+	Network.peer_joined.connect(_on_peer_joined)
+	Network.peer_left.connect(_on_peer_left)
+
+# 在 YSortLayer 挂 MultiplayerSpawner，server 在该层 add_child 会自动同步到 client。
+# 仅多人模式启用：单机下 OfflineMultiplayerPeer 不需要同步，挂 spawner 反而会
+# 拦截 ChunkManager 等动态 add_child 的节点（要求 force_readable_name=true）。
+func _setup_multiplayer_spawner() -> void:
+	if Network.is_singleplayer():
+		return
+	var spawner := MultiplayerSpawner.new()
+	spawner.name = "EntitySpawner"
+	spawner.spawn_path = y_sort_layer.get_path()
+	for scene_path in SPAWNABLE_SCENES:
+		spawner.add_spawnable_scene(scene_path)
+	add_child(spawner)
+
+func _on_peer_joined(peer_id: int) -> void:
+	if not Network.is_server():
+		return
+	# 在 YSortLayer 下 spawn 一个 Player 给该 peer
+	var p := PlayerScene.instantiate() as Player
+	p.peer_id = peer_id
+	p.name = "Player_%d" % peer_id
+	p.global_position = player.global_position + Vector2(randf_range(-32, 32), randf_range(-32, 32))
+	y_sort_layer.add_child(p, true)
+
+func _on_peer_left(peer_id: int) -> void:
+	if not Network.is_server():
+		return
+	for p in y_sort_layer.get_children():
+		if p is Player and (p as Player).peer_id == peer_id:
+			p.queue_free()
+			return
+
+# 找到本地玩家（peer_id 匹配自己的 player 节点）并初始化 HUD
+func _setup_hud_for_local_player() -> void:
+	var local := _find_local_player()
+	if local != null:
+		_hud.setup(local.health, local.inventory)
+		return
+	# 还没 spawn 到本地玩家（client 端），监听 spawner 等待
+	var spawner: MultiplayerSpawner = get_node_or_null("EntitySpawner")
+	if spawner:
+		spawner.spawned.connect(_on_entity_spawned)
+
+func _find_local_player() -> Player:
+	for p in get_tree().get_nodes_in_group("player"):
+		var pl := p as Player
+		if pl and pl.peer_id == Network.local_peer_id():
+			return pl
+	return null
+
+func _on_entity_spawned(node: Node) -> void:
+	if node is Player and (node as Player).peer_id == Network.local_peer_id():
+		_hud.setup((node as Player).health, (node as Player).inventory)
 
 func _load_map(map_id: String) -> void:
 	current_map_id = map_id
@@ -151,7 +222,8 @@ func _setup_ui() -> void:
 
 	_hud = HUDScene.instantiate()
 	hud_layer.add_child(_hud)
-	_hud.setup(player.health, player.inventory)
+	# 等找到本地玩家再 setup HUD（多人 client 时本地玩家是 spawner 后 add 的）
+	_setup_hud_for_local_player()
 
 	var ui_layer := CanvasLayer.new()
 	ui_layer.layer = 10
