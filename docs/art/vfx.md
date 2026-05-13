@@ -148,6 +148,109 @@ Transparent background, hard pixel edges, no anti-aliasing, no scene, no text.
 
 ---
 
+### `levelup_burst.png` — 升级光环（C6）
+
+| 项 | 值 |
+|---|---|
+| 源单帧 | 192×192 px |
+| 帧数 | 6 |
+| 总尺寸 | 1152×192 px |
+| 锚点 | 单帧中心，特效会被代码定位到玩家头顶上方 16px |
+| 设计 | 一道升级金环从玩家中心扩散，同时若干短光柱向上喷出。Frame 0：中心亮点，准备启动；Frame 1-2：底部出现实心圆 + 放射状光柱向上喷射；Frame 3-4：圆环扩散变薄 + 光柱继续上升变长；Frame 5：仅剩稀疏星粒淡出 |
+
+**AI 提示词模板**：
+
+```
+Game VFX sprite sheet, 6 frames in a horizontal strip, each frame 192x192 pixels,
+total 1152x192 pixels. Strict grid, no padding.
+Subject: a level-up burst effect. Frame 0: a small bright dot at center.
+Frame 1-2: a solid circle at the bottom of the cell with 4-6 short vertical
+light beams shooting upward from the circle. Frame 3-4: the circle expands into
+a hollow ring becoming thinner, and the light beams stretch longer reaching the
+top of the cell. Frame 5: only faint sparkles remain, mostly fading out.
+Pure white/light grey color so it can be tinted gold in-engine.
+Transparent background, hard pixel edges, no anti-aliasing, no realistic rendering,
+no scene, no text.
+```
+
+---
+
+### `equip_glow.png` — 装备光晕（C6）
+
+| 项 | 值 |
+|---|---|
+| 源单帧 | 64×64 px |
+| 帧数 | 4 |
+| 总尺寸 | 256×64 px |
+| 锚点 | 单帧中心，代码定位到玩家身体中点 |
+| 设计 | 装备瞬间的短促闪光。Frame 0：中心实心亮点；Frame 1：4-6 道短光线放射；Frame 2：环形涟漪扩散一圈；Frame 3：淡出 |
+
+**AI 提示词模板**：
+
+```
+Game VFX sprite sheet, 4 frames in a horizontal strip, each frame 64x64 pixels,
+total 256x64 pixels. Strict grid, no padding.
+Subject: a quick equip-item glow. Frame 0: a solid bright dot at center.
+Frame 1: 4-6 short light lines radiating outward in a star pattern.
+Frame 2: a thin expanding ring (ripple) replacing the lines.
+Frame 3: ring is largest and faintest, almost gone.
+Pure white/light grey color for in-engine tinting (will be tinted gold-white).
+Transparent background, hard pixel edges, no anti-aliasing, no scene, no text.
+```
+
+---
+
+### `harvest_pop.png` — 收获弹跳（C6）
+
+| 项 | 值 |
+|---|---|
+| 源单帧 | 64×64 px |
+| 帧数 | 4 |
+| 总尺寸 | 256×64 px |
+| 锚点 | 单帧中心偏下（y=48），表现作物从土里被拔出 |
+| 设计 | 收获作物时叶片与碎屑向上弹出。Frame 0：底部 1-2 片小叶子开始上跃；Frame 1：叶子上升+外散，加 2-3 颗圆形碎屑；Frame 2：叶子继续旋转上升，间距更大；Frame 3：碎屑稀疏淡出 |
+
+**AI 提示词模板**：
+
+```
+Game VFX sprite sheet, 4 frames in a horizontal strip, each frame 64x64 pixels,
+total 256x64 pixels. Strict grid, no padding.
+Subject: a crop harvest pop effect. Frame 0: 1-2 small leaf shapes at the bottom
+center starting to jump up. Frame 1: leaves rising higher and spreading outward,
+plus 2-3 small round particles (crop crumbs). Frame 2: leaves rotating, spreading
+further, particles drifting up. Frame 3: only a few faint particles remain at the top.
+Pure white/light grey color so it can be tinted green in-engine.
+Transparent background, hard pixel edges, no anti-aliasing, no scene, no text.
+```
+
+---
+
+### `place_dust.png` — 建造尘环（C6）
+
+| 项 | 值 |
+|---|---|
+| 源单帧 | 192×64 px |
+| 帧数 | 5 |
+| 总尺寸 | 960×64 px |
+| 锚点 | 单帧中心底部（y=56），表现建筑落地接触地面 |
+| 设计 | 建筑放置后扬起的扁平尘环。Frame 0：地面一道短粗椭圆；Frame 1：椭圆开始向左右拉长 + 上方零星颗粒；Frame 2：椭圆尘环达到最大（扁平），颗粒上飘最高；Frame 3：尘环薄淡，仅剩颗粒；Frame 4：稀疏颗粒淡出 |
+
+**AI 提示词模板**：
+
+```
+Game VFX sprite sheet, 5 frames in a horizontal strip, each frame 192x64 pixels,
+total 960x64 pixels. Strict grid, no padding.
+Subject: a building placement dust burst on flat ground. Frame 0: a short thick
+horizontal ellipse on the ground at center. Frame 1: ellipse stretches wider
+horizontally, a few small particles rising above it. Frame 2: ellipse at widest
+(flat dust ring), particles floating highest. Frame 3: dust ring thin and fading,
+particles still drifting. Frame 4: only sparse particles, mostly faded.
+Pure white/light grey color so it can be tinted brown-grey in-engine.
+Transparent background, hard pixel edges, no anti-aliasing, no scene, no text.
+```
+
+---
+
 ## 替换示例：melee_fan 接入正式美术
 
 替换占位后的目标场景：
