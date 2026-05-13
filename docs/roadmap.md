@@ -200,7 +200,7 @@
 - [x] C3 UI 按钮音效（SoundSystem 监听 SceneTree.node_added，所有 Button.pressed 自动播 ui_click）
 - [ ] C4 性能 stress test（高密度资源/怪物 + chunk 边界）
 - [ ] C5 移动端控制完整性（`mobile_controls.gd` 验证 + 适配）
-- [ ] C6 升级 / 装备变更 / 收获 / 放置粒子反馈
+- [x] C6 升级 / 装备变更 / 收获 / 放置粒子反馈（VFXEventRouter autoload 监听全局事件 + 4 个新 VFX）
 - [ ] C7 面板细节对齐（标题栏拖拽区域 cursor、关闭按钮样式统一）
 
 ### D. 内容广度

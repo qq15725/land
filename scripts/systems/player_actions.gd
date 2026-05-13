@@ -37,6 +37,24 @@ func request_cast_skill(skill_id: String, target_pos: Vector2) -> void:
 	else:
 		_rpc_cast_skill.rpc_id(Network.SERVER_PEER_ID, skill_id, target_pos)
 
+func request_learn_skill(skill_id: String) -> void:
+	if Network.is_server():
+		_do_learn_skill(Network.local_peer_id(), skill_id)
+	else:
+		_rpc_learn_skill.rpc_id(Network.SERVER_PEER_ID, skill_id)
+
+func request_set_class(class_id: String) -> void:
+	if Network.is_server():
+		_do_set_class(Network.local_peer_id(), class_id)
+	else:
+		_rpc_set_class.rpc_id(Network.SERVER_PEER_ID, class_id)
+
+func request_equip_skill(slot: int, skill_id: String) -> void:
+	if Network.is_server():
+		_do_equip_skill(Network.local_peer_id(), slot, skill_id)
+	else:
+		_rpc_equip_skill.rpc_id(Network.SERVER_PEER_ID, slot, skill_id)
+
 func request_interact() -> void:
 	if Network.is_server():
 		_do_interact(Network.local_peer_id())
@@ -101,6 +119,24 @@ func _rpc_cast_skill(skill_id: String, target_pos: Vector2) -> void:
 	_do_cast_skill(_sender_peer_id(), skill_id, target_pos)
 
 @rpc("any_peer", "call_remote", "reliable")
+func _rpc_learn_skill(skill_id: String) -> void:
+	if not Network.is_server():
+		return
+	_do_learn_skill(_sender_peer_id(), skill_id)
+
+@rpc("any_peer", "call_remote", "reliable")
+func _rpc_set_class(class_id: String) -> void:
+	if not Network.is_server():
+		return
+	_do_set_class(_sender_peer_id(), class_id)
+
+@rpc("any_peer", "call_remote", "reliable")
+func _rpc_equip_skill(slot: int, skill_id: String) -> void:
+	if not Network.is_server():
+		return
+	_do_equip_skill(_sender_peer_id(), slot, skill_id)
+
+@rpc("any_peer", "call_remote", "reliable")
 func _rpc_interact() -> void:
 	if not Network.is_server():
 		return
@@ -161,6 +197,32 @@ func _do_cast_skill(peer_id: int, skill_id: String, target_pos: Vector2) -> void
 	if p == null:
 		return
 	p.do_cast_skill(skill_id, target_pos)
+
+func _do_learn_skill(peer_id: int, skill_id: String) -> void:
+	var p := _player_for(peer_id)
+	if p == null:
+		return
+	var skill := ItemDatabase.get_active_skill(skill_id)
+	if skill == null:
+		return
+	p.active_skills.try_learn(skill)
+
+func _do_set_class(peer_id: int, class_id: String) -> void:
+	var p := _player_for(peer_id)
+	if p == null:
+		return
+	p.active_skills.set_class(class_id)
+
+func _do_equip_skill(peer_id: int, slot: int, skill_id: String) -> void:
+	var p := _player_for(peer_id)
+	if p == null:
+		return
+	if slot < 0 or slot >= p.equipped_skills.size():
+		return
+	# 只允许装备已学技能（或空字符串清空）
+	if not skill_id.is_empty() and not p.active_skills.is_learned(skill_id):
+		return
+	p.equipped_skills[slot] = skill_id
 
 func _do_interact(peer_id: int) -> void:
 	var p := _player_for(peer_id)

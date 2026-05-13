@@ -7,6 +7,10 @@ extends Node
 # 多人模式下每个玩家有自己的 _xp / 等级。SkillSystem autoload 只保留配置
 # （base_xp / growth / max_level）和升级公式。
 
+# 本地升级信号（同 player 的子组件如 PlayerActiveSkills 用），
+# 全局 EventBus.skill_leveled_up 也会同时 emit。
+signal leveled_up(skill_id: String, new_level: int)
+
 var _xp: Dictionary = {}   # skill_id → int
 
 func _ready() -> void:
@@ -27,6 +31,7 @@ func add_xp(skill_id: String, amount: int) -> void:
 	_xp[skill_id] = int(_xp.get(skill_id, 0)) + amount
 	var after := get_level(skill_id)
 	if after > before:
+		leveled_up.emit(skill_id, after)
 		EventBus.skill_leveled_up.emit(skill_id, after)
 
 func _on_resource_depleted(resource_id: int, player_id: int) -> void:

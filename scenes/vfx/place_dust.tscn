@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://vfx_place_dust"]
+
+[ext_resource type="Script" path="res://scenes/vfx/vfx_geom.gd" id="1_vfx"]
+
+[node name="PlaceDust" type="Node2D"]
+script = ExtResource("1_vfx")
+shape = "circle"
+size_a = 36.0
+lifetime = 0.4
+base_color = Color(0.75, 0.65, 0.45, 0.55)
+grow_scale = 1.6

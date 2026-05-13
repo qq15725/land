@@ -35,6 +35,7 @@ SkillSystem="*res://scripts/systems/skill_system.gd"
 UIStyle="*res://scripts/utils/ui_style.gd"
 SoundSystem="*res://scripts/systems/sound_system.gd"
 VFXLibrary="*res://scripts/systems/vfx_library.gd"
+VFXEventRouter="*res://scripts/systems/vfx_event_router.gd"
 
 [display]
 

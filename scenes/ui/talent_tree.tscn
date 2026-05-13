@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://talent_tree001"]
+
+[ext_resource type="Script" path="res://scenes/ui/talent_tree.gd" id="1_tt"]
+
+[node name="TalentTree" type="PanelContainer"]
+script = ExtResource("1_tt")

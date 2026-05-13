@@ -16,6 +16,7 @@ var _merchants: Array = []
 var _resource_nodes: Array = []
 var _biomes: Array = []
 var _active_skills: Dictionary = {}  # id → ActiveSkillData
+var _classes: Dictionary = {}        # id → ClassData
 
 var _icon_sheet: Texture2D = null
 var _icon_cache: Dictionary = {}
@@ -34,6 +35,7 @@ func _ready() -> void:
 	_load_resource_nodes()
 	_load_biomes()
 	_load_active_skills()
+	_load_classes()
 	_resolve_refs()
 
 func _load_items() -> void:
@@ -190,6 +192,8 @@ func _load_active_skills() -> void:
 		s.class_id = d.get("class_id", "")
 		s.unlock_level = int(d.get("unlock_level", 1))
 		s.parent_skill_id = d.get("parent_skill_id", "")
+		s.max_level = int(d.get("max_level", 1))
+		s.sp_cost = int(d.get("sp_cost", 1))
 		s.mp_cost = float(d.get("mp_cost", 0.0))
 		s.cooldown = float(d.get("cooldown", 0.0))
 		s.shape = d.get("shape", "fan")
@@ -208,6 +212,19 @@ func _load_active_skills() -> void:
 		s.anim_state = d.get("anim_state", "")
 		s.anim_duration = float(d.get("anim_duration", 0.3))
 		_active_skills[s.id] = s
+
+func _load_classes() -> void:
+	for d in _read_json("res://data/classes.json"):
+		var c := ClassData.new()
+		c.id = d.get("id", "")
+		c.display_name = d.get("display_name", "")
+		c.description = d.get("description", "")
+		var g: Array = d.get("icon_grid", [0, 0])
+		c.icon_grid = Vector2i(int(g[0]), int(g[1]))
+		c.hp_bonus = float(d.get("hp_bonus", 0.0))
+		c.mp_bonus = float(d.get("mp_bonus", 0.0))
+		c.mp_regen_bonus = float(d.get("mp_regen_bonus", 0.0))
+		_classes[c.id] = c
 
 func _resolve_refs() -> void:
 	for b in _buildings:
@@ -340,6 +357,21 @@ func get_active_skill(id: String) -> ActiveSkillData:
 
 func get_all_active_skills() -> Array:
 	return _active_skills.values()
+
+func get_class_data(id: String) -> ClassData:
+	return _classes.get(id, null)
+
+func get_all_classes() -> Array:
+	return _classes.values()
+
+# 按职业查可学技能（含通用 class_id=""）
+func get_skills_for_class(class_id: String) -> Array:
+	var out: Array = []
+	for s in _active_skills.values():
+		var sd := s as ActiveSkillData
+		if sd.class_id.is_empty() or sd.class_id == class_id:
+			out.append(sd)
+	return out
 
 func _read_json(path: String) -> Array:
 	if not FileAccess.file_exists(path):

@@ -10,6 +10,8 @@ const BuildMenuUIScene := preload("res://scenes/ui/build_menu_ui.tscn")
 const StorageUIScene := preload("res://scenes/ui/storage_ui.tscn")
 const TradeUIScene := preload("res://scenes/ui/trade_ui.tscn")
 const SkillUIScene := preload("res://scenes/ui/skill_ui.tscn")
+const TalentTreeScene := preload("res://scenes/ui/talent_tree.tscn")
+const ClassSelectScene := preload("res://scenes/ui/class_select.tscn")
 const PauseMenuScene := preload("res://scenes/ui/pause_menu.tscn")
 
 # 所有动态 spawn 的 scene 路径，server 端 add_child 后 MultiplayerSpawner
@@ -256,6 +258,16 @@ func _setup_ui() -> void:
 
 	var skill_ui := SkillUIScene.instantiate()
 	ui_layer.add_child(skill_ui)
+
+	var talent_tree := TalentTreeScene.instantiate()
+	ui_layer.add_child(talent_tree)
+
+	var class_select := ClassSelectScene.instantiate()
+	class_select.name = "ClassSelect"
+	ui_layer.add_child(class_select)
+	# 若玩家未选职业（class_id 为空），自动弹出
+	if player.active_skills and player.active_skills.class_id.is_empty():
+		class_select.show()
 
 	_pause_menu = PauseMenuScene.instantiate()
 	ui_layer.add_child(_pause_menu)

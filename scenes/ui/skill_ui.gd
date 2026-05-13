@@ -120,13 +120,7 @@ func _local_progress(skill_id: String) -> Dictionary:
 	return p.skills.get_progress(skill_id) if p and p.skills else {}
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("skill_menu"):
-		if visible:
-			hide()
-		else:
-			_refresh()
-			show()
-		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("ui_cancel") and visible:
+	# K 键改由 talent_tree.gd 接管。本面板仅在外部（如 talent_tree 内"等级"按钮）显式 show 时显示。
+	if event.is_action_pressed("ui_cancel") and visible:
 		hide()
 		get_viewport().set_input_as_handled()

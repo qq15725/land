@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://vfx_equip_glow"]
+
+[ext_resource type="Script" path="res://scenes/vfx/vfx_geom.gd" id="1_vfx"]
+
+[node name="EquipGlow" type="Node2D"]
+script = ExtResource("1_vfx")
+shape = "spark"
+size_a = 24.0
+lifetime = 0.3
+base_color = Color(1, 0.95, 0.55, 0.85)
+grow_scale = 1.5

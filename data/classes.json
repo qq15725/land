@@ -1,0 +1,29 @@
+[
+  {
+    "id": "warrior",
+    "display_name": "战士",
+    "description": "近战专精。高生命，低魔力。擅长扇形挥砍与原地 AOE。",
+    "icon_grid": [4, 5],
+    "hp_bonus": 40,
+    "mp_bonus": -20,
+    "mp_regen_bonus": -0.2
+  },
+  {
+    "id": "mage",
+    "display_name": "法师",
+    "description": "远程魔法专精。低生命，高魔力 + 高回蓝。擅长元素弹道。",
+    "icon_grid": [7, 5],
+    "hp_bonus": -20,
+    "mp_bonus": 60,
+    "mp_regen_bonus": 0.5
+  },
+  {
+    "id": "archer",
+    "display_name": "弓手",
+    "description": "中距离专精。生命魔力均衡。擅长矩形穿刺与连射。",
+    "icon_grid": [5, 5],
+    "hp_bonus": 10,
+    "mp_bonus": 20,
+    "mp_regen_bonus": 0.1
+  }
+]

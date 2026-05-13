@@ -118,6 +118,8 @@ func _collect_players(world: Node2D) -> Array:
 			"inventory": _save_inventory(player.inventory),
 			"equipped": _save_equipped(player.inventory),
 			"skills": player.skills.export_state() if player.skills else {},
+			"active_skills": player.active_skills.export_state() if player.active_skills else {},
+			"equipped_skills": player.equipped_skills.duplicate(),
 		})
 	return result
 
@@ -213,6 +215,12 @@ func _apply_one_player(player: Player, pd: Dictionary) -> void:
 	_load_equipped(player.inventory, pd.get("equipped", {}))
 	if player.skills:
 		player.skills.import_state(pd.get("skills", {}))
+	if player.active_skills:
+		player.active_skills.import_state(pd.get("active_skills", {}))
+	var eq_skills: Array = pd.get("equipped_skills", [])
+	if not eq_skills.is_empty():
+		for i in mini(eq_skills.size(), player.equipped_skills.size()):
+			player.equipped_skills[i] = eq_skills[i]
 
 # ─── 背包 ────────────────────────────────────────────────────────────────
 

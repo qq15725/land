@@ -20,3 +20,7 @@ signal creature_killed(creature: CreatureData, player_id: int)
 signal crop_harvested(crop: CropData, player_id: int)
 signal skill_leveled_up(skill_id: String, new_level: int)
 signal combo_hit(count: int)
+# 主动技能（技能树）相关
+signal skill_points_changed(player_id: int, new_total: int)
+signal active_skill_learned(player_id: int, skill_id: String, new_level: int)
+signal player_class_changed(player_id: int, class_id: String)

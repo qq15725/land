@@ -104,6 +104,16 @@ func setup(health: HealthComponent, inventory: InventoryComponent) -> void:
 		_set_bar(_mp_bar, mana_c.current_mana, mana_c.max_mana)
 		mana_c.mana_changed.connect(func(cur, m): _set_bar(_mp_bar, cur, m))
 
+	# SP 接通 PlayerActiveSkills
+	if _player is Player and (_player as Player).active_skills:
+		var act: PlayerActiveSkills = (_player as Player).active_skills
+		_base_defense_lbl.text = "SP %d" % act.skill_points
+		var local_pid := NetworkRegistry.get_id(_player)
+		EventBus.skill_points_changed.connect(func(pid, total):
+			if pid == local_pid:
+				_base_defense_lbl.text = "SP %d" % total
+		)
+
 	BuildingSystem.build_mode_entered.connect(func(_b): _mode_label.text = "[建造模式]  左键放置  右键/ESC取消")
 	BuildingSystem.build_mode_exited.connect(func(): _mode_label.text = "")
 
@@ -647,26 +657,26 @@ func _build_bottom_info_row() -> void:
 	_selected_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	sel.add_child(_selected_lbl)
 
-	# 基地防御
-	var base := _texture(ART + "hud_infoslot.png", Vector2(192, 48))
-	row.add_child(base)
-	var base_icon := Label.new()
-	base_icon.text = "⌂"
-	base_icon.position = Vector2(12, 8)
-	base_icon.size = Vector2(32, 32)
-	base_icon.add_theme_color_override("font_color", Color(0.4, 0.85, 0.4))
-	base_icon.add_theme_font_size_override("font_size", 18)
-	base_icon.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	base_icon.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	base.add_child(base_icon)
+	# 技能点 SP
+	var sp := _texture(ART + "hud_infoslot.png", Vector2(192, 48))
+	row.add_child(sp)
+	var sp_icon := Label.new()
+	sp_icon.text = "★"
+	sp_icon.position = Vector2(12, 8)
+	sp_icon.size = Vector2(32, 32)
+	sp_icon.add_theme_color_override("font_color", Color(0.85, 0.6, 1.0))
+	sp_icon.add_theme_font_size_override("font_size", 18)
+	sp_icon.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sp_icon.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	sp.add_child(sp_icon)
 	_base_defense_lbl = Label.new()
-	_base_defense_lbl.text = "安全"
+	_base_defense_lbl.text = "SP 0"
 	_base_defense_lbl.position = Vector2(48, 8)
 	_base_defense_lbl.size = Vector2(136, 32)
 	_base_defense_lbl.add_theme_font_size_override("font_size", 12)
 	_base_defense_lbl.add_theme_color_override("font_color", Color(0.95, 0.92, 0.78))
 	_base_defense_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	base.add_child(_base_defense_lbl)
+	sp.add_child(_base_defense_lbl)
 
 func _refresh_durability() -> void:
 	# 兼容旧调用：刷新选中物品信息

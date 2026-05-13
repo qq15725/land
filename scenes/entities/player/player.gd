@@ -155,8 +155,11 @@ func _setup_synchronizer() -> void:
 	add_child(_sync)
 
 
-func _on_equipment_changed(_slot_type: String) -> void:
+func _on_equipment_changed(slot_type: String) -> void:
 	health.damage_reduction = inventory.total_defense()
+	# 装备变更视觉反馈：金色光晕（首次 ready 时 slot_type 为空，跳过）
+	if not slot_type.is_empty() and get_parent() != null:
+		VFXLibrary.spawn("equip_glow", get_parent(), global_position + Vector2(0, -16), 0.0, Color(1.0, 0.95, 0.5, 0.9))
 
 
 func _setup_sprite_frames() -> void:

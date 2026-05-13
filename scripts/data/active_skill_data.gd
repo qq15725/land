@@ -11,10 +11,12 @@ extends Resource
 @export var description: String = ""
 @export var icon_grid: Vector2i = Vector2i.ZERO  # 复用 items icons.png 格子
 
-# ─── 学习与职业（预留，MVP 阶段都不强制） ───────────────────────────────
+# ─── 学习与职业 ────────────────────────────────────────────────────────
 @export var class_id: String = ""              # "" = 通用；"warrior"/"mage" 等
 @export var unlock_level: int = 1              # 总等级阈值
 @export var parent_skill_id: String = ""       # 技能树前置节点（"" = 根）
+@export var max_level: int = 1                 # 技能多级时该值 > 1
+@export var sp_cost: int = 1                   # 每级消耗的技能点
 
 # ─── 释放消耗 ──────────────────────────────────────────────────────────
 @export var mp_cost: float = 0.0

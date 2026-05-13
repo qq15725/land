@@ -36,6 +36,10 @@
 | `melee_rect` | 突刺 / 长矛矩形冲击 | `vfx_geom` shape=rect, 60×24 | 待用 |
 | `hit_spark` | 命中火花（小爆点） | `vfx_geom` shape=spark, 18 半径 | SkillExecutor 命中时 + Fireball 爆炸时 |
 | `projectile_trail` | 弹道尾迹 | `vfx_geom` shape=trail, 8 半径 | 待用 |
+| `levelup_burst` | 技能升级（金色光环） | `vfx_geom` shape=circle, 80 半径 / 0.55s / scale 1.8 | `VFXEventRouter._on_leveled_up` |
+| `equip_glow` | 装备变更（金白火花） | `vfx_geom` shape=spark, 24 半径 / 0.3s | `Player._on_equipment_changed` |
+| `harvest_pop` | 收获作物（绿色弹跳） | `vfx_geom` shape=spark, 16 半径 / 0.25s | `VFXEventRouter._on_crop_harvested` |
+| `place_dust` | 建造放置（棕灰尘环） | `vfx_geom` shape=circle, 36 半径 / 0.4s / scale 1.6 | `VFXEventRouter._on_building_placed` |
 
 ---
 
