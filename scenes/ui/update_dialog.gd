@@ -11,7 +11,7 @@ func _ready() -> void:
 	custom_minimum_size = Vector2(400, 300)
 	set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	visible = false
-	z_index = 100
+	z_index = ZLayer.UI_DIALOG
 	_build_layout()
 	UpdateSystem.download_progress.connect(_on_progress)
 	UpdateSystem.download_complete.connect(_on_complete)

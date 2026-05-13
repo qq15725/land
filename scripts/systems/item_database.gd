@@ -15,6 +15,7 @@ var _creatures: Dictionary = {}
 var _merchants: Array = []
 var _resource_nodes: Array = []
 var _biomes: Array = []
+var _active_skills: Dictionary = {}  # id → ActiveSkillData
 
 var _icon_sheet: Texture2D = null
 var _icon_cache: Dictionary = {}
@@ -32,6 +33,7 @@ func _ready() -> void:
 	_load_merchants()
 	_load_resource_nodes()
 	_load_biomes()
+	_load_active_skills()
 	_resolve_refs()
 
 func _load_items() -> void:
@@ -64,7 +66,7 @@ func _load_buildings() -> void:
 		b.display_name = d.get("display_name", "")
 		b.category = d.get("category", "building")
 		b.scene_path = d.get("scene_path", "")
-		b.sprite_path = d.get("sprite_path", "res://assets/sprites/buildings/%s.png" % b.id)
+		b.sprite_path = AssetPaths.resolve(d.get("sprite_path", ""), AssetPaths.building_sprite, b.id)
 		b.animal_id = d.get("animal_id", "")
 		b.connects = d.get("connects", false)
 		b.is_gate = d.get("is_gate", false)
@@ -102,7 +104,7 @@ func _load_animals() -> void:
 		var a := AnimalData.new()
 		a.id = d.get("id", "")
 		a.display_name = d.get("display_name", "")
-		a.sprite_path = "res://assets/animals/%s.png" % a.id
+		a.sprite_path = AssetPaths.resolve(d.get("sprite_path", ""), AssetPaths.animal_sprite, a.id)
 		a.feed_item_id = d.get("feed_item_id", "")
 		a.produce_item_id = d.get("produce_item_id", "")
 		a.produce_amount = d.get("produce_amount", 1)
@@ -117,7 +119,7 @@ func _load_creatures() -> void:
 		var c := CreatureData.new()
 		c.id = d.get("id", "")
 		c.display_name = d.get("display_name", "")
-		c.sprite_path = "res://assets/creatures/%s.png" % c.id
+		c.sprite_path = AssetPaths.resolve(d.get("sprite_path", ""), AssetPaths.creature_sprite, c.id)
 		c.max_health = d.get("max_health", 30.0)
 		c.move_speed = d.get("move_speed", 60.0)
 		c.attack_damage = d.get("attack_damage", 8.0)
@@ -176,6 +178,36 @@ func _load_biomes() -> void:
 		b.resource_weights = d.get("resource_weights", {})
 		b.creature_weights = d.get("creature_weights", {})
 		_biomes.append(b)
+
+func _load_active_skills() -> void:
+	for d in _read_json("res://data/active_skills.json"):
+		var s := ActiveSkillData.new()
+		s.id = d.get("id", "")
+		s.display_name = d.get("display_name", "")
+		s.description = d.get("description", "")
+		var g: Array = d.get("icon_grid", [0, 0])
+		s.icon_grid = Vector2i(int(g[0]), int(g[1]))
+		s.class_id = d.get("class_id", "")
+		s.unlock_level = int(d.get("unlock_level", 1))
+		s.parent_skill_id = d.get("parent_skill_id", "")
+		s.mp_cost = float(d.get("mp_cost", 0.0))
+		s.cooldown = float(d.get("cooldown", 0.0))
+		s.shape = d.get("shape", "fan")
+		s.shape_size = float(d.get("shape_size", 40.0))
+		s.shape_angle = float(d.get("shape_angle", 90.0))
+		s.projectile_scene = d.get("projectile_scene", "")
+		s.base_damage = float(d.get("base_damage", 15.0))
+		s.hit_ticks = d.get("hit_ticks", [0.0])
+		s.hit_damage_ratios = d.get("hit_damage_ratios", [1.0])
+		var c: Array = d.get("vfx_color", [1, 1, 1, 0.7])
+		s.vfx_color = Color(c[0], c[1], c[2], c[3])
+		s.vfx_id = d.get("vfx_id", "")
+		s.screen_shake = float(d.get("screen_shake", 2.0))
+		s.hit_stop_ms = int(d.get("hit_stop_ms", 50))
+		s.knockback = float(d.get("knockback", 200.0))
+		s.anim_state = d.get("anim_state", "")
+		s.anim_duration = float(d.get("anim_duration", 0.3))
+		_active_skills[s.id] = s
 
 func _resolve_refs() -> void:
 	for b in _buildings:
@@ -302,6 +334,12 @@ func get_biome(id: String) -> BiomeData:
 		if b.id == id:
 			return b
 	return null
+
+func get_active_skill(id: String) -> ActiveSkillData:
+	return _active_skills.get(id, null)
+
+func get_all_active_skills() -> Array:
+	return _active_skills.values()
 
 func _read_json(path: String) -> Array:
 	if not FileAccess.file_exists(path):

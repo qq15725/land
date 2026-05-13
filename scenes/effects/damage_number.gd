@@ -10,7 +10,7 @@ const DURATION := 0.8
 var _label: Label
 
 func _ready() -> void:
-	z_index = 100  # 盖在所有实体上
+	z_index = ZLayer.DAMAGE_TEXT
 
 # damage: 显示的伤害数字；color: 字色（默认白）；is_crit: 暴击用更大更红
 static func spawn(parent: Node, pos: Vector2, damage: float, is_crit: bool = false, color: Color = Color.WHITE) -> void:

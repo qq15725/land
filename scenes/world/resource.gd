@@ -45,7 +45,7 @@ func _apply_data(data: ResourceNodeData) -> void:
 	_collision.position.y = data.collision_offset_y
 
 	var tex: Texture2D
-	var sprite_path := "res://assets/resources/%s.png" % resource_id
+	var sprite_path := AssetPaths.resource_sprite(resource_id)
 	if ResourceLoader.exists(sprite_path):
 		tex = load(sprite_path) as Texture2D
 	if tex == null:

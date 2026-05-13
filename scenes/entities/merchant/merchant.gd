@@ -20,7 +20,7 @@ func _ready() -> void:
 
 
 func _setup_sprite_frames() -> void:
-	var tex := load("res://assets/sprites/characters/merchant.png") as Texture2D
+	var tex := load(AssetPaths.character_sprite("merchant")) as Texture2D
 	if tex == null:
 		return
 	var fw := tex.get_width() / 4

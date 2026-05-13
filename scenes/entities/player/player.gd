@@ -2,16 +2,9 @@ class_name Player
 extends CharacterBody2D
 
 const SPEED := 150.0
-const ATTACK_DAMAGE := 15.0
-const ATTACK_COOLDOWN := 0.5
-const KNOCKBACK_FORCE := 280.0
-const HIT_STOP_DURATION := 0.06
-const HIT_STOP_SCALE := 0.05
 const COMBO_TIMEOUT := 1.5
-const CRIT_CHANCE := 0.15
-const CRIT_MULT := 2.0
 
-const SPRITE_PATH := "res://assets/sprites/characters/player.png"
+const SPRITE_ID := "player"
 const FRAME_W := 128
 const FRAME_H := 256
 const FRAME_COLS := 4
@@ -23,14 +16,13 @@ const WALK_BOB_AMP := 1.2        # 走路 Y 轴起伏振幅
 const WALK_BOB_FREQ := 12.0      # 走路起伏频率
 const IDLE_FLOAT_AMP := 0.5
 const IDLE_FLOAT_FREQ := 2.5
-const SHADOW_ALPHA := 0.35
+const SHADOW_ALPHA := 0.55
 const CAM_SHAKE_DECAY := 8.0     # 攻击命中屏幕震动衰减速度
 
 @onready var inventory: InventoryComponent = $InventoryComponent
 @onready var health: HealthComponent = $HealthComponent
 @onready var interaction_area: Area2D = $InteractionArea
 @onready var visual: AnimatedSprite2D = $Visual
-@onready var attack_area: Area2D = $AttackArea
 @onready var camera: Camera2D = $Camera2D
 
 var _shadow: Node2D
@@ -39,15 +31,22 @@ var _is_moving: bool = false
 var _cam_shake_amp: float = 0.0
 
 var skills: PlayerSkills
+var active_skills: PlayerActiveSkills
+var mana: ManaComponent
+var skill_executor: SkillExecutor
+var anim_state: PlayerAnimState
 var peer_id: int = Network.SERVER_PEER_ID
 var display_name: String = "冒险者"
+
+# 5 个技能槽：index 0 = J（基础攻击），1 = Q，2 = E，3 = R，4 = G
+# 未来"技能装配"UI 写入此数组即可
+var equipped_skills: Array = ["basic_swing", "triple_slash", "fireball", "whirlwind", ""]
 
 # 显式同步：position / hp / velocity / current_anim
 # 用 MultiplayerSynchronizer 自动 30Hz 广播
 var _sync: MultiplayerSynchronizer
 var _sync_anim: String = "walk_down"
 
-var _attack_timer: float = 0.0
 var _is_dead: bool = false
 var _combo_count: int = 0
 var _combo_timer: float = 0.0
@@ -66,13 +65,29 @@ func _ready() -> void:
 	skills = PlayerSkills.new()
 	skills.name = "PlayerSkills"
 	add_child(skills)
+	active_skills = PlayerActiveSkills.new()
+	active_skills.name = "PlayerActiveSkills"
+	add_child(active_skills)
+	mana = ManaComponent.new()
+	mana.name = "ManaComponent"
+	add_child(mana)
+	skill_executor = SkillExecutor.new()
+	skill_executor.name = "SkillExecutor"
+	add_child(skill_executor)
+	anim_state = PlayerAnimState.new()
+	anim_state.name = "AnimState"
+	add_child(anim_state)
 	_setup_synchronizer()
 	_setup_shadow()
 	_setup_camera()
 	health.died.connect(_on_died)
 	health.damaged.connect(func(amount): EventBus.player_damaged.emit(amount))
 	health.died.connect(func(): EventBus.player_died.emit())
-	health.damaged.connect(func(_a): _camera_shake(2.0))
+	health.damaged.connect(func(_a):
+		_camera_shake(2.0)
+		if anim_state:
+			anim_state.play_state("hit", 0.25)
+	)
 	inventory.equipment_changed.connect(_on_equipment_changed)
 	add_to_group("player")
 	_setup_sprite_frames()
@@ -82,16 +97,16 @@ func _ready() -> void:
 func _setup_shadow() -> void:
 	_shadow = Node2D.new()
 	_shadow.name = "Shadow"
-	_shadow.z_index = -1
+	_shadow.z_index = ZLayer.SHADOW
 	_shadow.position = Vector2(0, -2)
 	add_child(_shadow)
 	move_child(_shadow, 0)
 	# 用 Polygon2D 画椭圆（足够顺滑的近似多边形）
 	var poly := Polygon2D.new()
 	var pts := PackedVector2Array()
-	var rx := 8.0
-	var ry := 3.0
-	var n := 16
+	var rx := 11.0
+	var ry := 4.5
+	var n := 20
 	for i in n:
 		var a := float(i) / n * TAU
 		pts.append(Vector2(cos(a) * rx, sin(a) * ry))
@@ -145,7 +160,7 @@ func _on_equipment_changed(_slot_type: String) -> void:
 
 
 func _setup_sprite_frames() -> void:
-	var tex := load(SPRITE_PATH) as Texture2D
+	var tex := load(AssetPaths.character_sprite(SPRITE_ID)) as Texture2D
 	if tex == null:
 		return
 	var frames := SpriteFrames.new()
@@ -174,7 +189,6 @@ func _physics_process(delta: float) -> void:
 		return
 	if _is_dead:
 		return
-	_attack_timer = maxf(0.0, _attack_timer - delta)
 	if _combo_timer > 0.0:
 		_combo_timer -= delta
 		if _combo_timer <= 0.0:
@@ -198,6 +212,9 @@ func _physics_process(delta: float) -> void:
 
 
 func _update_animation(move_dir: Vector2) -> void:
+	# 施法 / 受击 / 死亡锁定期间，不切换 walk 动画
+	if anim_state and anim_state.is_locked():
+		return
 	if move_dir.length() < 0.01:
 		visual.stop()
 		visual.frame = 0
@@ -269,7 +286,15 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("use_item"):
 		PlayerActions.request_use_selected_item()
 	elif event.is_action_pressed("attack"):
-		PlayerActions.request_attack()
+		_cast_equipped(0)
+	elif event.is_action_pressed("skill_q"):
+		_cast_equipped(1)
+	elif event.is_action_pressed("skill_e"):
+		_cast_equipped(2)
+	elif event.is_action_pressed("skill_r"):
+		_cast_equipped(3)
+	elif event.is_action_pressed("skill_f2"):
+		_cast_equipped(4)
 	elif OS.get_name() == "Android" and event is InputEventScreenTouch:
 		var touch := event as InputEventScreenTouch
 		if touch.pressed:
@@ -279,6 +304,14 @@ func _unhandled_input(event: InputEvent) -> void:
 				_click_moving = true
 				get_viewport().set_input_as_handled()
 
+
+func _cast_equipped(slot: int) -> void:
+	if slot < 0 or slot >= equipped_skills.size():
+		return
+	var sid: String = equipped_skills[slot]
+	if sid.is_empty():
+		return
+	PlayerActions.request_cast_skill(sid, get_global_mouse_position())
 
 # 由 PlayerActions 在 server 上调用（单机时也走相同路径）。
 func do_interact() -> void:
@@ -307,56 +340,30 @@ func do_use_selected_item() -> void:
 		EventBus.item_used.emit(item)
 
 
-func do_attack() -> void:
-	if _attack_timer > 0.0:
+func do_cast_skill(skill_id: String, target_pos: Vector2) -> void:
+	var skill := ItemDatabase.get_active_skill(skill_id)
+	if skill == null:
 		return
+	# 远程武器（弓）保留弹药消耗逻辑：当 skill 是弹道且玩家装备的是 ranged 武器时扣弹药
 	var weapon := inventory.get_equipped("weapon")
-	# 远程武器需要消耗弹药
-	if weapon and weapon.ranged:
+	if skill.shape == "projectile" and weapon and weapon.ranged:
 		var ammo_item := ItemDatabase.get_item(weapon.ammo_item_id) if not weapon.ammo_item_id.is_empty() else null
 		if ammo_item == null or not inventory.has_item(ammo_item, 1):
 			return
 		inventory.remove_item(ammo_item, 1)
+	if not active_skills.try_cast(skill, mana):
+		return
+	if anim_state and not skill.anim_state.is_empty():
+		anim_state.play_state(skill.anim_state, skill.anim_duration)
+	skill_executor.cast(skill, target_pos, self)
 
-	var speed_mod := weapon.attack_speed if weapon else 0.0
-	_attack_timer = ATTACK_COOLDOWN * maxf(0.2, 1.0 - speed_mod)
-	_flash_attack()
-
-	var base_damage := ATTACK_DAMAGE + inventory.total_damage_bonus()
-	var hit_any := false
-	for body in attack_area.get_overlapping_bodies():
-		if body is Creature:
-			var creature := body as Creature
-			var is_crit := randf() < CRIT_CHANCE
-			var dmg: float = base_damage * (CRIT_MULT if is_crit else 1.0)
-			creature.take_damage_from(self, dmg)
-			var kb_dir := (creature.global_position - global_position).normalized()
-			creature.velocity += kb_dir * KNOCKBACK_FORCE * (1.5 if is_crit else 1.0)
-			DamageNumber.spawn(get_parent(), creature.global_position + Vector2(0, -16), dmg, is_crit)
-			hit_any = true
-	if hit_any:
-		_on_hit_landed()
-
-
-func _flash_attack() -> void:
-	visual.modulate = Color(1.5, 1.5, 0.5)
-	await get_tree().create_timer(0.1).timeout
-	if is_instance_valid(self) and not _is_dead:
-		visual.modulate = Color.WHITE
-
-func _on_hit_landed() -> void:
+# 由 SkillExecutor 在每段命中后通知，处理 combo 等需要玩家上下文的状态
+func on_skill_hit_landed(_skill: ActiveSkillData) -> void:
 	_combo_count += 1
 	_combo_timer = COMBO_TIMEOUT
 	if _combo_count >= 2:
 		EventBus.combo_hit.emit(_combo_count)
-	_hit_stop()
-	_camera_shake(3.5)
 
-func _hit_stop() -> void:
-	Engine.time_scale = HIT_STOP_SCALE
-	# ignore_time_scale=true 让 timer 按真实时间走，不受减速影响
-	await get_tree().create_timer(HIT_STOP_DURATION, true, false, true).timeout
-	Engine.time_scale = 1.0
 
 
 const DropItemScene := preload("res://scenes/entities/drop_item/drop_item.tscn")

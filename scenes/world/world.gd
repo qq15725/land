@@ -286,10 +286,10 @@ func _autosave(reason: String) -> void:
 		_hud.show_toast("✓ %s" % reason, 2.0)
 
 func _update_day_overlay() -> void:
-	# 颜色分级：白天暖白；黎明/黄昏暖橙；夜晚冷蓝
-	const DAY := Color(1.05, 1.02, 0.95)
-	const DUSK := Color(1.15, 0.85, 0.65)
-	const NIGHT := Color(0.45, 0.55, 0.85)
+	# 颜色分级：白天接近中性（不染色资源/UI）；黎明/黄昏暖橙；夜晚冷蓝
+	const DAY := Color(1.0, 1.0, 1.0)
+	const DUSK := Color(1.10, 0.88, 0.72)
+	const NIGHT := Color(0.55, 0.65, 0.92)
 	var target: Color
 	var ratio := TimeSystem.get_phase_ratio()
 	if TimeSystem.is_night():

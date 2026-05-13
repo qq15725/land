@@ -1,0 +1,12 @@
+[gd_scene load_steps=2 format=3 uid="uid://vfx_melee_rect"]
+
+[ext_resource type="Script" path="res://scenes/vfx/vfx_geom.gd" id="1_vfx"]
+
+[node name="MeleeRect" type="Node2D"]
+script = ExtResource("1_vfx")
+shape = "rect"
+size_a = 60.0
+size_b = 24.0
+lifetime = 0.2
+base_color = Color(1, 0.8, 0.4, 0.6)
+grow_scale = 1.08

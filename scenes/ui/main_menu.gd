@@ -176,23 +176,23 @@ func _build_right() -> Control:
 	inner.add_child(btn_row)
 
 	# 联机入口
-	var host_btn := _make_action_btn("⌂  创建房间", "res://assets/sprites/ui/btn_green.png")
+	var host_btn := _make_action_btn("创建房间", "res://assets/sprites/ui/btn_green.png")
 	host_btn.pressed.connect(_on_host_pressed)
 	btn_row.add_child(host_btn)
 
-	var join_btn := _make_action_btn("→  加入房间", "res://assets/sprites/ui/btn_green.png")
+	var join_btn := _make_action_btn("加入房间", "res://assets/sprites/ui/btn_green.png")
 	join_btn.pressed.connect(_on_join_pressed)
 	btn_row.add_child(join_btn)
 
-	_update_btn = _make_action_btn("⚙  检查更新", "res://assets/sprites/ui/btn_green.png")
+	_update_btn = _make_action_btn("检查更新", "res://assets/sprites/ui/btn_green.png")
 	_update_btn.pressed.connect(_on_check_update_pressed)
 	btn_row.add_child(_update_btn)
 
-	var settings_btn := _make_action_btn("⚙  设置", "res://assets/sprites/ui/btn_brown.png")
+	var settings_btn := _make_action_btn("设置", "res://assets/sprites/ui/btn_brown.png")
 	settings_btn.pressed.connect(func(): _settings_menu.open())
 	btn_row.add_child(settings_btn)
 
-	var quit_btn := _make_action_btn("⮐  退出游戏", "res://assets/sprites/ui/btn_brown.png")
+	var quit_btn := _make_action_btn("退出游戏", "res://assets/sprites/ui/btn_brown.png")
 	quit_btn.pressed.connect(func(): get_tree().quit())
 	btn_row.add_child(quit_btn)
 
@@ -206,6 +206,8 @@ func _make_action_btn(txt: String, tex_path: String) -> Button:
 	btn.custom_minimum_size = Vector2(148, 42)
 	btn.add_theme_font_size_override("font_size", 13)
 	btn.add_theme_color_override("font_color", Color.WHITE)
+	btn.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	var sheet := load(tex_path) as Texture2D
 	var state_regions := {
 		"normal":  Rect2(0, 0,  192, 48),
@@ -223,10 +225,10 @@ func _make_action_btn(txt: String, tex_path: String) -> Button:
 		s.texture_margin_right  = 12
 		s.texture_margin_top    = 10
 		s.texture_margin_bottom = 10
-		s.content_margin_left   = 14
-		s.content_margin_right  = 14
-		s.content_margin_top    = 8
-		s.content_margin_bottom = 8
+		s.content_margin_left   = 16
+		s.content_margin_right  = 16
+		s.content_margin_top    = 6
+		s.content_margin_bottom = 10
 		btn.add_theme_stylebox_override(state, s)
 	return btn
 
@@ -370,13 +372,13 @@ func _on_check_update_pressed() -> void:
 	_update_btn.disabled = true
 	UpdateSystem.update_available.disconnect(_on_update_available)
 	UpdateSystem.update_available.connect(func(version, changelog):
-		_update_btn.text = "⚙  检查更新"
+		_update_btn.text = "检查更新"
 		_update_btn.disabled = false
 		_on_update_available(version, changelog)
 	, CONNECT_ONE_SHOT)
 	get_tree().create_timer(8.0).timeout.connect(func():
 		if _update_btn and _update_btn.disabled:
-			_update_btn.text = "✓  已是最新"
+			_update_btn.text = "已是最新"
 			_update_btn.disabled = false
 	, CONNECT_ONE_SHOT)
 	UpdateSystem.check()

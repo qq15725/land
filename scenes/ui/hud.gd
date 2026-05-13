@@ -22,9 +22,10 @@ var _inventory: InventoryComponent
 var _health: HealthComponent
 
 # 进度条字典：{bg, fill, label, max_w}
+# 左上角色条：HP / MP / FP（经验条在底部 hotbar 上方，由 _hotbar_xp_bar 显示）
 var _hp_bar: Dictionary = {}
-var _xp_bar: Dictionary = {}
-var _stamina_bar: Dictionary = {}
+var _mp_bar: Dictionary = {}
+var _fp_bar: Dictionary = {}
 var _hotbar_xp_bar: Dictionary = {}
 
 # ① 角色信息
@@ -53,8 +54,9 @@ var _hotbar_level_lbl: Label
 var _hotbar_icons: Array[ItemIcon] = []
 var _hotbar_selected_overlays: Array[NinePatchRect] = []
 
-# ⑩ Skill
-var _skill_slots: Array[Control] = []
+# ⑩ Skill —— 每格 {root, icon: TextureRect, cd_overlay: ColorRect, cd_lbl: Label, skill: ActiveSkillData}
+# 4 个槽对应 player.equipped_skills 的 index 1..4（J=0 不在技能栏，由底部 hotbar 视觉之外的左下另存）
+var _skill_slots: Array[Dictionary] = []
 
 # ⑪ Bottom info
 var _gold_lbl: Label
@@ -96,6 +98,12 @@ func setup(health: HealthComponent, inventory: InventoryComponent) -> void:
 	_set_bar(_hp_bar, health.current_health, health.max_health)
 	health.health_changed.connect(func(cur, m): _set_bar(_hp_bar, cur, m))
 
+	# MP 接通 ManaComponent
+	if _player and _player is Player and (_player as Player).mana:
+		var mana_c: ManaComponent = (_player as Player).mana
+		_set_bar(_mp_bar, mana_c.current_mana, mana_c.max_mana)
+		mana_c.mana_changed.connect(func(cur, m): _set_bar(_mp_bar, cur, m))
+
 	BuildingSystem.build_mode_entered.connect(func(_b): _mode_label.text = "[建造模式]  左键放置  右键/ESC取消")
 	BuildingSystem.build_mode_exited.connect(func(): _mode_label.text = "")
 
@@ -110,8 +118,12 @@ func setup(health: HealthComponent, inventory: InventoryComponent) -> void:
 	_refresh_hotbar()
 	_refresh_xp()
 	_refresh_durability()
-	_set_bar(_stamina_bar, 100, 100)
+	# MP 由上方 mana_changed 接通；FP 系统未实现，固定占位 100/100
+	if not (_player is Player and (_player as Player).mana):
+		_set_bar(_mp_bar, 100, 100)
+	_set_bar(_fp_bar, 100, 100)
 	_gold_lbl.text = str(inventory.gold)
+	_refresh_skill_bar()
 	if _minimap and _player is Node2D:
 		_minimap.setup(_player as Node2D)
 
@@ -141,10 +153,11 @@ func _build_char_info() -> void:
 	_level_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	tex.add_child(_level_lbl)
 
-	# 3 条进度条（覆盖底图已画的红/绿/紫满条）
-	_hp_bar = _bar_overlay(tex, 132, 44, 168, 16, Color(0.82, 0.18, 0.18))
-	_xp_bar = _bar_overlay(tex, 132, 68, 168, 16, Color(0.30, 0.65, 0.30))
-	_stamina_bar = _bar_overlay(tex, 132, 92, 168, 16, Color(0.55, 0.30, 0.78))
+	# 3 条进度条：HP（红）/ MP（蓝）/ FP（橙）。坐标对应 hud_charinfo.png 底图凹陷槽位。
+	# 经验条不在此处，只在底部 hotbar 上方显示。
+	_hp_bar = _bar_overlay(tex, 130, 44, 174, 12, Color(0.92, 0.22, 0.22))
+	_mp_bar = _bar_overlay(tex, 130, 66, 174, 12, Color(0.30, 0.55, 1.00))
+	_fp_bar = _bar_overlay(tex, 130, 88, 174, 12, Color(1.00, 0.70, 0.20))
 
 # ─── ② ③ ④ 顶部居中 ────────────────────────────────────────────────────
 
@@ -233,13 +246,14 @@ func _build_top_right() -> void:
 	var col := VBoxContainer.new()
 	col.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
 	col.position = Vector2(-204, 12)
-	col.add_theme_constant_override("separation", 8)
+	col.add_theme_constant_override("separation", 10)
 	add_child(col)
 
 	# 顶部菜单按钮组：角色 / 地图 / 设置
 	var menu_row := HBoxContainer.new()
 	menu_row.alignment = BoxContainer.ALIGNMENT_END
-	menu_row.add_theme_constant_override("separation", 4)
+	menu_row.add_theme_constant_override("separation", 6)
+	menu_row.custom_minimum_size = Vector2(192, 44)
 	col.add_child(menu_row)
 	menu_row.add_child(_make_menu_btn("👤", "角色", _on_menu_inventory))
 	menu_row.add_child(_make_menu_btn("🗺", "地图", _on_menu_map))
@@ -266,6 +280,11 @@ func _build_top_right() -> void:
 	_coord_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_coord_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	coord.add_child(_coord_lbl)
+
+	# 与坐标条之间留 6px 间距
+	var quest_spacer := Control.new()
+	quest_spacer.custom_minimum_size = Vector2(0, 6)
+	col.add_child(quest_spacer)
 
 	# ⑥ 任务追踪 header + rows
 	var quest_col := VBoxContainer.new()
@@ -340,8 +359,8 @@ func _build_hotbar() -> void:
 	var tex := _texture(ART + "hud_hotbar.png", Vector2(640, 128))
 	center.add_child(tex)
 
-	# 经验条：覆盖底图顶部绿条
-	_hotbar_xp_bar = _bar_overlay(tex, 28, 16, 584, 24, Color(0.45, 0.85, 0.4))
+	# 经验条：反向遮罩。坐标对应 hud_hotbar.png 底图原画的绿条区域。
+	_hotbar_xp_bar = _bar_overlay(tex, 28, 16, 584, 20, Color.GREEN)
 	# 等级徽章位（中央，覆盖底图深色方块）
 	var lvl_holder := ColorRect.new()
 	lvl_holder.color = Color(0.06, 0.06, 0.08)
@@ -435,8 +454,8 @@ func _refresh_xp() -> void:
 	_level_lbl.text = "Lv. %d" % lv
 	_hotbar_level_lbl.text = str(lv)
 	var ratio: float = float(total_into) / float(maxi(1, total_span))
-	_set_bar(_xp_bar, ratio, 1.0, "%d xp" % total_xp)
-	_set_bar(_hotbar_xp_bar, ratio, 1.0, "")
+	# 经验条只在底部 hotbar 上方显示，左上角色条不再显 xp
+	_set_bar(_hotbar_xp_bar, ratio, 1.0, "%d xp" % total_xp)
 
 # ─── ⑩ 技能栏 hud_skillslot.png 80×80 ───────────────────────────────────
 
@@ -447,11 +466,10 @@ func _build_skill_bar() -> void:
 	box.add_theme_constant_override("separation", 8)
 	add_child(box)
 
-	const KEYS := ["Q", "E", "R", "F"]
+	const KEYS := ["Q", "E", "R", "G"]
 	for i in SKILL_SLOTS:
 		var slot := _texture(ART + "hud_skillslot.png", Vector2(80, 80))
 		box.add_child(slot)
-		_skill_slots.append(slot)
 
 		var key := Label.new()
 		key.text = KEYS[i] if i < KEYS.size() else ""
@@ -459,14 +477,124 @@ func _build_skill_bar() -> void:
 		key.size = Vector2(16, 16)
 		key.add_theme_font_size_override("font_size", 12)
 		key.add_theme_color_override("font_color", Color(0.95, 0.92, 0.78))
+		key.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.9))
+		key.add_theme_constant_override("shadow_offset_x", 1)
+		key.add_theme_constant_override("shadow_offset_y", 1)
 		slot.add_child(key)
 
-		var mid := Label.new()
-		mid.text = "—"
-		mid.modulate = Color(0.55, 0.55, 0.55)
-		mid.add_theme_font_size_override("font_size", 24)
-		mid.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-		slot.add_child(mid)
+		# 中央图标（绑定技能时填充，未绑定时显示"—"）
+		var icon := TextureRect.new()
+		icon.position = Vector2(16, 16)
+		icon.size = Vector2(48, 48)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		slot.add_child(icon)
+
+		var empty := Label.new()
+		empty.text = "—"
+		empty.modulate = Color(0.55, 0.55, 0.55)
+		empty.add_theme_font_size_override("font_size", 24)
+		empty.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+		slot.add_child(empty)
+
+		# 冷却遮罩 + 冷却数字（默认隐藏）
+		var cd_overlay := ColorRect.new()
+		cd_overlay.color = Color(0, 0, 0, 0.55)
+		cd_overlay.position = Vector2(0, 0)
+		cd_overlay.size = Vector2(80, 80)
+		cd_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		cd_overlay.visible = false
+		slot.add_child(cd_overlay)
+
+		var cd_lbl := Label.new()
+		cd_lbl.position = Vector2(0, 28)
+		cd_lbl.size = Vector2(80, 24)
+		cd_lbl.add_theme_font_size_override("font_size", 16)
+		cd_lbl.add_theme_color_override("font_color", Color(1, 1, 1))
+		cd_lbl.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.9))
+		cd_lbl.add_theme_constant_override("shadow_offset_x", 1)
+		cd_lbl.add_theme_constant_override("shadow_offset_y", 1)
+		cd_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		cd_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		cd_lbl.visible = false
+		slot.add_child(cd_lbl)
+
+		_skill_slots.append({
+			"root": slot,
+			"icon": icon,
+			"empty": empty,
+			"cd_overlay": cd_overlay,
+			"cd_lbl": cd_lbl,
+			"skill": null,
+		})
+
+func _update_skill_bar_state() -> void:
+	if not (_player is Player):
+		return
+	var pl := _player as Player
+	var act_skills: PlayerActiveSkills = pl.active_skills
+	var mana_c: ManaComponent = pl.mana
+	if act_skills == null:
+		return
+	for entry in _skill_slots:
+		var sd: ActiveSkillData = entry.get("skill")
+		var icon: TextureRect = entry["icon"]
+		var cd_overlay: ColorRect = entry["cd_overlay"]
+		var cd_lbl: Label = entry["cd_lbl"]
+		if sd == null:
+			cd_overlay.visible = false
+			cd_lbl.visible = false
+			icon.modulate = Color.WHITE
+			continue
+		var cd := act_skills.cooldown_remaining(sd.id)
+		var locked := not act_skills.is_unlocked(sd)
+		var mp_low := mana_c != null and mana_c.current_mana < sd.mp_cost
+		if cd > 0.0:
+			var ratio := clampf(cd / maxf(0.01, sd.cooldown), 0.0, 1.0)
+			cd_overlay.visible = true
+			cd_overlay.size = Vector2(80, 80 * ratio)
+			cd_overlay.position = Vector2(0, 80 - 80 * ratio)
+			cd_lbl.visible = true
+			cd_lbl.text = "%.1f" % cd
+			icon.modulate = Color(0.5, 0.5, 0.5)
+		elif locked:
+			cd_overlay.visible = true
+			cd_overlay.size = Vector2(80, 80)
+			cd_overlay.position = Vector2(0, 0)
+			cd_lbl.visible = false
+			icon.modulate = Color(0.3, 0.3, 0.3)
+		elif mp_low:
+			cd_overlay.visible = false
+			cd_lbl.visible = false
+			icon.modulate = Color(0.5, 0.5, 0.9)  # 蓝灰提示 MP 不足
+		else:
+			cd_overlay.visible = false
+			cd_lbl.visible = false
+			icon.modulate = Color.WHITE
+
+func _refresh_skill_bar() -> void:
+	var bindings: Array = []
+	if _player is Player:
+		var eq: Array = (_player as Player).equipped_skills
+		# 跳过 index 0 (J 基础攻击)，技能栏只显示 1..4
+		for i in range(1, eq.size()):
+			bindings.append(eq[i])
+	for i in SKILL_SLOTS:
+		var entry: Dictionary = _skill_slots[i]
+		var binding: String = bindings[i] if i < bindings.size() else ""
+		if binding.is_empty():
+			entry["skill"] = null
+			(entry["icon"] as TextureRect).texture = null
+			(entry["empty"] as Label).visible = true
+			continue
+		var sd: ActiveSkillData = ItemDatabase.get_active_skill(binding)
+		entry["skill"] = sd
+		if sd == null:
+			(entry["empty"] as Label).visible = true
+			continue
+		(entry["icon"] as TextureRect).texture = ItemDatabase.get_icon_at_grid(sd.icon_grid)
+		(entry["empty"] as Label).visible = false
 
 # ─── ⑪ 底部信息行 hud_infoslot.png 192×48 ───────────────────────────────
 
@@ -634,18 +762,18 @@ func _texture(path: String, fixed_size: Vector2) -> TextureRect:
 	t.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return t
 
-# 在 parent 的 (x, y, w, h) 区域放一个 ColorRect 进度条覆盖
-# 完全遮挡底图原有彩色满条；fill 宽度由 _set_bar() 调整。
+# 代码绘制圆角胶囊进度条。要求底图槽位是"空槽"（不画填充色），代码 fill
+# 完全控制颜色。fill 宽度由 _set_bar() 按 ratio 动态调整。
 func _bar_overlay(parent: Control, x: int, y: int, w: int, h: int, fill_color: Color) -> Dictionary:
-	var bg := ColorRect.new()
-	bg.color = Color(0.06, 0.06, 0.08)
-	bg.position = Vector2(x, y)
-	bg.size = Vector2(w, h)
-	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	parent.add_child(bg)
-
-	var fill := ColorRect.new()
-	fill.color = fill_color
+	var radius: int = h / 2
+	var fill := Panel.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = fill_color
+	sb.corner_radius_top_left = radius
+	sb.corner_radius_top_right = radius
+	sb.corner_radius_bottom_left = radius
+	sb.corner_radius_bottom_right = radius
+	fill.add_theme_stylebox_override("panel", sb)
 	fill.position = Vector2(x, y)
 	fill.size = Vector2(w, h)
 	fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -658,7 +786,7 @@ func _bar_overlay(parent: Control, x: int, y: int, w: int, h: int, fill_color: C
 	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	lbl.add_theme_font_size_override("font_size", 10)
 	lbl.add_theme_color_override("font_color", Color(1, 1, 1))
-	lbl.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.85))
+	lbl.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.9))
 	lbl.add_theme_constant_override("shadow_offset_x", 1)
 	lbl.add_theme_constant_override("shadow_offset_y", 1)
 	lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -670,7 +798,13 @@ func _set_bar(bar: Dictionary, cur: float, maximum: float, label_text: String = 
 	if bar.is_empty():
 		return
 	var ratio: float = clampf(cur / maxf(0.01, maximum), 0.0, 1.0)
-	(bar["fill"] as ColorRect).size.x = float(bar["max_w"]) * ratio
+	var fill: Panel = bar["fill"]
+	# Panel + 圆角 stylebox 在 size.x = 0 时仍会渲染左圆头，需要显式隐藏
+	if ratio <= 0.001:
+		fill.visible = false
+	else:
+		fill.visible = true
+		fill.size.x = float(bar["max_w"]) * ratio
 	if label_text.is_empty():
 		(bar["label"] as Label).text = "%d/%d" % [int(cur), int(maximum)]
 	else:
@@ -716,6 +850,9 @@ func _process(delta: float) -> void:
 		_toast_label.modulate.a = clampf(_toast_timer, 0.0, 1.0)
 		if _toast_timer <= 0.0:
 			_toast_label.text = ""
+
+	# 技能栏冷却 / MP 状态
+	_update_skill_bar_state()
 
 	# 危险边框呼吸
 	if _danger_active:

@@ -31,6 +31,12 @@ func request_attack() -> void:
 	else:
 		_rpc_attack.rpc_id(Network.SERVER_PEER_ID)
 
+func request_cast_skill(skill_id: String, target_pos: Vector2) -> void:
+	if Network.is_server():
+		_do_cast_skill(Network.local_peer_id(), skill_id, target_pos)
+	else:
+		_rpc_cast_skill.rpc_id(Network.SERVER_PEER_ID, skill_id, target_pos)
+
 func request_interact() -> void:
 	if Network.is_server():
 		_do_interact(Network.local_peer_id())
@@ -89,6 +95,12 @@ func _rpc_attack() -> void:
 	_do_attack(_sender_peer_id())
 
 @rpc("any_peer", "call_remote", "reliable")
+func _rpc_cast_skill(skill_id: String, target_pos: Vector2) -> void:
+	if not Network.is_server():
+		return
+	_do_cast_skill(_sender_peer_id(), skill_id, target_pos)
+
+@rpc("any_peer", "call_remote", "reliable")
 func _rpc_interact() -> void:
 	if not Network.is_server():
 		return
@@ -143,6 +155,12 @@ func _do_attack(peer_id: int) -> void:
 	if p == null:
 		return
 	p.do_attack()
+
+func _do_cast_skill(peer_id: int, skill_id: String, target_pos: Vector2) -> void:
+	var p := _player_for(peer_id)
+	if p == null:
+		return
+	p.do_cast_skill(skill_id, target_pos)
 
 func _do_interact(peer_id: int) -> void:
 	var p := _player_for(peer_id)

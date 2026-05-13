@@ -216,7 +216,7 @@
 > 文档：[`art/hud.md`](art/hud.md)。参考图：[`references/hud.png`](references/hud.png) + [`references/main.png`](references/main.png)。
 > 当前 HUD 只有左上 HP/金币/时间 + 底部 9 格 hotbar，远低于愿景图密度。
 
-- [~] E1 角色信息条（头像+名字+Lv+HP/XP/耐力 三条，结构已搭；HP/XP 已接通；**耐力系统未实现** 固定 100/100 占位）
+- [~] E1 角色信息条（头像+名字+Lv+HP/MP/FP 三条，结构已搭；HP/MP 已接通；**FP 系统未实现** 固定 100/100 占位；经验条统一放底部 hotbar 上方）
 - [x] E2 快捷栏强化（9-patch 容器 + 经验条 + 等级徽章 + 亮黄选中边框）
 - [x] E3 小地图实绘（Minimap 控件：玩家黄点 + 朝向三角 + 附近建筑/农田/怪物色点）
 - [ ] E4 状态 Buff 条（**依赖 Buff 系统**，未实现）
@@ -296,7 +296,15 @@
 
 ## 当前进度
 
-**已完成**：Phase 0–8 + 路线 A（QoL）+ B1（货币）+ 路线 G 阶段 A 全部（G1–G7 多人架构改造）+ 阶段 B 基础设施（G8–G13）
+**已完成**：Phase 0–8 + 路线 A（QoL）+ B1（货币）+ 路线 G 阶段 A 全部（G1–G7 多人架构改造）+ 阶段 B 基础设施（G8–G13）+ 战斗系统抽象（见下）
+
+**战斗系统（2026-05-13 完成）**：
+- **数据驱动技能**：`ActiveSkillData` 30+ 字段；`data/active_skills.json` 4 招（basic_swing / triple_slash / fireball / whirlwind）
+- **统一入口**：`SkillExecutor` 按 shape 派发（fan/circle/rect/projectile），多段 tick 命中，server-authoritative
+- **VFX 体系**：`VFXLibrary` autoload + `scenes/vfx/{id}.tscn` + 通用 `vfx_geom.gd`；占位几何先用，美术按 `docs/art/vfx.md` 替换
+- **状态机**：`PlayerAnimState` 组件 (cast_fan/cast_circle/cast_rect/cast_projectile/hit/die)，等 character 帧扩展自动接入
+- **预留**：职业 `class_id`、技能树 `parent_skill_id`、技能学习 `learned[]`、技能装配 `equipped_skills[5]`
+- **资源约定**：`AssetPaths` 统一路径；`ZLayer` 全局 z_index 常量
 
 **战略主线（已确定）**：
 1. **路线 E · 补齐 HUD** ✅ 信息密度已对齐参考图，hud.gd 12 部件全接美术

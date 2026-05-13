@@ -2,7 +2,7 @@
 
 **源文件**：单帧 128×256 px，精灵表 **512×1024 px**（4 列 × 4 行），透明背景，PNG 导出。
 
-## 行走动画布局
+## 行走动画布局（MVP 版，所有角色当前用 4 行）
 
 ```
 行 0（walk_down）：  [帧0] [帧1] [帧2] [帧3]   ← 面朝下行走
@@ -12,6 +12,45 @@
 ```
 
 > 若生成工具难以区分左右，可只生成左向，右向水平翻转复用。
+
+## 玩家施法 / 受击 / 死亡动画扩展（未来美术）
+
+代码层 `PlayerAnimState` 组件已经准备好状态切换接口，但当前用 Tween 模拟（scale 抖动 / modulate 闪光），**没有真正的施法帧**。等正式动画美术出来后，将精灵表从 4 行扩展到 8 行：
+
+| 行 | 名称 | 帧数 | 用途 | 触发 |
+|---|---|---|---|---|
+| 0-3 | `walk_down/up/left/right` | 4 | 行走（已实现） | 移动 |
+| 4 | `cast_fan` | 4 | 近战挥砍 | basic_swing / triple_slash 等 fan 形状技能 |
+| 5 | `cast_circle` | 4 | 自身周围 AOE | whirlwind 等 circle 形状技能 |
+| 6 | `cast_projectile` | 4 | 远程施法手势 | fireball 等 projectile 形状技能 |
+| 7 | `hit` | 2-3 | 受击 | health.damaged 触发 |
+
+**扩展后精灵表尺寸**：`512×2048 px`（4 列 × 8 行）。当前 `player.png` 还是 `512×1024`，扩展时一次性重出。
+
+### 提示词增量（追加在角色提示词末尾）
+
+```
+Sprite sheet layout: 4 columns × 8 rows, each cell 128x256 pixels, total 512x2048.
+Row 4 (cast_fan): 4 frames of melee sword swing — wind-up, mid-swing, follow-through,
+  recover. Front-facing pose.
+Row 5 (cast_circle): 4 frames of whirling self-buff — crouch, spinning rise,
+  arms outstretched, settle.
+Row 6 (cast_projectile): 4 frames of ranged casting — pull-back arm,
+  forward throw motion, arm extended, recover.
+Row 7 (hit): 3 frames of damage reaction — knock-back lean, mid-stagger, recover.
+  Last cell of the row can be empty/duplicate.
+All cast/hit poses face downward (the camera). All frames same scale and baseline.
+```
+
+### 死亡动画（占位策略）
+
+代码层目前用 `visible = false` 瞬间隐藏 + 2s 后复活。如需死亡淡出动画，加：
+
+| 行 | 名称 | 帧数 | 用途 |
+|---|---|---|---|
+| 8 | `die` | 3-4 | 倒地 + 淡出 |
+
+`PlayerAnimState.play_state("die", duration)` 已经预留接口。
 
 ## 提示词模板（角色 / NPC）
 

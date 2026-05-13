@@ -54,6 +54,7 @@ assets/sprites/items/icons.png         # 物品图标整张表
 | 游戏内 UI | [ui.md](ui.md) | 面板背景、按钮、9-patch、血量条等通用 UI 元素 |
 | HUD 布局 | [hud.md](hud.md) | 游戏内 HUD 各区域部件规格（角色信息 / 快捷栏 / 小地图 / 状态栏 / 移动端控制） |
 | 主菜单美术 | [main_menu.md](main_menu.md) | 背景、标题 Logo、存档槽、菜单按钮 |
+| 战斗 VFX | [vfx.md](vfx.md) | 技能特效场景规范（挥砍 / AOE / 命中火花 / 弹道）+ 美术替换流程 |
 
 ## 字体
 
