@@ -22,7 +22,7 @@
   {
     "id": "wooden_plank",
     "display_name": "木板",
-    "icon_grid": [2, 0],
+    "icon_grid": [0, 9],
     "max_stack": 99,
     "description": "加工过的木材，用途更广",
     "color": [0.75, 0.55, 0.25, 1.0],
@@ -32,7 +32,7 @@
   {
     "id": "iron_ore",
     "display_name": "铁矿石",
-    "icon_grid": [3, 0],
+    "icon_grid": [0, 9],
     "max_stack": 99,
     "description": "从铁矿节点采集的原矿，需要熔炼",
     "color": [0.5, 0.45, 0.42, 1.0],
@@ -72,7 +72,7 @@
   {
     "id": "carrot",
     "display_name": "胡萝卜",
-    "icon_grid": [7, 0],
+    "icon_grid": [2, 0],
     "max_stack": 20,
     "description": "",
     "color": [1.0, 0.55, 0.1, 1.0],
@@ -82,7 +82,7 @@
   {
     "id": "carrot_seed",
     "display_name": "胡萝卜种子",
-    "icon_grid": [0, 1],
+    "icon_grid": [0, 9],
     "max_stack": 20,
     "description": "",
     "color": [0.9, 0.55, 0.1, 1.0],
@@ -91,7 +91,7 @@
   {
     "id": "wheat",
     "display_name": "小麦",
-    "icon_grid": [1, 1],
+    "icon_grid": [3, 0],
     "max_stack": 20,
     "description": "",
     "color": [0.95, 0.88, 0.4, 1.0],
@@ -101,7 +101,7 @@
   {
     "id": "wheat_seed",
     "display_name": "小麦种子",
-    "icon_grid": [2, 1],
+    "icon_grid": [0, 9],
     "max_stack": 20,
     "description": "",
     "color": [0.85, 0.78, 0.3, 1.0],
@@ -110,7 +110,7 @@
   {
     "id": "potato",
     "display_name": "土豆",
-    "icon_grid": [3, 1],
+    "icon_grid": [0, 9],
     "max_stack": 20,
     "description": "",
     "color": [0.85, 0.72, 0.4, 1.0],
@@ -168,7 +168,7 @@
   {
     "id": "chicken_egg",
     "display_name": "鸡蛋",
-    "icon_grid": [1, 2],
+    "icon_grid": [0, 1],
     "max_stack": 20,
     "description": "",
     "color": [0.98, 0.95, 0.82, 1.0],
@@ -227,7 +227,7 @@
   {
     "id": "rare_seed",
     "display_name": "稀有种子",
-    "icon_grid": [7, 2],
+    "icon_grid": [2, 1],
     "max_stack": 10,
     "description": "神秘商人带来的种子，用途未知",
     "color": [0.8, 0.3, 0.8, 1.0],
@@ -236,7 +236,7 @@
   {
     "id": "blueprint",
     "display_name": "配方图纸",
-    "icon_grid": [0, 3],
+    "icon_grid": [3, 1],
     "max_stack": 5,
     "description": "记载了高级合成配方的图纸",
     "color": [0.3, 0.6, 0.9, 1.0],
@@ -275,7 +275,7 @@
   {
     "id": "cooked_meat",
     "display_name": "烤肉",
-    "icon_grid": [4, 3],
+    "icon_grid": [1, 1],
     "max_stack": 10,
     "description": "香喷喷的烤肉，恢复大量生命",
     "color": [0.7, 0.35, 0.2, 1.0],

@@ -152,6 +152,7 @@ GrowthComponent       # 作物/动物生长状态
 
 ## 文档
 
+- [`docs/gameplay.md`](docs/gameplay.md) — **当前已实现玩法快照**，新增系统/内容前先对一下定位
 - [`docs/roadmap.md`](docs/roadmap.md) — 开发阶段规划与待办事项，按 Phase 划分，开工前更新进度
 - [`docs/art/`](docs/art/README.md) — 美术资源生成提示词（按类别分文件），含角色、环境、建筑、物品图标
 - [`docs/sounds.md`](docs/sounds.md) — 音效与 BGM 资源映射、风格描述

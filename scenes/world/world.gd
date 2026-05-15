@@ -49,7 +49,7 @@ var _day_overlay: ColorRect = null
 var _canvas_modulate: CanvasModulate = null
 var _pause_menu: Control = null
 
-var terrain_map: TileMap = null
+var terrain_map: TileMapLayer = null
 var terrain_seed: int = 0
 var map_markers: Dictionary = {}   # "next_0"/"next_1"/"next_2"/"prev" → Vector2i
 var current_map_id: String = ""    # 当前地图 id，如 "0"、"0-1"
@@ -67,8 +67,9 @@ func _ready() -> void:
 	if SaveSystem.slot_exists(GameManager.current_save_slot):
 		await SaveSystem.load_save(GameManager.current_save_slot, self)
 	else:
-		_load_map("0")
+		await _load_map("0")
 	_update_chunks()
+	_maybe_show_class_select()
 	BuildingSystem.build_mode_entered.connect(_on_build_mode_entered)
 	BuildingSystem.build_mode_exited.connect(_on_build_mode_exited)
 	BuildingSystem.building_placed.connect(_on_building_placed)
@@ -138,16 +139,16 @@ func _load_map(map_id: String) -> void:
 	if GameManager.world_type == "preset":
 		var img_path := "res://assets/maps/" + map_id + ".png"
 		if FileAccess.file_exists(img_path):
-			map_markers = WorldGenerator.generate_from_image(terrain_map, img_path)
+			map_markers = await WorldGenerator.generate_from_image(terrain_map, img_path)
 		else:
 			push_error("预设地图不存在: " + img_path + "，回退到程序化生成")
-			_gen_random()
+			await _gen_random()
 	else:
-		_gen_random()
+		await _gen_random()
 
 func _gen_random() -> void:
 	terrain_seed = randi()
-	WorldGenerator.generate(terrain_map, terrain_seed)
+	await WorldGenerator.generate(terrain_map, terrain_seed)
 
 
 func _check_portals(delta: float) -> void:
@@ -191,7 +192,7 @@ func _travel(marker_key: String) -> void:
 			node.queue_free()
 	ChunkManager.clear_state()
 
-	_load_map(target_id)
+	await _load_map(target_id)
 	_update_chunks()
 	_portal_cooldown = PORTAL_COOLDOWN
 
@@ -204,8 +205,28 @@ func _travel(marker_key: String) -> void:
 		)
 
 
+func _maybe_show_class_select() -> void:
+	# 仅当本地玩家从未选过职业（class_id 为空）时弹出。读档恢复后由此判断，避免重弹。
+	var local := _find_local_player()
+	if local == null or local.active_skills == null:
+		return
+	if not local.active_skills.class_id.is_empty():
+		return
+	var cs := _find_class_select()
+	if cs:
+		cs.show()
+
+func _find_class_select() -> Control:
+	for layer in get_children():
+		if layer is CanvasLayer:
+			var n := (layer as CanvasLayer).get_node_or_null("ClassSelect")
+			if n:
+				return n as Control
+	return null
+
+
 func _setup_terrain() -> void:
-	terrain_map = TileMap.new()
+	terrain_map = TileMapLayer.new()
 	terrain_map.name = "TerrainMap"
 	terrain_map.tile_set = WorldGenerator.create_tileset()
 	terrain_map.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -265,9 +286,6 @@ func _setup_ui() -> void:
 	var class_select := ClassSelectScene.instantiate()
 	class_select.name = "ClassSelect"
 	ui_layer.add_child(class_select)
-	# 若玩家未选职业（class_id 为空），自动弹出
-	if player.active_skills and player.active_skills.class_id.is_empty():
-		class_select.show()
 
 	_pause_menu = PauseMenuScene.instantiate()
 	ui_layer.add_child(_pause_menu)

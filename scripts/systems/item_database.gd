@@ -1,10 +1,10 @@
 extends Node
 
 const ICON_SHEET_PATH := "res://assets/sprites/items/icons.png"
-const ICON_GRID_COLS := 8
-const ICON_GRID_ROWS := 6
+const ICON_GRID_COLS := 4
+const ICON_GRID_ROWS := 2
 
-var _icon_size: int = 32
+var _icon_size: int = 64
 
 var _items: Dictionary = {}
 var _buildings: Array = []
@@ -276,22 +276,30 @@ func get_item_icon(item: ItemData) -> Texture2D:
 	var key: String = item.id
 	if _icon_cache.has(key):
 		return _icon_cache[key]
-	var tex: Texture2D
+	var tex: Texture2D = _resolve_item_icon(item)
+	_icon_cache[key] = tex
+	return tex
+
+# 三段回退：
+# 1) JSON override 字段 `icon_path` 直接指文件
+# 2) 按 id 找独立 PNG（assets/sprites/items/icons/{id}.png）
+# 3) icons.png atlas 切片（旧机制，逐步淘汰）
+# 4) `color` 字段生成纯色占位
+func _resolve_item_icon(item: ItemData) -> Texture2D:
+	if not item.icon_path.is_empty() and ResourceLoader.exists(item.icon_path):
+		return load(item.icon_path) as Texture2D
+	var per_id := AssetPaths.item_icon(item.id)
+	if ResourceLoader.exists(per_id):
+		return load(per_id) as Texture2D
 	if _icon_sheet:
 		var x := item.icon_grid.x * _icon_size
 		var y := item.icon_grid.y * _icon_size
-		# icons.png 未扩到新格子时回退到纯色，避免读越界透明
-		if x + _icon_size > _icon_sheet.get_width() or y + _icon_size > _icon_sheet.get_height():
-			tex = _make_color_icon(item.color)
-		else:
+		if x + _icon_size <= _icon_sheet.get_width() and y + _icon_size <= _icon_sheet.get_height():
 			var atlas := AtlasTexture.new()
 			atlas.atlas = _icon_sheet
 			atlas.region = Rect2(x, y, _icon_size, _icon_size)
-			tex = atlas
-	else:
-		tex = _make_color_icon(item.color)
-	_icon_cache[key] = tex
-	return tex
+			return atlas
+	return _make_color_icon(item.color)
 
 func _make_color_icon(c: Color) -> ImageTexture:
 	var img := Image.create(_icon_size, _icon_size, false, Image.FORMAT_RGBA8)

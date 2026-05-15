@@ -52,7 +52,7 @@
 > 目标：世界有内容，有探索价值，有威胁感
 
 - [x] 昼夜循环（TimeSystem，白天 120s / 夜晚 60s，HUD 显示）
-- [x] 夜晚黑暗叠加层（渐变暗化效果）
+- [x] 夜晚色调压暗（CanvasModulate 渐变 DAY→DUSK→NIGHT）
 - [x] 怪物数据层（CreatureResource，掉落表）
 - [x] 怪物场景（状态机：游荡/追击/攻击/死亡）
 - [x] 怪物攻击行为（夜晚刷新，检测玩家后追击）
@@ -190,7 +190,7 @@
 - [ ] B4 成就 / 图鉴（收集进度、击杀统计、合成种类）
 - [ ] B5 节日 / 季节事件（春樱 / 秋丰收 / 冬雪人）
 - [ ] B6 PvE 平衡 + Boss / 副本（怪物难度递增曲线，季节性 Boss）
-- [x] B7 战斗反馈（DamageNumber 飘字 + hit-stop 60ms + KNOCKBACK ×1.5 + 15% 暴击 ×2 倍伤 + combo 计数→HUD toast）
+- [x] B7 战斗反馈（DamageNumber 飘字 + hit-stop 每招独立 30~90ms + 击退 每招独立 140~360px + combo 计数→HUD toast；暴击系统未实装）
 
 ### C. 质量打磨 / 已知 bug
 > 存量问题清理。

@@ -135,7 +135,7 @@ func _apply(data: Dictionary, world: Node2D) -> void:
 func _apply_v2(data: Dictionary, world: Node2D) -> void:
 	var world_data: Dictionary = data.get("world", {})
 	var players_data: Array = data.get("players", [])
-	_apply_world(world_data, world)
+	await _apply_world(world_data, world)
 	_apply_players(players_data, world)
 	await _load_buildings(world, world_data.get("buildings", []))
 
@@ -159,7 +159,7 @@ func _apply_v1(data: Dictionary, world: Node2D) -> void:
 		"equipped": data.get("equipped", {}),
 		"skills": data.get("skills", {}),
 	}
-	_apply_world(world_data, world)
+	await _apply_world(world_data, world)
 	_apply_players([player_data], world)
 	# v1 资源节点平铺存档兜底
 	if not world_data.has("chunk_snapshots") or (world_data["chunk_snapshots"] as Array).is_empty():
@@ -177,9 +177,9 @@ func _apply_world(world_data: Dictionary, world: Node2D) -> void:
 	if seed_val == 0:
 		seed_val = randi()
 	world.set("terrain_seed", seed_val)
-	var tm := world.get_node_or_null("TerrainMap") as TileMap
+	var tm := world.get_node_or_null("TerrainMap") as TileMapLayer
 	if tm:
-		WorldGenerator.generate(tm, seed_val)
+		await WorldGenerator.generate(tm, seed_val)
 
 	NetworkRegistry.import_state(world_data.get("network_registry", {}))
 	ChunkManager.clear_state()

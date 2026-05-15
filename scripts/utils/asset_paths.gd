@@ -22,6 +22,9 @@ static func resource_sprite(id: String) -> String:
 static func character_sprite(id: String) -> String:
 	return "res://assets/sprites/characters/%s.png" % id
 
+static func item_icon(id: String) -> String:
+	return "res://assets/sprites/items/icons/%s.png" % id
+
 static func vfx_scene(id: String) -> String:
 	return "res://scenes/vfx/%s.tscn" % id
 

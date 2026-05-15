@@ -1,13 +1,12 @@
 extends PanelContainer
 
 # 职业选择面板。
-# 出现时机：world._setup_ui_layer 时若玩家 class_id 为空则自动 show；
-# 也可由技能树"切换职业"按钮手动打开。
+# 出现时机：world._ready 读档完成后，若玩家 class_id 仍为空才弹出。
+# 职业一旦选定即锁定，无法切换；本面板不提供"稍后再选"出口。
 
 var _grid: HBoxContainer
 
 func _ready() -> void:
-	set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	visible = false
 	# 半透明背景
 	var sb := StyleBoxFlat.new()
@@ -18,6 +17,13 @@ func _ready() -> void:
 	sb.corner_radius_bottom_right = 8
 	add_theme_stylebox_override("panel", sb)
 	_build_layout()
+	# children 加完后用 MINSIZE 模式反算 offset 实现真正居中
+	# （直接 PRESET_CENTER + size=0 时面板会从中心点向右下扩）
+	visibility_changed.connect(_recenter)
+	call_deferred("_recenter")
+
+func _recenter() -> void:
+	set_anchors_and_offsets_preset(Control.PRESET_CENTER, Control.PRESET_MODE_MINSIZE)
 
 func _build_layout() -> void:
 	var margin := MarginContainer.new()
@@ -36,7 +42,7 @@ func _build_layout() -> void:
 	vbox.add_child(title)
 
 	var hint := Label.new()
-	hint.text = "选择后将影响 HP / MP 上限与可学习的技能。可以稍后在技能面板（K）中切换。"
+	hint.text = "选择后将影响 HP / MP 上限与可学习的技能。职业一旦确定无法更改。"
 	hint.add_theme_font_size_override("font_size", 11)
 	hint.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -46,15 +52,6 @@ func _build_layout() -> void:
 	_grid.add_theme_constant_override("separation", 12)
 	_grid.alignment = BoxContainer.ALIGNMENT_CENTER
 	vbox.add_child(_grid)
-
-	# 关闭按钮
-	var bottom := HBoxContainer.new()
-	bottom.alignment = BoxContainer.ALIGNMENT_CENTER
-	vbox.add_child(bottom)
-	var skip_btn := Button.new()
-	skip_btn.text = "稍后再选"
-	skip_btn.pressed.connect(hide)
-	bottom.add_child(skip_btn)
 
 	_refresh_classes()
 

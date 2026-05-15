@@ -211,6 +211,9 @@ func _do_set_class(peer_id: int, class_id: String) -> void:
 	var p := _player_for(peer_id)
 	if p == null:
 		return
+	# 职业一次锁定：已选过的不允许再改
+	if not p.active_skills.class_id.is_empty():
+		return
 	p.active_skills.set_class(class_id)
 
 func _do_equip_skill(peer_id: int, slot: int, skill_id: String) -> void:

@@ -1,81 +1,96 @@
 # 美术：物品图标
 
-物品图标统一打包成一张 sprite sheet，**8 列 × 6 行** grid 排列。占位与正式版尺寸均可，只要保持 8×6 网格：
+物品图标按 **id 单独成图**，每个 `64×64 px` 独立 PNG，方便逐个迭代。
 
-- 占位：`256×128 px`，单格 `32×32 px`（仅装下 4 行，其余越界自动回退纯色）
-- 正式版：`512×384 px`，单格 `64×64 px`（装下全部 48 格）
+- 文件位置：`assets/sprites/items/icons/{id}.png`
+- 代码加载顺序（`ItemDatabase._resolve_item_icon`）：
+  1. JSON `icon_path` 字段 override（特殊路径才填）
+  2. `assets/sprites/items/icons/{id}.png`
+  3. 旧 atlas `icons.png` 切片（兼容用，逐步淘汰）
+  4. `color` 字段纯色占位
 
-文件：`assets/sprites/items/icons.png`
+> 旧的 `icons.png` atlas 仍可工作（兼容老流程），但**新增物品图标请走单文件**。下面表中已分配 atlas 格子的物品，画完单文件后可以无视那个格子。
 
-## 提示词模板
+## 提示词模板（单图标）
+
+每次只生成一张。**风格锚**：参考现有 `assets/sprites/items/icons.png` 中已有的 8 个 isometric 图标（木块 / 石块 / 胡萝卜 / 麦穗 / 蛋 / 烤鸡 / 魔晶 / 卷轴）作为风格基准。
 
 ```
-Minecraft-style pixel art icon sheet, transparent background, flat front view,
-blocky item icons, hard square pixel edges, flat 2-3 tone color fills, no gradients.
-Grid layout, 8 columns × 6 rows. Canvas size {W}x{H} pixels, each cell {S}x{S} pixels.
-Strict grid layout, no padding between cells, no spacing between cells.
-Each icon is a simple recognizable block or item, Minecraft inventory icon style.
+Generate a single pixel-art item icon, 64×64 pixels, transparent background.
+Use the reference image as the style anchor: chunky isometric 3/4 view, same warm earthy palette, hard pixel edges, 2-3 tone shading per face, no anti-aliasing, no gradients, no outline.
+Center the icon in the canvas, leave 4–6 px transparent margin on all sides.
+No background fill, no cell border, no text, no watermark, no item shadow.
 
-Icons (left to right, top to bottom):
-{逐个列出图标描述}
-
-Minecraft pixel art, game asset icons, clean grid, transparent background
+Subject: {单个物品的简短描述，见下表}
 ```
 
-## 当前图标分布（8 列 × 6 行）
+把 `{Subject}` 替换成下表对应行的英文描述即可。
 
-| (col, row) | id | 描述 |
-|------------|----|------|
-| (0, 0) | `wood` | 棕色橡木原木块，纹理像素线 |
-| (1, 0) | `stone` | 灰色石块，2-3 条裂纹像素线 |
-| (2, 0) | `wooden_plank` | 浅棕色木板，2 道横向接缝像素线 |
-| (3, 0) | `iron_ore` | 灰褐色矿石块，铁色斑点像素 |
-| (4, 0) | `iron_bar` | 灰白金属锭，方正几何，1-2 像素高光 |
-| (5, 0) | `rope` | 卷起的麻绳圈，浅棕色编织像素 |
-| (6, 0) | `hay` | 金黄色干草捆，竖直草秆像素 |
-| (7, 0) | `carrot` | 橙色胡萝卜，绿色叶片像素 |
-| (0, 1) | `carrot_seed` | 小袋装橙色种子，棕色袋身 |
-| (1, 1) | `wheat` | 金黄小麦捆，麦穗像素 |
-| (2, 1) | `wheat_seed` | 小袋装黄色种子 |
-| (3, 1) | `potato` | 米黄色土豆，斑点像素 |
-| (4, 1) | `potato_seed` | 小袋装米色种子 |
-| (5, 1) | `tomato` | 红色番茄，绿色蒂叶像素 |
-| (6, 1) | `tomato_seed` | 小袋装红色种子 |
-| (7, 1) | `berry` | 紫红色浆果一簇 |
-| (0, 2) | `mushroom` | 红盖白杆蘑菇 |
-| (1, 2) | `chicken_egg` | 白色椭圆鸡蛋 |
-| (2, 2) | `milk` | 玻璃瓶装白色牛奶 |
-| (3, 2) | `animal_feed` | 棕色饲料桶/袋 |
-| (4, 2) | `cooked_carrot` | 橙红色烤胡萝卜在木盘上 |
-| (5, 2) | `cooked_mushroom` | 深棕色烤蘑菇 |
-| (6, 2) | `berry_jam` | 紫红色果酱玻璃罐 |
-| (7, 2) | `rare_seed` | 紫色发光稀有种子，星点像素 |
-| (0, 3) | `blueprint` | 卷起的米色羊皮纸蓝图 |
-| (1, 3) | `axe` | 木柄铁斧子，刀刃像素高光 |
-| (2, 3) | `pickaxe` | 木柄铁镐子，T 字形头部 |
-| (3, 3) | `meat` | 粉红色生肉块，骨头白点像素 |
-| (4, 3) | `cooked_meat` | 棕色烤肉块，火烤纹路像素 |
-| (5, 3) | `leather` | 棕色皮革卷，方形堆叠 |
-| (6, 3) | `wool` | 白色绒毛团，方块化云朵 |
-| (7, 3) | `bone` | 白色骨头，两端方块状骨节 |
-| (0, 4) | `corn` | 黄色玉米棒，绿色苞叶像素 |
-| (1, 4) | `corn_seed` | 小袋装黄色玉米种子 |
-| (2, 4) | `pumpkin` | 橙色南瓜，纵向凹槽像素，绿色蒂 |
-| (3, 4) | `pumpkin_seed` | 小袋装橙色种子 |
-| (4, 4) | `mushroom_soup` | 木碗装棕色蘑菇汤，蘑菇块漂浮 |
-| (5, 4) | `pumpkin_soup` | 木碗装橙色南瓜汤，热气像素 |
-| (6, 4) | `corn_bread` | 金黄色玉米饼，方形扁面包 |
-| (7, 4) | `bone_meal` | 米白色骨粉堆，颗粒像素 |
-| (0, 5) | `wooden_sword` | 木柄木剑，方形短剑 |
-| (1, 5) | `iron_sword` | 木柄铁剑，长方形剑刃 |
-| (2, 5) | `bow` | 木弓 + 弓弦像素，"D" 形 |
-| (3, 5) | `arrow` | 一束木箭矢，箭头像素 |
-| (4, 5) | `leather_armor` | 棕色皮甲背心，缝线像素 |
-| (5, 5) | `iron_armor` | 灰色铁甲胸甲，铆钉像素 |
-| (6, 5) | `lucky_charm` | 金色四叶草吊坠 |
+## 物品图标清单
 
-## 替换流程
+文件名 = `{id}.png`。下表列出每个 id 的 Subject。
 
-1. 用上方提示词生成，确保 8×5 网格、无 padding、透明背景。
-2. 覆盖 `assets/sprites/items/icons.png`。
-3. 新增物品时在表中分配未占用的 `(col, row)`。
+| id | Subject（英文，喂给提示词） |
+|---|---|
+| `wood` | brown oak log block, pixel grain lines on top face |
+| `stone` | grey cobblestone block, 2-3 pixel cracks |
+| `wooden_plank` | light brown plank block, two horizontal seam lines |
+| `iron_ore` | grey-brown ore block with iron speckle pixels |
+| `iron_bar` | pale grey metal ingot, geometric, 1-2 pixel highlight |
+| `rope` | coiled hemp rope ring, light brown weave pixels |
+| `hay` | golden hay bale, vertical straw pixels |
+| `carrot` | orange carrot with green leaf pixels |
+| `carrot_seed` | small brown pouch with orange seeds spilling out |
+| `wheat` | golden wheat bundle, ear pixels |
+| `wheat_seed` | small brown pouch with yellow seeds spilling out |
+| `potato` | beige potato with darker spot pixels |
+| `potato_seed` | small brown pouch with beige seeds spilling out |
+| `tomato` | red tomato with green stem pixels |
+| `tomato_seed` | small brown pouch with red seeds spilling out |
+| `berry` | cluster of purple-red berries |
+| `mushroom` | red-cap white-stem mushroom |
+| `chicken_egg` | white oval egg |
+| `milk` | glass bottle filled with white milk |
+| `animal_feed` | brown feed sack |
+| `cooked_carrot` | roasted orange carrot on a wooden plate |
+| `cooked_mushroom` | dark brown grilled mushroom |
+| `berry_jam` | glass jar of purple-red jam |
+| `rare_seed` | glowing purple rare seed with star sparkle pixels |
+| `blueprint` | rolled beige parchment blueprint |
+| `axe` | wood-handled iron axe, blade highlight pixel |
+| `pickaxe` | wood-handled iron pickaxe, T-shape head |
+| `meat` | pink raw meat chunk with white bone pixel |
+| `cooked_meat` | brown roasted meat with grill mark pixels |
+| `leather` | stacked brown leather rolls |
+| `wool` | white wool tuft, blocky cloud shape |
+| `bone` | white bone, block-shaped knuckles on both ends |
+| `corn` | yellow corn cob with green husk pixels |
+| `corn_seed` | small brown pouch with yellow corn seeds spilling out |
+| `pumpkin` | orange pumpkin with vertical groove pixels, green stem |
+| `pumpkin_seed` | small brown pouch with orange pumpkin seeds spilling out |
+| `mushroom_soup` | wooden bowl with brown mushroom soup, floating mushroom chunks |
+| `pumpkin_soup` | wooden bowl with orange pumpkin soup, steam pixels |
+| `corn_bread` | golden flat cornbread square |
+| `bone_meal` | pile of off-white bone meal granules |
+| `wooden_sword` | wood-handled wooden shortsword, rectangular blade |
+| `iron_sword` | wood-handled iron longsword, rectangular blade |
+| `bow` | wooden bow with bowstring pixels, D-shape |
+| `arrow` | bundle of wooden arrows, pixel arrowhead |
+| `leather_armor` | brown leather vest with stitch pixels |
+| `iron_armor` | grey iron chestplate with rivet pixels |
+| `lucky_charm` | golden four-leaf clover pendant |
+
+## 工作流
+
+1. 选一个还没出图的 id（背包里显示为纯色块的就是缺图的）。
+2. 用上方模板 + 该 id 的 Subject 跑一张 64×64 PNG。
+3. 存到 `assets/sprites/items/icons/{id}.png`，Godot 自动 import。
+4. 进游戏看效果，不满意只需要重画这一张。
+
+## 旧 atlas 状态（仅供 fallback）
+
+`assets/sprites/items/icons.png` 是早期 4×2 = 8 个 isometric 图标的占位 atlas。新流程不再依赖它，但代码保留切片回退以兼容已有 `icon_grid` 字段。等所有物品都有单文件之后，可以：
+
+1. 删除 `assets/sprites/items/icons.png` 和对应 `.import`
+2. 删除 `ItemDatabase` 里 `_icon_sheet` 相关代码段
+3. `ItemData` 移除 `icon_grid` 字段，`items.json` 同步清掉

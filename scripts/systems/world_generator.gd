@@ -74,9 +74,42 @@ func create_tileset() -> TileSet:
 		for idx in blob_tiles.size():
 			var coords := Vector2i(idx % ATLAS_COLS, idx / ATLAS_COLS)
 			_setup_blob_tile(src, coords, terrain_id, blob_tiles[idx])
+			# 中心 tile（4 边 4 角全连）加 3 个 flip 变体，让引擎按 probability 加权随机选
+			var b: Dictionary = blob_tiles[idx]
+			if b.n and b.e and b.s and b.w and b.ne and b.se and b.sw and b.nw:
+				_add_flip_variants(src, coords, terrain_id, b)
 		ts.add_source(src, terrain_id)  # source_id = terrain_id
 
 	return ts
+
+
+# 中心 tile 的 4 种 flip 组合（原 + h / + v / + h&v）作为同 peering 的备选。
+# 由于中心 tile 8 邻接全连通，flip 不破坏 autotile 视觉。其它 bitmask 不可 flip。
+func _add_flip_variants(src: TileSetAtlasSource, coords: Vector2i, terrain_id: int, b: Dictionary) -> void:
+	const FLIPS := [
+		[true,  false, false],
+		[false, true,  false],
+		[true,  true,  false],
+	]
+	for f in FLIPS:
+		var alt_id := src.create_alternative_tile(coords)
+		var td: TileData = src.get_tile_data(coords, alt_id)
+		td.flip_h = f[0]
+		td.flip_v = f[1]
+		td.transpose = f[2]
+		td.terrain_set = TERRAIN_SET
+		td.terrain     = terrain_id
+		# 同 peering bits — 中心 tile 8 邻接全 1
+		td.set_terrain_peering_bit(TileSet.CELL_NEIGHBOR_TOP_SIDE,             terrain_id)
+		td.set_terrain_peering_bit(TileSet.CELL_NEIGHBOR_RIGHT_SIDE,           terrain_id)
+		td.set_terrain_peering_bit(TileSet.CELL_NEIGHBOR_BOTTOM_SIDE,          terrain_id)
+		td.set_terrain_peering_bit(TileSet.CELL_NEIGHBOR_LEFT_SIDE,            terrain_id)
+		td.set_terrain_peering_bit(TileSet.CELL_NEIGHBOR_TOP_RIGHT_CORNER,     terrain_id)
+		td.set_terrain_peering_bit(TileSet.CELL_NEIGHBOR_BOTTOM_RIGHT_CORNER,  terrain_id)
+		td.set_terrain_peering_bit(TileSet.CELL_NEIGHBOR_BOTTOM_LEFT_CORNER,   terrain_id)
+		td.set_terrain_peering_bit(TileSet.CELL_NEIGHBOR_TOP_LEFT_CORNER,      terrain_id)
+		# probability 默认 1.0（与原 tile 等权），可调小让 flip 变体少一点：
+		td.probability = 0.8
 
 
 # 枚举 47 种 blob 组合，返回有序 Array（与 atlas 行列一一对应）
@@ -122,13 +155,61 @@ func _setup_blob_tile(src: TileSetAtlasSource, coords: Vector2i, terrain_id: int
 #  程序化地形生成
 # ─────────────────────────────────────────────────────────────────────────────
 
-func generate(tilemap: TileMap, seed_val: int) -> void:
+const TERRAIN_CACHE_DIR := "user://world_cache"
+
+func generate(tilemap: TileMapLayer, seed_val: int) -> void:
+	# 优先从字节流缓存载入（毫秒级）；miss 则跑慢算法 + 写盘
+	if _load_from_cache(tilemap, seed_val):
+		init_biome_noise(seed_val)
+		return
+
 	var map := _build_map(seed_val)
 	map = _smooth(map)
 	_carve_paths(map, seed_val)
 	tilemap.clear()
-	_apply_terrain(tilemap, map, MAP_SIZE, MAP_SIZE, -MAP_HALF, -MAP_HALF)
+	await _apply_terrain(tilemap, map, MAP_SIZE, MAP_SIZE, -MAP_HALF, -MAP_HALF)
 	init_biome_noise(seed_val)
+	_save_to_cache(tilemap, seed_val)
+
+# 字节流缓存读取：命中返回 true，miss 返回 false
+func _load_from_cache(tilemap: TileMapLayer, seed_val: int) -> bool:
+	var path := _cache_path(seed_val)
+	if not FileAccess.file_exists(path):
+		return false
+	var f := FileAccess.open(path, FileAccess.READ)
+	if f == null:
+		return false
+	var data := f.get_buffer(f.get_length())
+	f.close()
+	if data.is_empty():
+		return false
+	tilemap.tile_map_data = data
+	return true
+
+# 把当前 TileMapLayer 序列化为字节流写盘
+func _save_to_cache(tilemap: TileMapLayer, seed_val: int) -> void:
+	var dir_path := TERRAIN_CACHE_DIR
+	if not DirAccess.dir_exists_absolute(dir_path):
+		var err := DirAccess.make_dir_recursive_absolute(dir_path)
+		if err != OK:
+			push_warning("无法创建 terrain 缓存目录: %s" % dir_path)
+			return
+	var path := _cache_path(seed_val)
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	if f == null:
+		push_warning("无法写入 terrain 缓存: %s" % path)
+		return
+	f.store_buffer(tilemap.tile_map_data)
+	f.close()
+
+func _cache_path(seed_val: int) -> String:
+	return "%s/terrain_%d.bin" % [TERRAIN_CACHE_DIR, seed_val]
+
+# 清除指定 seed 的缓存（存档重置时调用）
+func clear_cache(seed_val: int) -> void:
+	var path := _cache_path(seed_val)
+	if FileAccess.file_exists(path):
+		DirAccess.remove_absolute(path)
 
 
 # Biome 噪声基于世界 seed，与 tile 生成同步。
@@ -150,39 +231,52 @@ func get_biome_at(pos: Vector2) -> BiomeData:
 	return biomes[idx]
 
 
-func _apply_terrain(tilemap: TileMap, map: Array, w: int, h: int, ox: int, oy: int) -> void:
-	# 预建 blob bitmask → atlas坐标 查找表，绕开 set_cells_terrain_connect 的传播开销
-	var lookup: Dictionary = {}
-	var blob_tiles := _enumerate_blob_tiles()
-	for idx in blob_tiles.size():
-		var b: Dictionary = blob_tiles[idx]
-		var key: int = (b.n << 7) | (b.e << 6) | (b.s << 5) | (b.w << 4) \
-					 | (b.ne << 3) | (b.se << 2) | (b.sw << 1) | b.nw
-		lookup[key] = Vector2i(idx % ATLAS_COLS, idx / ATLAS_COLS)
+func _apply_terrain(tilemap: TileMapLayer, map: Array, w: int, h: int, ox: int, oy: int) -> void:
+	# 两阶段：先 set_cell 占位（让所有 cell 都有 terrain id），再分批
+	# set_cells_terrain_connect 由引擎按 peering bits + probability 选 tile（含 flip 变体）。
+	#
+	# 大地图（400×400=160K cell）会阻塞主循环 1~2 秒。每处理 N 个 cell / 1 批
+	# 让一帧，避免卡死。
+	const BATCH := 256
+	const YIELD_EVERY_CELLS := 4096
 
-	var w1 := w - 1
-	var h1 := h - 1
+	# 阶段 1：set_cell 占位（atlas (0,0)），让每个 cell 都有 terrain id
+	var cells_by_terrain: Array = []
+	cells_by_terrain.resize(TERRAIN_COUNT)
+	for i in TERRAIN_COUNT:
+		cells_by_terrain[i] = []
+	var processed := 0
 	for row in h:
 		for col in w:
 			var tid: int = map[row * w + col]
-			var n_v: int  = 1 if (row > 0  and map[(row - 1) * w + col]     == tid) else 0
-			var s_v: int  = 1 if (row < h1 and map[(row + 1) * w + col]     == tid) else 0
-			var e_v: int  = 1 if (col < w1 and map[row * w + col + 1]       == tid) else 0
-			var ww_v: int = 1 if (col > 0  and map[row * w + col - 1]       == tid) else 0
-			var ne_v: int = 1 if (n_v == 1 and e_v  == 1 and map[(row-1)*w + col+1] == tid) else 0
-			var se_v: int = 1 if (s_v == 1 and e_v  == 1 and map[(row+1)*w + col+1] == tid) else 0
-			var sw_v: int = 1 if (s_v == 1 and ww_v == 1 and map[(row+1)*w + col-1] == tid) else 0
-			var nw_v: int = 1 if (n_v == 1 and ww_v == 1 and map[(row-1)*w + col-1] == tid) else 0
-			var key: int = (n_v << 7) | (e_v << 6) | (s_v << 5) | (ww_v << 4) \
-						 | (ne_v << 3) | (se_v << 2) | (sw_v << 1) | nw_v
-			tilemap.set_cell(0, Vector2i(ox + col, oy + row), tid, lookup.get(key, Vector2i.ZERO))
+			var pos := Vector2i(ox + col, oy + row)
+			tilemap.set_cell(pos, tid, Vector2i.ZERO)
+			cells_by_terrain[tid].append(pos)
+			processed += 1
+			if processed % YIELD_EVERY_CELLS == 0:
+				await get_tree().process_frame
+
+	# 阶段 2：按 terrain 分小批 set_cells_terrain_connect 让引擎重画 + 随机选 alt
+	for tid in TERRAIN_COUNT:
+		var cells: Array = cells_by_terrain[tid]
+		if cells.is_empty():
+			continue
+		var i := 0
+		while i < cells.size():
+			var end := mini(i + BATCH, cells.size())
+			var batch: Array[Vector2i] = []
+			for j in range(i, end):
+				batch.append(cells[j])
+			tilemap.set_cells_terrain_connect(batch, TERRAIN_SET, tid, false)
+			i += BATCH
+			await get_tree().process_frame
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  图片地图生成
 # ─────────────────────────────────────────────────────────────────────────────
 
-func generate_from_image(tilemap: TileMap, image_path: String) -> Dictionary:
+func generate_from_image(tilemap: TileMapLayer, image_path: String) -> Dictionary:
 	var file_bytes := FileAccess.get_file_as_bytes(image_path)
 	if file_bytes.is_empty():
 		push_error("地图文件不存在: " + image_path)
@@ -212,7 +306,7 @@ func generate_from_image(tilemap: TileMap, image_path: String) -> Dictionary:
 				map[iy * img_w + ix] = _match_terrain_color(col)
 
 	tilemap.clear()
-	_apply_terrain(tilemap, map, img_w, img_h, -half_w, -half_h)
+	await _apply_terrain(tilemap, map, img_w, img_h, -half_w, -half_h)
 	init_biome_noise(image_path.hash())
 	return markers
 
@@ -385,12 +479,14 @@ func _make_noise(seed_val: int, freq: float, octaves: int) -> FastNoiseLite:
 	return n
 
 
-func _load_terrain_texture(terrain_id: int) -> ImageTexture:
+func _load_terrain_texture(terrain_id: int) -> Texture2D:
+	# 走 Godot import 系统拿 CompressedTexture2D，导出后仍可用；
+	# 旧的 Image.load_from_file() 路径在导出包中读不到原始 PNG。
 	var path := TERRAIN_ATLAS_PATHS[terrain_id]
-	if FileAccess.file_exists(path):
-		var img := Image.load_from_file(path)
-		if img:
-			return ImageTexture.create_from_image(img)
+	if ResourceLoader.exists(path):
+		var tex := load(path) as Texture2D
+		if tex != null:
+			return tex
 	return _gen_fallback_texture(terrain_id)
 
 

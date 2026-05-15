@@ -5,14 +5,15 @@ extends DraggablePanel
 # 每行技能：图标 / 名字 / 等级 / 描述 / [学习] / 4 个装配按钮 Q/E/R/G
 
 const SLOT_KEYS := ["J", "Q", "E", "R", "G"]
-const TAB_CLASS_IDS := ["", "warrior", "mage", "archer"]
-const TAB_NAMES := ["通用", "战士", "法师", "弓手"]
+const CLASS_NAMES := {"warrior": "战士", "mage": "法师", "archer": "弓手"}
 
 var _player: Player = null
 var _class_lbl: Label
 var _sp_lbl: Label
+var _tab_row: HBoxContainer
 var _list: VBoxContainer
 var _tab_btns: Array[Button] = []
+var _tab_class_ids: Array[String] = []
 var _current_tab: int = 0
 
 func _ready() -> void:
@@ -60,26 +61,13 @@ func _build_layout() -> void:
 	_sp_lbl.text = "SP 0"
 	_sp_lbl.add_theme_color_override("font_color", Color(0.85, 0.6, 1.0))
 	status.add_child(_sp_lbl)
-	var class_btn := Button.new()
-	class_btn.text = "切换职业"
-	class_btn.pressed.connect(_open_class_select)
-	status.add_child(class_btn)
 
 	vbox.add_child(HSeparator.new())
 
-	# 职业 tab
-	var tab_row := HBoxContainer.new()
-	tab_row.add_theme_constant_override("separation", 4)
-	vbox.add_child(tab_row)
-	for i in TAB_NAMES.size():
-		var b := Button.new()
-		b.text = TAB_NAMES[i]
-		b.toggle_mode = true
-		b.button_pressed = (i == 0)
-		var idx := i
-		b.pressed.connect(func(): _switch_tab(idx))
-		tab_row.add_child(b)
-		_tab_btns.append(b)
+	# 职业 tab（动态：通用 + 当前职业），在 _refresh 中重建
+	_tab_row = HBoxContainer.new()
+	_tab_row.add_theme_constant_override("separation", 4)
+	vbox.add_child(_tab_row)
 
 	# 技能列表（滚动）
 	var scroll := ScrollContainer.new()
@@ -114,12 +102,41 @@ func _refresh() -> void:
 	_class_lbl.text = "职业：%s" % (cls.display_name if cls != null else "通用")
 	_sp_lbl.text = "SP %d" % act.skill_points
 
-	var tab_class: String = TAB_CLASS_IDS[_current_tab]
+	_rebuild_tabs(cls_id)
+	var tab_class: String = _tab_class_ids[_current_tab]
 	for s in ItemDatabase.get_all_active_skills():
 		var sd := s as ActiveSkillData
 		if sd.class_id != tab_class:
 			continue
 		_list.add_child(_make_row(sd))
+
+# 按当前职业重建 tab：通用 + 自己职业（无职业时只有通用）
+func _rebuild_tabs(cls_id: String) -> void:
+	var ids: Array[String] = [""]
+	var names: Array[String] = ["通用"]
+	if not cls_id.is_empty():
+		ids.append(cls_id)
+		names.append(CLASS_NAMES.get(cls_id, cls_id))
+	if ids == _tab_class_ids:
+		# 结构未变，只刷新按钮按下状态
+		for i in _tab_btns.size():
+			_tab_btns[i].button_pressed = (i == _current_tab)
+		return
+	_tab_class_ids = ids
+	for b in _tab_btns:
+		b.queue_free()
+	_tab_btns.clear()
+	if _current_tab >= ids.size():
+		_current_tab = 0
+	for i in names.size():
+		var b := Button.new()
+		b.text = names[i]
+		b.toggle_mode = true
+		b.button_pressed = (i == _current_tab)
+		var idx := i
+		b.pressed.connect(func(): _switch_tab(idx))
+		_tab_row.add_child(b)
+		_tab_btns.append(b)
 
 func _make_row(skill: ActiveSkillData) -> Control:
 	var act: PlayerActiveSkills = _player.active_skills
@@ -226,16 +243,6 @@ func _on_equip_clicked(slot: int, skill_id: String, was_equipped: bool) -> void:
 	var target_id := "" if was_equipped else skill_id
 	PlayerActions.request_equip_skill(slot, target_id)
 	_refresh()
-
-func _open_class_select() -> void:
-	# 找/建 ClassSelect 面板（同 ui_layer 中）
-	var parent := get_parent()
-	var existing := parent.get_node_or_null("ClassSelect")
-	if existing != null:
-		(existing as Control).show()
-		return
-	# 由 world 在初始化时挂；fallback：弹 toast 提示
-	push_warning("ClassSelect 未挂载到 UI 层")
 
 # ─── 事件 ────────────────────────────────────────────────────────────────
 

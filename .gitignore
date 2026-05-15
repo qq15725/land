@@ -6,3 +6,6 @@
 .idea/
 .claude/
 CLAUDE.md
+
+# 临时目录（imagegen 等）
+tmp/

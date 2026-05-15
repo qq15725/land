@@ -51,7 +51,8 @@ var _quest_box: VBoxContainer
 
 # ⑦ Hotbar
 var _hotbar_level_lbl: Label
-var _hotbar_icons: Array[ItemIcon] = []
+# 每槽 { icon: TextureRect, count: Label }
+var _hotbar_slots: Array[Dictionary] = []
 var _hotbar_selected_overlays: Array[NinePatchRect] = []
 
 # ⑩ Skill —— 每格 {root, icon: TextureRect, cd_overlay: ColorRect, cd_lbl: Label, skill: ActiveSkillData}
@@ -189,9 +190,11 @@ func _build_top_center() -> void:
 	var env := _texture(ART + "hud_envinfo.png", Vector2(256, 56))
 	row.add_child(env)
 
+	# 左凹槽实测 x=17~47 / y=13~43 (31×31)，icon 28×28 居中
 	_phase_icon = TextureRect.new()
-	_phase_icon.position = Vector2(8, 12)
-	_phase_icon.size = Vector2(32, 32)
+	_phase_icon.position = Vector2(18, 14)
+	_phase_icon.size = Vector2(28, 28)
+	_phase_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_phase_icon.texture = _weather_atlas_region(0)  # 太阳
 	_phase_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_phase_icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -207,9 +210,11 @@ func _build_top_center() -> void:
 	_time_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	env.add_child(_time_lbl)
 
+	# 右凹槽实测 x=208~238 / y=13~43 (31×31)，icon 28×28 居中
 	_weather_icon = TextureRect.new()
-	_weather_icon.position = Vector2(216, 12)
-	_weather_icon.size = Vector2(32, 32)
+	_weather_icon.position = Vector2(209, 14)
+	_weather_icon.size = Vector2(28, 28)
+	_weather_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_weather_icon.texture = _weather_atlas_region(0)
 	_weather_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_weather_icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -360,6 +365,8 @@ func set_quests(quests: Array) -> void:
 func _build_hotbar() -> void:
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	margin.offset_top = -184
+	margin.offset_bottom = 0
 	margin.add_theme_constant_override("margin_bottom", 56)
 	add_child(margin)
 
@@ -386,15 +393,16 @@ func _build_hotbar() -> void:
 	_hotbar_level_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	lvl_holder.add_child(_hotbar_level_lbl)
 
-	# 9 格：从 x=24 起，每格 64×56，y=56
-	const SLOT_X0 := 24
-	const SLOT_W := 64
-	const SLOT_Y := 56
+	# 9 格槽位坐标按 hud_hotbar.png 实测：第 1 槽 x=58~107，间距 60px，y=57~112
+	const SLOT_X0 := 58
+	const SLOT_STEP := 60
+	const SLOT_INNER_W := 50
+	const SLOT_Y := 57
 	const SLOT_H := 56
 	for i in HOTBAR_SIZE:
 		var slot_root := Control.new()
-		slot_root.position = Vector2(SLOT_X0 + i * SLOT_W, SLOT_Y)
-		slot_root.size = Vector2(SLOT_W, SLOT_H)
+		slot_root.position = Vector2(SLOT_X0 + i * SLOT_STEP, SLOT_Y)
+		slot_root.size = Vector2(SLOT_INNER_W, SLOT_H)
 		tex.add_child(slot_root)
 
 		# 数字键标记（左下角）
@@ -406,19 +414,37 @@ func _build_hotbar() -> void:
 		key_lbl.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8))
 		slot_root.add_child(key_lbl)
 
-		# 物品图标（用 ItemIcon，但不显示背景槽）
-		var icon := ItemIcon.new(false)
-		icon.position = Vector2(8, 4)
-		icon.size = Vector2(48, 48)
-		icon.custom_minimum_size = Vector2(48, 48)
-		_hotbar_icons.append(icon)
+		# 物品图标 40×40，绝对定位居中放进 50×56 凹槽
+		var icon := TextureRect.new()
+		icon.position = Vector2(5, 8)
+		icon.size = Vector2(40, 40)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		slot_root.add_child(icon)
+
+		# 数量角标（右下）
+		var count_lbl := Label.new()
+		count_lbl.position = Vector2(SLOT_INNER_W - 22, SLOT_H - 16)
+		count_lbl.size = Vector2(20, 14)
+		count_lbl.add_theme_font_size_override("font_size", 10)
+		count_lbl.add_theme_color_override("font_color", Color.WHITE)
+		count_lbl.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.9))
+		count_lbl.add_theme_constant_override("shadow_offset_x", 1)
+		count_lbl.add_theme_constant_override("shadow_offset_y", 1)
+		count_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		count_lbl.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+		count_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		slot_root.add_child(count_lbl)
+
+		_hotbar_slots.append({"icon": icon, "count": count_lbl})
 
 		# 选中态边框（NinePatch，叠在格子外延）
 		var sel := NinePatchRect.new()
 		sel.texture = load(ART + "hud_hotbar_selected.png")
 		sel.position = Vector2(-4, -4)
-		sel.size = Vector2(SLOT_W + 8, SLOT_H + 8)
+		sel.size = Vector2(SLOT_INNER_W + 8, SLOT_H + 8)
 		sel.patch_margin_left = 16
 		sel.patch_margin_right = 16
 		sel.patch_margin_top = 16
@@ -433,17 +459,22 @@ func _refresh_hotbar() -> void:
 	if not _inventory:
 		return
 	for i in HOTBAR_SIZE:
-		var icon: ItemIcon = _hotbar_icons[i]
+		var entry: Dictionary = _hotbar_slots[i]
+		var icon: TextureRect = entry["icon"]
+		var count_lbl: Label = entry["count"]
 		var sel: NinePatchRect = _hotbar_selected_overlays[i]
 		if i >= _inventory.slots.size():
-			icon.clear()
+			icon.texture = null
+			count_lbl.text = ""
 			sel.visible = false
 			continue
 		var slot: Dictionary = _inventory.slots[i]
 		if slot.item:
-			icon.show_item(slot.item, slot.amount)
+			icon.texture = ItemDatabase.get_item_icon(slot.item)
+			count_lbl.text = "x%d" % slot.amount if slot.amount > 1 else ""
 		else:
-			icon.clear()
+			icon.texture = null
+			count_lbl.text = ""
 		sel.visible = i == _inventory.selected_slot
 
 # 玩家总等级 = 4 个技能等级之和（从本地 player.skills 组件读取）

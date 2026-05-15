@@ -24,7 +24,7 @@ const TERRAIN_TINTS := {
 }
 
 var _player: Node2D = null
-var _terrain_map: TileMap = null
+var _terrain_map: TileMapLayer = null
 
 func setup(player: Node2D) -> void:
 	_player = player
@@ -32,7 +32,7 @@ func setup(player: Node2D) -> void:
 	# 查找世界 TerrainMap（与玩家在同一 world 节点下）
 	var world := player.get_tree().get_first_node_in_group("world")
 	if world:
-		_terrain_map = world.get_node_or_null("TerrainMap") as TileMap
+		_terrain_map = world.get_node_or_null("TerrainMap") as TileMapLayer
 
 func _process(_delta: float) -> void:
 	if _player and is_instance_valid(_player):
@@ -55,7 +55,7 @@ func _draw() -> void:
 		for dy in range(-rng, rng + 1, step):
 			for dx in range(-rng, rng + 1, step):
 				var t := ptile + Vector2i(dx, dy)
-				var sid := _terrain_map.get_cell_source_id(0, t)
+				var sid := _terrain_map.get_cell_source_id(t)
 				if sid < 0:
 					continue
 				var d := Vector2(dx * TILE_SIZE, dy * TILE_SIZE) / SCALE

@@ -14,8 +14,12 @@ func _ready() -> void:
 	_load_font()
 
 func _load_sheet() -> void:
-	var sheet := Image.load_from_file(SHEET_PATH)
-	if not sheet:
+	# 走 import 系统拿 Texture2D 再 get_image()，避免导出后无 PNG 可读
+	var tex := load(SHEET_PATH) as Texture2D
+	if tex == null:
+		return
+	var sheet := tex.get_image()
+	if sheet == null:
 		return
 
 	var panel_s  := _crop(sheet, Rect2i(0,   0,  128, 128), 32, 32, 32, 32)

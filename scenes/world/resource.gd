@@ -146,12 +146,14 @@ func _play_break_and_deplete(player: Player = null) -> void:
 	tween.tween_callback(_on_break_fade_done)
 
 func _on_break_fade_done() -> void:
+	_collision.set_deferred("disabled", true)
 	get_tree().create_timer(respawn_time).timeout.connect(_respawn)
 
 func _respawn() -> void:
 	depleted_flag = false
 	visual.modulate = Color.WHITE
 	_show_frame(0)
+	_collision.set_deferred("disabled", false)
 	respawned.emit()
 
 func is_depleted() -> bool:
@@ -165,6 +167,7 @@ func restore_from_save(elapsed: float) -> void:
 	visual.modulate = Color(1, 1, 1, 0)
 	if _frame_count >= 3:
 		_show_frame(2)
+	_collision.set_deferred("disabled", true)
 	var remaining := maxf(respawn_time - elapsed, 0.1)
 	get_tree().create_timer(remaining).timeout.connect(_respawn)
 
