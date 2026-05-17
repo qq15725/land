@@ -254,5 +254,470 @@
       {"item_id": "rope", "amount": 1}
     ],
     "required_station": "workbench"
+  },
+  {
+    "id": "fishing_rod",
+    "output_item_id": "fishing_rod",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "wood", "amount": 3},
+      {"item_id": "rope", "amount": 2}
+    ],
+    "required_station": "workbench"
+  },
+  {
+    "id": "bread",
+    "output_item_id": "corn_bread",
+    "output_amount": 3,
+    "ingredients": [
+      {"item_id": "flour", "amount": 2},
+      {"item_id": "milk", "amount": 1}
+    ],
+    "required_station": "oven"
+  },
+  {
+    "id": "fish_grill",
+    "output_item_id": "cooked_meat",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "fish", "amount": 1}
+    ],
+    "required_station": "oven"
+  },
+  {
+    "id": "iron_bar_anvil",
+    "output_item_id": "iron_bar",
+    "output_amount": 2,
+    "ingredients": [
+      {"item_id": "iron_ore", "amount": 3},
+      {"item_id": "wood", "amount": 1}
+    ],
+    "required_station": "anvil"
+  },
+  {
+    "id": "meteorite_sword",
+    "output_item_id": "iron_sword",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "meteorite_ore", "amount": 2},
+      {"item_id": "iron_bar", "amount": 2}
+    ],
+    "required_station": "anvil"
+  },
+  {
+    "id": "spinach_seed",
+    "output_item_id": "spinach_seed",
+    "output_amount": 3,
+    "ingredients": [
+      {"item_id": "spinach", "amount": 1}
+    ],
+    "required_station": ""
+  },
+  {
+    "id": "parsnip_seed",
+    "output_item_id": "parsnip_seed",
+    "output_amount": 3,
+    "ingredients": [
+      {"item_id": "parsnip", "amount": 1}
+    ],
+    "required_station": ""
+  },
+  {
+    "id": "green_bean_seed",
+    "output_item_id": "green_bean_seed",
+    "output_amount": 3,
+    "ingredients": [
+      {"item_id": "green_bean", "amount": 1}
+    ],
+    "required_station": ""
+  },
+  {
+    "id": "chili_seed",
+    "output_item_id": "chili_seed",
+    "output_amount": 2,
+    "ingredients": [
+      {"item_id": "chili", "amount": 1}
+    ],
+    "required_station": ""
+  },
+  {
+    "id": "blueberry_seed",
+    "output_item_id": "blueberry_seed",
+    "output_amount": 2,
+    "ingredients": [
+      {"item_id": "blueberry", "amount": 1}
+    ],
+    "required_station": ""
+  },
+  {
+    "id": "grape_seed",
+    "output_item_id": "grape_seed",
+    "output_amount": 2,
+    "ingredients": [
+      {"item_id": "grape", "amount": 1}
+    ],
+    "required_station": ""
+  },
+  {
+    "id": "garlic_seed",
+    "output_item_id": "garlic_seed",
+    "output_amount": 2,
+    "ingredients": [
+      {"item_id": "garlic", "amount": 1}
+    ],
+    "required_station": ""
+  },
+  {
+    "id": "coffee_seed",
+    "output_item_id": "coffee_seed",
+    "output_amount": 2,
+    "ingredients": [
+      {"item_id": "coffee_bean", "amount": 1}
+    ],
+    "required_station": ""
+  },
+  {
+    "id": "sunflower_seed",
+    "output_item_id": "sunflower_seed",
+    "output_amount": 3,
+    "ingredients": [
+      {"item_id": "sunflower", "amount": 1}
+    ],
+    "required_station": ""
+  },
+  {
+    "id": "copper_bar",
+    "output_item_id": "copper_bar",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "copper_ore", "amount": 3},
+      {"item_id": "coal", "amount": 1}
+    ],
+    "required_station": "anvil"
+  },
+  {
+    "id": "gold_bar",
+    "output_item_id": "gold_bar",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "gold_ore", "amount": 4},
+      {"item_id": "coal", "amount": 2}
+    ],
+    "required_station": "anvil"
+  },
+  {
+    "id": "glass",
+    "output_item_id": "glass",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "sand", "amount": 3},
+      {"item_id": "coal", "amount": 1}
+    ],
+    "required_station": "oven"
+  },
+  {
+    "id": "cloth",
+    "output_item_id": "cloth",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "fiber", "amount": 4}
+    ],
+    "required_station": "workbench"
+  },
+  {
+    "id": "cloth_wool",
+    "output_item_id": "cloth",
+    "output_amount": 2,
+    "ingredients": [
+      {"item_id": "wool", "amount": 2}
+    ],
+    "required_station": "workbench"
+  },
+  {
+    "id": "red_dye",
+    "output_item_id": "red_dye",
+    "output_amount": 2,
+    "ingredients": [
+      {"item_id": "red_flower", "amount": 3}
+    ],
+    "required_station": "workbench"
+  },
+  {
+    "id": "yellow_dye",
+    "output_item_id": "yellow_dye",
+    "output_amount": 2,
+    "ingredients": [
+      {"item_id": "yellow_flower", "amount": 3}
+    ],
+    "required_station": "workbench"
+  },
+  {
+    "id": "blue_dye",
+    "output_item_id": "blue_dye",
+    "output_amount": 2,
+    "ingredients": [
+      {"item_id": "kelp", "amount": 2},
+      {"item_id": "crystal_shard", "amount": 1}
+    ],
+    "required_station": "workbench"
+  },
+  {
+    "id": "cape_red",
+    "output_item_id": "cape_red",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "cloth", "amount": 4},
+      {"item_id": "red_dye", "amount": 2}
+    ],
+    "required_station": "workbench"
+  },
+  {
+    "id": "hat_straw",
+    "output_item_id": "hat_straw",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "hay", "amount": 6},
+      {"item_id": "rope", "amount": 2}
+    ],
+    "required_station": "workbench"
+  },
+  {
+    "id": "copper_sword",
+    "output_item_id": "copper_sword",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "copper_bar", "amount": 3},
+      {"item_id": "wood", "amount": 2}
+    ],
+    "required_station": "anvil"
+  },
+  {
+    "id": "gold_sword",
+    "output_item_id": "gold_sword",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "gold_bar", "amount": 3},
+      {"item_id": "iron_bar", "amount": 1},
+      {"item_id": "ruby", "amount": 1}
+    ],
+    "required_station": "anvil"
+  },
+  {
+    "id": "copper_pickaxe",
+    "output_item_id": "copper_pickaxe",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "copper_bar", "amount": 2},
+      {"item_id": "wood", "amount": 2}
+    ],
+    "required_station": "anvil"
+  },
+  {
+    "id": "iron_pickaxe",
+    "output_item_id": "iron_pickaxe",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "iron_bar", "amount": 3},
+      {"item_id": "wood", "amount": 2}
+    ],
+    "required_station": "anvil"
+  },
+  {
+    "id": "iron_axe",
+    "output_item_id": "iron_axe",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "iron_bar", "amount": 3},
+      {"item_id": "wood", "amount": 2}
+    ],
+    "required_station": "anvil"
+  },
+  {
+    "id": "hoe",
+    "output_item_id": "hoe",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "wood", "amount": 3},
+      {"item_id": "stone", "amount": 1}
+    ],
+    "required_station": "workbench"
+  },
+  {
+    "id": "watering_can",
+    "output_item_id": "watering_can",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "iron_bar", "amount": 2},
+      {"item_id": "wood", "amount": 1}
+    ],
+    "required_station": "anvil"
+  },
+  {
+    "id": "lantern",
+    "output_item_id": "lantern",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "glass", "amount": 2},
+      {"item_id": "iron_bar", "amount": 1},
+      {"item_id": "coal", "amount": 1}
+    ],
+    "required_station": "workbench"
+  },
+  {
+    "id": "ward_charm",
+    "output_item_id": "ward_charm",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "gold_bar", "amount": 2},
+      {"item_id": "sapphire", "amount": 1},
+      {"item_id": "cloth", "amount": 1}
+    ],
+    "required_station": "anvil"
+  },
+  {
+    "id": "speed_charm",
+    "output_item_id": "speed_charm",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "gold_bar", "amount": 1},
+      {"item_id": "emerald", "amount": 1},
+      {"item_id": "rope", "amount": 1}
+    ],
+    "required_station": "anvil"
+  },
+  {
+    "id": "fish_bait",
+    "output_item_id": "fish_bait",
+    "output_amount": 5,
+    "ingredients": [
+      {"item_id": "bone_meal", "amount": 1},
+      {"item_id": "fiber", "amount": 1}
+    ],
+    "required_station": "workbench"
+  },
+  {
+    "id": "salmon_steak",
+    "output_item_id": "salmon_steak",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "salmon", "amount": 1},
+      {"item_id": "sunflower_oil", "amount": 1}
+    ],
+    "required_station": "oven"
+  },
+  {
+    "id": "fish_stew",
+    "output_item_id": "fish_stew",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "trout", "amount": 1},
+      {"item_id": "kelp", "amount": 1},
+      {"item_id": "milk", "amount": 1}
+    ],
+    "required_station": "cooking_pot"
+  },
+  {
+    "id": "salad",
+    "output_item_id": "salad",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "spinach", "amount": 1},
+      {"item_id": "tomato", "amount": 1},
+      {"item_id": "parsnip", "amount": 1}
+    ],
+    "required_station": "cooking_pot"
+  },
+  {
+    "id": "blueberry_pie",
+    "output_item_id": "blueberry_pie",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "blueberry", "amount": 4},
+      {"item_id": "flour", "amount": 2},
+      {"item_id": "chicken_egg", "amount": 1}
+    ],
+    "required_station": "oven"
+  },
+  {
+    "id": "grape_wine",
+    "output_item_id": "grape_wine",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "grape", "amount": 5}
+    ],
+    "required_station": "workbench"
+  },
+  {
+    "id": "spicy_stew",
+    "output_item_id": "spicy_stew",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "chili", "amount": 2},
+      {"item_id": "meat", "amount": 1},
+      {"item_id": "garlic", "amount": 1}
+    ],
+    "required_station": "cooking_pot"
+  },
+  {
+    "id": "garlic_bread",
+    "output_item_id": "garlic_bread",
+    "output_amount": 2,
+    "ingredients": [
+      {"item_id": "flour", "amount": 2},
+      {"item_id": "garlic", "amount": 1},
+      {"item_id": "sunflower_oil", "amount": 1}
+    ],
+    "required_station": "oven"
+  },
+  {
+    "id": "pumpkin_pie",
+    "output_item_id": "pumpkin_pie",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "pumpkin", "amount": 1},
+      {"item_id": "flour", "amount": 2},
+      {"item_id": "chicken_egg", "amount": 1},
+      {"item_id": "milk", "amount": 1}
+    ],
+    "required_station": "oven"
+  },
+  {
+    "id": "coffee_drink",
+    "output_item_id": "coffee_drink",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "coffee_bean", "amount": 3}
+    ],
+    "required_station": "cooking_pot"
+  },
+  {
+    "id": "omelette",
+    "output_item_id": "omelette",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "chicken_egg", "amount": 2},
+      {"item_id": "milk", "amount": 1}
+    ],
+    "required_station": "cooking_pot"
+  },
+  {
+    "id": "omelette_duck",
+    "output_item_id": "omelette",
+    "output_amount": 2,
+    "ingredients": [
+      {"item_id": "duck_egg", "amount": 2},
+      {"item_id": "milk", "amount": 1}
+    ],
+    "required_station": "cooking_pot"
+  },
+  {
+    "id": "sunflower_oil",
+    "output_item_id": "sunflower_oil",
+    "output_amount": 1,
+    "ingredients": [
+      {"item_id": "sunflower", "amount": 1},
+      {"item_id": "sunflower_seed", "amount": 4}
+    ],
+    "required_station": "workbench"
   }
 ]

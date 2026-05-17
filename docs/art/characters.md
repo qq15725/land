@@ -99,12 +99,25 @@ Minecraft pixel art, game asset, no background, clean sprite sheet grid
 |----|------|-----------|----------|------|
 | `player` | blocky farmer, square head, blue overall pants, brown shirt, simple pixel face | 512×1024 | `assets/sprites/characters/player.png` | ✅ |
 | `merchant` | blocky traveling merchant, wide flat hat, long coat, rectangular backpack | 512×1024 | `assets/sprites/characters/merchant.png` | ✅ |
-| `slime` | green cube slime, square body, pixel dot eyes, bouncy block movement | 512×1024 | `assets/sprites/characters/slime.png` | ✅ |
-| `skeleton` | white rectangular skeleton, block skull head, stick-like limbs made of thin rectangles | 512×1024 | `assets/sprites/characters/skeleton.png` | ✅ |
-| `chicken` | small white blocky chicken, square body, rectangular beak, stubby block legs | 512×1024 | `assets/sprites/characters/chicken.png` | ✅ |
-| `cow` | blocky cow, white body with brown pixel patches, pink square nose, stubby block legs | 512×1024 | `assets/animals/cow.png` | ⏳ |
-| `pig` | blocky pink pig, round-ish square body, pixel snout, four stubby block legs | 512×1024 | `assets/animals/pig.png` | ⏳ |
-| `sheep` | blocky white woolly sheep, fluffy square block body, small head, four block legs | 512×1024 | `assets/animals/sheep.png` | ⏳ |
-| `wolf` | blocky grey wolf, lean rectangular body, pixel teeth, sharp triangular ears made of squares | 512×1024 | `assets/creatures/wolf.png` | ⏳ |
-| `zombie` | green-skinned blocky humanoid zombie, torn shirt, dragging walk pose | 512×1024 | `assets/creatures/zombie.png` | ⏳ |
-| `bat` | small black bat with pixel wings, glowing red dot eyes, hovering in place | 512×1024 | `assets/creatures/bat.png` | ⏳ |
+| `slime` | green cube slime, square body, pixel dot eyes, bouncy block movement | 512×1024 | `assets/creatures/slime.png` | ✅ |
+| `skeleton` | white rectangular skeleton, block skull head, stick-like limbs made of thin rectangles | 512×1024 | `assets/creatures/skeleton.png` | ✅ |
+| `chicken` | small white blocky chicken, square body, rectangular beak, stubby block legs | 512×1024 | `assets/animals/chicken.png` | ✅ |
+| `cow` | blocky cow, white body with brown pixel patches, pink square nose, stubby block legs | 512×1024 | `assets/animals/cow.png` | ✅ |
+| `pig` | blocky pink pig, round-ish square body, pixel snout, four stubby block legs | 512×1024 | `assets/animals/pig.png` | ✅ |
+| `sheep` | blocky white woolly sheep, fluffy square block body, small head, four block legs | 512×1024 | `assets/animals/sheep.png` | ✅ |
+| `wolf` | blocky grey wolf, lean rectangular body, pixel teeth, sharp triangular ears made of squares | 512×1024 | `assets/creatures/wolf.png` | ✅ |
+| `zombie` | green-skinned blocky humanoid zombie, torn shirt, dragging walk pose | 512×1024 | `assets/creatures/zombie.png` | ✅ |
+| `bat` | small black bat with pixel wings, glowing red dot eyes, hovering in place | 512×1024 | `assets/creatures/bat.png` | ✅ |
+| `rabbit` | small blocky white rabbit, long pixel ears, pink pixel nose, hopping pose, fluffy square tail | 512×1024 | `assets/creatures/rabbit.png` | ✅ |
+| `deer` | tall blocky deer, brown body with white belly pixels, branching antler blocks on head, four thin block legs | 512×1024 | `assets/creatures/deer.png` | ✅ |
+| `season_bear` | huge boss-sized blocky brown bear, two pixel rows taller than player, dark brown fur with lighter belly, large square paws with white claw pixels, angry pixel eyes glowing red, intimidating wide stance | 512×1024 | `assets/creatures/season_bear.png` | ✅ |
+| `stone_golem` | massive blocky grey stone humanoid, dice-cube torso made of stacked rock blocks, cubic boulder fists, glowing cyan crack pixels along seams, slow heavy stomp pose | 512×1024 | `assets/creatures/stone_golem.png` | ⏳ |
+| `bat_king` | boss-sized deep purple-red bat, twice the size of a normal bat, large jagged block wings, glowing red pixel eyes, sharp white fang pixels, golden crown pixel on head | 512×1024 | `assets/creatures/bat_king.png` | ⏳ |
+| `fire_elemental` | hovering blocky flame creature, layered orange-red fire cube body, brighter yellow core pixel, drifting ember speckles trailing, two pixel-dot eyes glowing white | 512×1024 | `assets/creatures/fire_elemental.png` | ⏳ |
+| `ice_slime` | pale cyan-blue semi-transparent cube slime, frost crystal pixels embedded inside, two dark pixel eyes, faint white frost highlight on top face | 512×1024 | `assets/creatures/ice_slime.png` | ⏳ |
+| `wisp` | small floating glowing orb creature, soft white-yellow core pixel surrounded by faint translucent aura blocks, two tiny dot eyes, no limbs, hovering pose | 512×1024 | `assets/creatures/wisp.png` | ⏳ |
+| `venom_scorpion` | dark green blocky scorpion, segmented rectangular body, two large pixel claw pincers raised forward, curled pixel tail with purple venom drop at stinger tip, low scuttle pose | 512×1024 | `assets/creatures/venom_scorpion.png` | ⏳ |
+| `duck` | small blocky white duck, square body, flat orange pixel beak, short stubby orange legs, two small wing block accents on sides, waddling pose | 512×1024 | `assets/animals/duck.png` | ⏳ |
+| `goose` | tall blocky white goose, longer neck made of stacked white blocks, bright orange pixel beak with black mask pixels around eyes, hissing pose | 512×1024 | `assets/animals/goose.png` | ⏳ |
+| `rabbit_farm` | domestic farm rabbit variant, blocky cream-white body with brown pixel patches, long pixel ears, pink pixel nose, calm sitting pose with fluffy block tail | 512×1024 | `assets/animals/rabbit_farm.png` | ⏳ |
+| `angora_goat` | fluffy white angora goat, oversized woolly square block body, small pixel horns, four short block legs, dark pixel eyes and small black nose | 512×1024 | `assets/animals/angora_goat.png` | ⏳ |

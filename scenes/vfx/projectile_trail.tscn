@@ -5,7 +5,17 @@
 [node name="ProjectileTrail" type="Node2D"]
 script = ExtResource("1_vfx")
 shape = "trail"
-size_a = 8.0
-lifetime = 0.3
-base_color = Color(1, 0.55, 0.15, 0.7)
-grow_scale = 0.5
+size_a = 14.0
+lifetime = 0.22
+base_color = Color(1, 1, 0.95, 0.7)
+grow_scale = 1.1
+flash_intensity = 0.2
+emit_particles = true
+particle_count = 8
+particle_speed_min = 40.0
+particle_speed_max = 80.0
+particle_lifetime = 0.3
+particle_scale = 2.0
+particle_color_core = Color(1, 1, 0.95, 0.9)
+particle_color_mid = Color(1, 0.9, 0.5, 0.7)
+particle_color_end = Color(1, 0.6, 0.2, 0)

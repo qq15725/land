@@ -23,5 +23,19 @@
       {"give_item_id": "wood", "give_amount": 20, "receive_item_id": "blueprint", "receive_amount": 2},
       {"give_item_id": "wooden_plank", "give_amount": 6, "receive_item_id": "rare_seed", "receive_amount": 3}
     ]
+  },
+  {
+    "id": "mystery_traveler",
+    "display_name": "神秘旅人",
+    "color": [0.55, 0.4, 0.9, 1.0],
+    "visit_interval": 9999.0,
+    "stay_duration": 180.0,
+    "trades": [
+      {"give_item_id": "meteorite_ore", "give_amount": 1, "receive_item_id": "blueprint", "receive_amount": 2},
+      {"give_item_id": "meteorite_ore", "give_amount": 3, "receive_item_id": "rare_seed", "receive_amount": 5},
+      {"give_item_id": "blueprint", "give_amount": 1, "receive_item_id": "hat_straw", "receive_amount": 1},
+      {"give_item_id": "blueprint", "give_amount": 2, "receive_item_id": "cape_red", "receive_amount": 1},
+      {"give_item_id": "iron_bar", "give_amount": 10, "receive_item_id": "lucky_charm", "receive_amount": 1}
+    ]
   }
 ]

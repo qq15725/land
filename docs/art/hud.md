@@ -31,7 +31,7 @@
 
 > 每个部件下方只列**结构和尺寸**。材质、颜色、边框宽度等以参考图为准 —— 生成时把 [`docs/references/hud.png`](../references/hud.png) 作为附图，不需要在提示词里复述这些。
 
-### ① 角色信息条 `assets/sprites/ui/hud_charinfo.png`
+### ✅ ① 角色信息条 `assets/sprites/ui/hud_charinfo.png`
 
 源尺寸：**320×128 px**
 
@@ -49,12 +49,12 @@
 >
 > 代码填充颜色（仅用于明确视觉语义，底图不要预染色）：
 > - HP 红 `(0.92, 0.22, 0.22)` ← HealthComponent 生命值
-> - MP 蓝 `(0.30, 0.55, 1.00)` ← 魔法值，放主动技能消耗（**MP 系统未实现**，固定 100/100 占位）
-> - FP 橙 `(1.00, 0.70, 0.20)` ← 疲劳值，副本/活动消耗（**FP 系统未实现**，固定 100/100 占位）
+> - MP 蓝 `(0.30, 0.55, 1.00)` ← ManaComponent，主动技能消耗
+> - FP 橙 `(1.00, 0.70, 0.20)` ← FocusComponent，攻击/技能消耗、食物恢复
 >
 > **经验条不放这里**，统一放在底部 hotbar 上方（§⑦），左上角色条只显示 Lv 数字。
 
-### ② Buff 条 `assets/sprites/ui/hud_buff_slot.png`
+### ✅ ② Buff 条 `assets/sprites/ui/hud_buff_slot.png`
 
 单格源尺寸：**56×56 px**（图标 32×32 居中 + 4px 边 + 底部 24×8 px 剩余时间小条位）
 
@@ -62,16 +62,43 @@
 - 横向 N 个 buff 格子等距排列，间距 8px，由代码动态生成
 - 每格独立绘制图标 + 剩余时间，图标 32×32 来自后续 buff 数据表
 
-### ③ 环境信息条 `assets/sprites/ui/hud_envinfo.png`
+### ✅ ③ 环境信息条 `assets/sprites/ui/hud_envinfo.png`
 
 源尺寸：**256×56 px**，9-patch 横向可拉伸
 
 结构（参考图顶部居中）：
 - 昼夜图标 32×32（太阳/月亮，已在 `ui_sheet.png` ROW 6）
 - 时间数字 Label（像素字体）
-- 天气图标 32×32（晴/雨/雪，独立 atlas `hud_weather.png` 64×32 横排两态作占位）
+- 天气图标 32×32，独立 atlas **`hud_weather.png`** 横排 4 态
 
-### ④ 事件提示条 `assets/sprites/ui/hud_event.png`
+### `hud_weather.png` 天气图标 atlas
+
+源尺寸：**128×32 px**（4 态 × 32×32），横排：
+
+| index | 含义 | Subject（英文，单格 32×32） |
+|---|---|---|
+| 0 | 晴 sunny | yellow sun with short ray pixels, classic emoji-style, warm orange center |
+| 1 | 雨 rain | three blue rain droplets falling diagonally, motion blur pixel lines |
+| 2 | 雪 snow | white six-point snowflake with crystalline arms, light blue pixel core |
+| 3 | 雷暴 thunder | dark grey cloud with bright yellow zigzag lightning bolt below |
+
+**AI 提示词模板**：
+
+```
+Generate a pixel art icon sprite sheet, 4 frames in a horizontal strip,
+each frame 32x32 pixels, total 128x32 pixels. Strict grid, no padding.
+All icons share the same flat pixel style with hard edges, transparent background.
+Each frame centered in its cell, leave 2 px transparent margin.
+
+Frame 0 (sunny): yellow sun with short triangular ray pixels.
+Frame 1 (rain): three blue rain droplets falling diagonally with small motion lines.
+Frame 2 (snow): white six-point snowflake with light blue accents.
+Frame 3 (thunder): dark grey cloud with a bright yellow zigzag lightning bolt below.
+
+Transparent background, hard pixel edges, no anti-aliasing, no text.
+```
+
+### ✅ ④ 事件提示条 `assets/sprites/ui/hud_event.png`
 
 源尺寸：**320×56 px**，9-patch 横向可拉伸
 
@@ -82,7 +109,7 @@
 
 > 仅在事件队列非空时显示；可同时显示 1 条。
 
-### ⑤ 小地图框 `assets/sprites/ui/hud_minimap.png`
+### ✅ ⑤ 小地图框 `assets/sprites/ui/hud_minimap.png`
 
 源尺寸：**192×192 px**
 
@@ -92,7 +119,7 @@
 - 配套坐标条 `hud_coord.png`：160×24 px，9-patch 横向可拉伸
 - 兴趣点图钉 `hud_poi_pin.png`：16×16 px，叠加在内圆上
 
-### ⑥ 任务追踪条 `assets/sprites/ui/hud_quest_row.png`
+### ✅ ⑥ 任务追踪条 `assets/sprites/ui/hud_quest_row.png`
 
 单行源尺寸：**256×40 px**，9-patch 横向可拉伸
 
@@ -102,7 +129,7 @@
 - 右侧进度数字 "x/y"
 - 多任务时纵向堆叠；顶部一个 256×24 px 标题栏 `hud_quest_header.png`（"任务追踪"）可折叠
 
-### ⑦ 快捷栏 `assets/sprites/ui/hud_hotbar.png`
+### ✅ ⑦ 快捷栏 `assets/sprites/ui/hud_hotbar.png`
 
 源尺寸：**640×128 px**（**关键参考区域**）
 
@@ -123,7 +150,7 @@
 >
 > 当前代码（`hud.gd`）已实现 9 格 + 1–9 数字键选中。重出美术时槽位间距对齐到 64×64。
 
-### ⑧ 移动控制 `assets/sprites/ui/hud_dpad.png`
+### ✅ ⑧ 移动控制 `assets/sprites/ui/hud_dpad.png`
 
 源尺寸：**256×256 px**（仅移动端）
 
@@ -131,7 +158,7 @@
 - 8 方向 D-pad，中心实心按钮 64×64，外围 4 方向 + 4 对角，各 64×64
 - 中间一个独立摇杆球 `hud_stick.png` 80×80 px
 
-### ⑨ 交互按钮 `assets/sprites/ui/hud_actionbtns.png`
+### ✅ ⑨ 交互按钮 `assets/sprites/ui/hud_actionbtns.png`
 
 源尺寸：**192×192 px**（仅移动端）
 
@@ -139,7 +166,7 @@
 - 3 个 96×96 px 圆按钮 L 形排列
 - 图标位 48×48 居中：剑（攻击）/ 手（拾取/交互）/ 对话泡 —— 三个图标单独出
 
-### ⑩ 技能栏 `assets/sprites/ui/hud_skillslot.png`
+### ✅ ⑩ 技能栏 `assets/sprites/ui/hud_skillslot.png`
 
 单格源尺寸：**80×80 px**
 
@@ -149,7 +176,7 @@
 - 冷却遮罩由代码绘制圆形扇形蒙版
 - 横排 4 格，间距 8px
 
-### ⑪ 底部信息行 `assets/sprites/ui/hud_infoslot.png`
+### ✅ ⑪ 底部信息行 `assets/sprites/ui/hud_infoslot.png`
 
 单子条源尺寸：**192×48 px**，9-patch 横向可拉伸
 
@@ -159,7 +186,7 @@
 - 当前固定 3 子条：**资源/货币** / **装备耐久** / **基地防御**
 - 资源子条内可显示多个 「图标 + 数字」单元（金币 + 宝石 + 主要资源）
 
-### ⑫ 危险边框特效 `assets/sprites/ui/hud_danger_edge.png`
+### ✅ ⑫ 危险边框特效 `assets/sprites/ui/hud_danger_edge.png`
 
 源尺寸：**1920×1080 px**（全屏外圈遮罩，**9-patch 角 256px**）
 

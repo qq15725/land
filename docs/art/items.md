@@ -78,7 +78,85 @@ Subject: {单个物品的简短描述，见下表}
 | `arrow` | bundle of wooden arrows, pixel arrowhead |
 | `leather_armor` | brown leather vest with stitch pixels |
 | `iron_armor` | grey iron chestplate with rivet pixels |
+| `lucky_charm` | golden four-leaf clover pendant on a chain, glowing pixel sparkles |
+| `meteorite_ore` | dark purple-blue cosmic ore chunk with cyan glowing crack pixels, faint star sparkle |
+| `fish` | blue freshwater fish, scale pixels, white belly, pixel eye and tail fin |
+| `fishing_rod` | wooden fishing rod with brown handle, thin line trailing down, small white float at line end |
+| `hat_straw` | wide-brimmed yellow straw hat, woven straw pixel texture, brown band |
+| `cape_red` | red flowing cape with gold trim pixels, billowing block shape |
+| `flour` | small white sack of flour, brown rope tie, sprinkle of white powder pixels around base |
 | `lucky_charm` | golden four-leaf clover pendant |
+| `copper_ore` | chunk of grey stone with orange-red copper veins, isometric block, warm metallic speckles |
+| `copper_bar` | small ingot of polished copper, orange-pink metallic, isometric block with one bright highlight pixel |
+| `gold_ore` | grey stone chunk with bright yellow gold nuggets embedded, isometric block, sparkle pixel |
+| `gold_bar` | small ingot of polished gold, vivid yellow metallic, isometric block with two-tone highlight |
+| `coal` | chunk of black coal with dim grey highlights, isometric block, faint soot speckle |
+| `clay` | small mound of reddish-brown wet clay, glossy highlight pixel, soft rounded block |
+| `sand` | pile of pale yellow sand, two-tone tan shading, a few darker grain pixels on top |
+| `glass` | transparent pale-blue glass pane block with white edge highlight pixels |
+| `ruby` | faceted red gemstone, two-tone red, bright white sparkle pixel on top facet |
+| `emerald` | faceted green gemstone, two-tone green, bright white sparkle pixel on top facet |
+| `sapphire` | faceted blue gemstone, two-tone blue, bright white sparkle pixel on top facet |
+| `amethyst` | faceted purple gemstone, two-tone violet, bright white sparkle pixel on top facet |
+| `crystal_shard` | small jagged cyan-blue crystal shard, glowing edge pixel, isometric prism |
+| `shell` | spiral seashell, pale pink and cream stripes, smooth pixel curl |
+| `pearl` | small round white pearl with soft blue highlight pixel, sitting on a tiny grey shell base |
+| `kelp` | bundle of dark green ribbon seaweed, slight teal highlight, droopy silhouette |
+| `driftwood` | bleached grey-white weathered log piece, washed-smooth grain pixels |
+| `salmon` | pink-orange salmon fish with silver belly, dark stripe along side, pixel eye and tail fin |
+| `trout` | speckled brown trout with green back, white belly, small dark spot pixels |
+| `catfish` | grey-brown catfish with wide flat head, two pixel whiskers, dark dorsal fin |
+| `legendary_fish` | huge golden mythical fish with iridescent rainbow scale pixels, glowing white sparkle aura |
+| `fish_bait` | small grey-brown pile of mashed bait worms, faint shine pixel |
+| `fiber` | bundle of pale green plant fibers, loose strands, tied with a thin brown string |
+| `cloth` | folded square of off-white woven cloth, subtle weave pixel pattern |
+| `red_dye` | small glass vial filled with vivid red dye, cork stopper, drip pixel on side |
+| `yellow_dye` | small glass vial filled with bright yellow dye, cork stopper, drip pixel on side |
+| `blue_dye` | small glass vial filled with deep blue dye, cork stopper, drip pixel on side |
+| `red_flower` | single red blossom with four square petals, yellow center pixel, two green leaf pixels |
+| `yellow_flower` | single yellow blossom with four square petals, orange center pixel, two green leaf pixels |
+| `spinach` | bundle of dark green spinach leaves, curly edge pixels, light vein highlights |
+| `spinach_seed` | small brown pouch with green seed pixels spilling out |
+| `parsnip` | pale cream parsnip root with tapered tip, green leafy top pixels |
+| `parsnip_seed` | small brown pouch with cream seed pixels spilling out |
+| `green_bean` | cluster of bright green long bean pods, slight pod bulge pixels |
+| `green_bean_seed` | small brown pouch with dark green seed pixels spilling out |
+| `chili` | bright red chili pepper, curved pod shape, small green stem pixel |
+| `chili_seed` | small brown pouch with red seed pixels spilling out |
+| `blueberry` | cluster of deep blue blueberries, white frost highlight pixels on top |
+| `blueberry_seed` | small brown pouch with blue seed pixels spilling out |
+| `grape` | bunch of purple grapes in pyramid cluster, small green leaf and stem on top |
+| `grape_seed` | small brown pouch with purple seed pixels spilling out |
+| `garlic` | white garlic bulb with pale papery skin, top stem pixels, faint clove division lines |
+| `garlic_seed` | small brown pouch with white clove pixels spilling out |
+| `coffee_bean` | small handful of glossy brown coffee beans, white center groove pixel on each |
+| `coffee_seed` | small brown pouch with dark brown coffee seed pixels spilling out |
+| `sunflower` | bright yellow sunflower with brown center disk pixels, single green stem |
+| `sunflower_seed` | small brown pouch with striped black-and-white sunflower seed pixels |
+| `duck_egg` | pale blue oval duck egg, smooth surface highlight |
+| `goose_egg` | large cream-white goose egg, slightly elongated oval with soft highlight pixel |
+| `rabbit_fur` | folded patch of fluffy white rabbit fur, soft pixel tufts, faint pink underside |
+| `salmon_steak` | pink salmon steak fillet on a wooden plate, dark stripe and white fat line pixels |
+| `fish_stew` | wooden bowl with creamy fish stew, fish chunk and herb pixels floating, steam pixels |
+| `salad` | wooden bowl of mixed green salad, red tomato and yellow flower pixels on top |
+| `blueberry_pie` | golden pie slice with deep blue blueberry filling, lattice crust pixels on top |
+| `grape_wine` | green glass bottle with red wine, cork stopper, small grape cluster label pixel |
+| `spicy_stew` | wooden bowl with red spicy stew, chili pixel floating on top, steam swirl pixels |
+| `garlic_bread` | golden toasted bread slice with white garlic spread pixels and tiny green herb specks |
+| `pumpkin_pie` | orange pumpkin pie slice with golden crust, cinnamon sprinkle pixels on top |
+| `coffee_drink` | brown ceramic mug filled with dark coffee, white foam pixel on top, steam swirl |
+| `omelette` | folded yellow omelette on a wooden plate, brown crispy edge pixels |
+| `sunflower_oil` | small glass bottle filled with golden yellow oil, sunflower symbol on label pixel |
+| `ward_charm` | small silver pentagram charm on a thin chain, faint blue protective glow pixels |
+| `speed_charm` | small bronze winged-foot charm on a thin chain, motion blur pixel lines beside it |
+| `lantern` | small handheld iron-frame lantern with warm yellow glowing pane, top ring handle pixel |
+| `copper_sword` | wood-handled copper longsword, orange-pink metallic blade, rectangular guard |
+| `gold_sword` | wood-handled gold longsword, bright yellow metallic blade with sparkle pixel |
+| `copper_pickaxe` | wood-handled copper pickaxe, orange-pink T-shape head, two-tone metallic |
+| `iron_pickaxe` | wood-handled iron pickaxe, dark grey T-shape head, single highlight pixel |
+| `iron_axe` | wood-handled iron axe, dark grey wedge blade, single highlight pixel |
+| `hoe` | wood-handled iron hoe, flat rectangular blade head angled forward, soil grain pixels |
+| `watering_can` | green metal watering can with curved spout, water droplet pixels, rivet highlight |
 
 ## 工作流
 
@@ -94,3 +172,21 @@ Subject: {单个物品的简短描述，见下表}
 1. 删除 `assets/sprites/items/icons.png` 和对应 `.import`
 2. 删除 `ItemDatabase` 里 `_icon_sheet` 相关代码段
 3. `ItemData` 移除 `icon_grid` 字段，`items.json` 同步清掉
+
+## 已生成清单 _(自动同步自 assets/ 目录)_
+
+### 物品图标（单文件）（53 个）
+
+目录：`assets/sprites/items/icons/`
+
+- `animal_feed`, `arrow`, `axe`, `berry`, `berry_jam`
+- `blueprint`, `bone`, `bone_meal`, `bow`, `cape_red`
+- `carrot`, `carrot_seed`, `chicken_egg`, `cooked_carrot`, `cooked_meat`
+- `cooked_mushroom`, `corn`, `corn_bread`, `corn_seed`, `fish`
+- `fishing_rod`, `flour`, `hat_straw`, `hay`, `iron_armor`
+- `iron_bar`, `iron_ore`, `iron_sword`, `leather`, `leather_armor`
+- `lucky_charm`, `meat`, `meteorite_ore`, `milk`, `mushroom`
+- `mushroom_soup`, `pickaxe`, `potato`, `potato_seed`, `pumpkin`
+- `pumpkin_seed`, `pumpkin_soup`, `rare_seed`, `rope`, `stone`
+- `tomato`, `tomato_seed`, `wheat`, `wheat_seed`, `wood`
+- `wooden_plank`, `wooden_sword`, `wool`

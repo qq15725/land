@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=3 uid="uid://vfx_lightning"]
+
+[ext_resource type="Script" path="res://scenes/vfx/vfx_geom.gd" id="1_vfx"]
+
+[node name="Lightning" type="Node2D"]
+script = ExtResource("1_vfx")
+shape = "spark"
+size_a = 36.0
+lifetime = 0.22
+base_color = Color(1, 0.97, 0.43, 0.95)
+grow_scale = 1.9
+flash_intensity = 1.0
+emit_particles = true
+particle_count = 22
+particle_speed_min = 130.0
+particle_speed_max = 280.0
+particle_lifetime = 0.38
+particle_scale = 3.0
+particle_color_core = Color(1, 1, 1, 1)
+particle_color_mid = Color(1, 0.965, 0.427, 0.95)
+particle_color_end = Color(0.486, 0.302, 1, 0)

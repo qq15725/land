@@ -84,3 +84,17 @@ ROW 10 — Toast bubble background (96x48 px, 9-patch with 16px corners):
 
 Minecraft pixel art UI, clean edges, consistent dark grey palette, transparent background
 ```
+
+## 已生成清单 _(自动同步自 assets/ 目录)_
+
+### UI 美术（33 个）
+
+目录：`assets/sprites/ui/`
+
+- `btn_brown`, `btn_green`, `hud_action_attack`, `hud_action_icons`, `hud_action_interact`
+- `hud_action_talk`, `hud_actionbtns`, `hud_buff_slot`, `hud_charinfo`, `hud_coord`
+- `hud_danger_edge`, `hud_dpad`, `hud_envinfo`, `hud_event`, `hud_hotbar`
+- `hud_hotbar_selected`, `hud_infoslot`, `hud_minimap`, `hud_poi_pin`, `hud_quest_header`
+- `hud_quest_row`, `hud_skillslot`, `hud_stick`, `hud_weather`, `icon_trash`
+- `main_menu_bg`, `menu_icons`, `panel_wood`, `save_thumb_empty`, `save_thumb_farm`
+- `slot_frame`, `title_land`, `ui_sheet`

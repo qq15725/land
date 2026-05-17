@@ -22,15 +22,15 @@ Transparent background unless stated otherwise.
 
 | 文件 | 尺寸 | 9-patch 边距 | 用途 | 状态 |
 |------|------|------------|------|------|
-| `assets/sprites/ui/main_menu_bg.png` | 1280×720 | — | 全屏背景插图 | ⏳ 待生成 |
-| `assets/sprites/ui/title_land.png` | 384×128 | — | "Land" 装饰标题 Logo | ⏳ 待生成 |
-| `assets/sprites/ui/panel_wood.png` | 192×192 | 32px | 存档面板木质框（9-patch） | ⏳ 待生成 |
-| `assets/sprites/ui/slot_frame.png` | 192×80 | 12px | 单个存档槽内框（9-patch） | ⏳ 待生成 |
-| `assets/sprites/ui/save_thumb_farm.png` | 128×80 | — | 有存档时缩略图 | ⏳ 待生成 |
-| `assets/sprites/ui/save_thumb_empty.png` | 128×80 | — | 空存档位缩略图 | ⏳ 待生成 |
-| `assets/sprites/ui/menu_icons.png` | 128×32 | — | 图标条带：叶片/齿轮/出门/垃圾桶，各 32×32 | ⏳ 待生成 |
-| `assets/sprites/ui/btn_green.png` | 192×144 | 16px | 绿色按钮（检查更新），3态竖排 | ⏳ 待生成 |
-| `assets/sprites/ui/btn_brown.png` | 192×144 | 16px | 棕色按钮（退出游戏），3态竖排 | ⏳ 待生成 |
+| `assets/sprites/ui/main_menu_bg.png` | 1280×720 | — | 全屏背景插图 | ✅ 已生成 |
+| `assets/sprites/ui/title_land.png` | 384×128 | — | "Land" 装饰标题 Logo | ✅ 已生成 |
+| `assets/sprites/ui/panel_wood.png` | 192×192 | 32px | 存档面板木质框（9-patch） | ✅ 已生成 |
+| `assets/sprites/ui/slot_frame.png` | 192×80 | 12px | 单个存档槽内框（9-patch） | ✅ 已生成 |
+| `assets/sprites/ui/save_thumb_farm.png` | 128×80 | — | 有存档时缩略图 | ✅ 已生成 |
+| `assets/sprites/ui/save_thumb_empty.png` | 128×80 | — | 空存档位缩略图 | ✅ 已生成 |
+| `assets/sprites/ui/menu_icons.png` | 128×32 | — | 图标条带：叶片/齿轮/出门/垃圾桶，各 32×32 | ✅ 已生成 |
+| `assets/sprites/ui/btn_green.png` | 192×144 | 16px | 绿色按钮（检查更新），3态竖排 | ✅ 已生成 |
+| `assets/sprites/ui/btn_brown.png` | 192×144 | 16px | 棕色按钮（退出游戏），3态竖排 | ✅ 已生成 |
 
 ---
 
@@ -210,12 +210,12 @@ Same structure as green button, different color.
 | 文件 | 状态 |
 |------|------|
 | 参考图 | ✅ `docs/references/main_menu.png` |
-| `main_menu_bg.png` | ⏳ 待生成 |
-| `title_land.png` | ⏳ 待生成 |
-| `panel_wood.png` | ⏳ 待生成 |
-| `slot_frame.png` | ⏳ 待生成 |
-| `save_thumb_farm.png` | ⏳ 待生成 |
-| `save_thumb_empty.png` | ⏳ 待生成 |
-| `menu_icons.png` | ⏳ 待生成 |
-| `btn_green.png` | ⏳ 待生成 |
-| `btn_brown.png` | ⏳ 待生成 |
+| `main_menu_bg.png` | ✅ 已生成 |
+| `title_land.png` | ✅ 已生成 |
+| `panel_wood.png` | ✅ 已生成 |
+| `slot_frame.png` | ✅ 已生成 |
+| `save_thumb_farm.png` | ✅ 已生成 |
+| `save_thumb_empty.png` | ✅ 已生成 |
+| `menu_icons.png` | ✅ 已生成 |
+| `btn_green.png` | ✅ 已生成 |
+| `btn_brown.png` | ✅ 已生成 |

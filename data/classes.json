@@ -6,7 +6,8 @@
     "icon_grid": [4, 5],
     "hp_bonus": 40,
     "mp_bonus": -20,
-    "mp_regen_bonus": -0.2
+    "mp_regen_bonus": -0.2,
+    "starting_skills": ["power_strike", "iron_body"]
   },
   {
     "id": "mage",
@@ -15,7 +16,8 @@
     "icon_grid": [7, 5],
     "hp_bonus": -20,
     "mp_bonus": 60,
-    "mp_regen_bonus": 0.5
+    "mp_regen_bonus": 0.5,
+    "starting_skills": ["energy_bolt", "magic_guard"]
   },
   {
     "id": "archer",
@@ -24,6 +26,27 @@
     "icon_grid": [5, 5],
     "hp_bonus": 10,
     "mp_bonus": 20,
-    "mp_regen_bonus": 0.1
+    "mp_regen_bonus": 0.1,
+    "starting_skills": ["arrow_blow", "focus"]
+  },
+  {
+    "id": "thief",
+    "display_name": "盗贼",
+    "description": "敏捷专精。低防御，高闪避与暴击。擅长瞬移突袭与毒系 DOT。",
+    "icon_grid": [6, 5],
+    "hp_bonus": 0,
+    "mp_bonus": 10,
+    "mp_regen_bonus": 0.2,
+    "starting_skills": ["lucky_seven", "dark_sight"]
+  },
+  {
+    "id": "pirate",
+    "display_name": "海盗",
+    "description": "平衡型混战。中等生命与魔力。擅长拳脚连击、双枪扫射与召唤海洋伙伴。",
+    "icon_grid": [4, 5],
+    "hp_bonus": 25,
+    "mp_bonus": 10,
+    "mp_regen_bonus": 0.1,
+    "starting_skills": ["somersault_kick", "double_shot_pirate"]
   }
 ]

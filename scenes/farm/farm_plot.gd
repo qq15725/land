@@ -14,6 +14,7 @@ var _grow_timer: float = 0.0
 
 func _ready() -> void:
 	NetworkRegistry.attach(self)
+	add_to_group("farm_plot")
 	hint_label.hide()
 	interact_area.body_entered.connect(_on_body_entered)
 	interact_area.body_exited.connect(_on_body_exited)
@@ -28,7 +29,7 @@ func on_placed(data: BuildingData = null) -> void:
 func _process(delta: float) -> void:
 	if _state != State.GROWING:
 		return
-	_grow_timer -= delta
+	_grow_timer -= delta * WeatherSystem.growth_multiplier() * FestivalSystem.growth_bonus()
 	if _grow_timer <= 0.0:
 		_state = State.READY
 		_apply_state_visual()
@@ -53,7 +54,10 @@ func interact(player: Player) -> void:
 		State.GROWING:
 			pass
 		State.READY:
-			player.inventory.add_item(_current_crop.output_item, _current_crop.output_amount)
+			# 秋收节：收获 +50%
+			var bonus_mul := 1.5 if FestivalSystem.is_active("autumn_harvest") else 1.0
+			var harvest_amt: int = int(ceil(_current_crop.output_amount * bonus_mul))
+			player.inventory.add_item(_current_crop.output_item, harvest_amt)
 			HitParticles.spawn(get_parent(), global_position, Color(1.0, 0.85, 0.1))
 			EventBus.crop_harvested.emit(_current_crop, NetworkRegistry.get_id(player))
 			_current_crop = null

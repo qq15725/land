@@ -53,5 +53,88 @@
     "output_amount": 2,
     "growth_time": 60.0,
     "allowed_seasons": ["autumn"]
+  },
+  {
+    "id": "spinach",
+    "display_name": "菠菜",
+    "seed_item_id": "spinach_seed",
+    "output_item_id": "spinach",
+    "output_amount": 4,
+    "growth_time": 18.0,
+    "allowed_seasons": ["spring"]
+  },
+  {
+    "id": "parsnip",
+    "display_name": "欧防风",
+    "seed_item_id": "parsnip_seed",
+    "output_item_id": "parsnip",
+    "output_amount": 3,
+    "growth_time": 22.0,
+    "allowed_seasons": ["spring"]
+  },
+  {
+    "id": "green_bean",
+    "display_name": "绿豆",
+    "seed_item_id": "green_bean_seed",
+    "output_item_id": "green_bean",
+    "output_amount": 4,
+    "growth_time": 28.0,
+    "bonus_drop": {"item_id": "fiber", "amount": 1},
+    "allowed_seasons": ["spring", "summer"]
+  },
+  {
+    "id": "chili",
+    "display_name": "辣椒",
+    "seed_item_id": "chili_seed",
+    "output_item_id": "chili",
+    "output_amount": 3,
+    "growth_time": 40.0,
+    "allowed_seasons": ["summer"]
+  },
+  {
+    "id": "blueberry",
+    "display_name": "蓝莓",
+    "seed_item_id": "blueberry_seed",
+    "output_item_id": "blueberry",
+    "output_amount": 4,
+    "growth_time": 38.0,
+    "allowed_seasons": ["summer"]
+  },
+  {
+    "id": "grape",
+    "display_name": "葡萄",
+    "seed_item_id": "grape_seed",
+    "output_item_id": "grape",
+    "output_amount": 3,
+    "growth_time": 55.0,
+    "allowed_seasons": ["autumn"]
+  },
+  {
+    "id": "garlic",
+    "display_name": "大蒜",
+    "seed_item_id": "garlic_seed",
+    "output_item_id": "garlic",
+    "output_amount": 3,
+    "growth_time": 25.0,
+    "allowed_seasons": ["autumn", "winter"]
+  },
+  {
+    "id": "coffee_bean",
+    "display_name": "咖啡豆",
+    "seed_item_id": "coffee_seed",
+    "output_item_id": "coffee_bean",
+    "output_amount": 4,
+    "growth_time": 70.0,
+    "allowed_seasons": ["spring", "summer", "autumn"]
+  },
+  {
+    "id": "sunflower",
+    "display_name": "向日葵",
+    "seed_item_id": "sunflower_seed",
+    "output_item_id": "sunflower",
+    "output_amount": 1,
+    "growth_time": 45.0,
+    "bonus_drop": {"item_id": "sunflower_seed", "amount": 3},
+    "allowed_seasons": ["summer", "autumn"]
   }
 ]

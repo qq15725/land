@@ -74,6 +74,8 @@ var _danger_active: bool = false
 var _mode_label: Label
 var _toast_label: Label
 var _toast_timer: float = 0.0
+var _combo_label: Label
+var _combo_tween: Tween = null
 
 # ─── 生命周期 ────────────────────────────────────────────────────────────
 
@@ -81,6 +83,7 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	theme = UIStyle.theme
+	add_to_group("hud")
 
 	_build_danger_edge()
 	_build_char_info()
@@ -125,14 +128,26 @@ func setup(health: HealthComponent, inventory: InventoryComponent) -> void:
 	EventBus.item_sold.connect(_on_item_sold)
 	EventBus.skill_leveled_up.connect(func(_id, _lv): _refresh_xp())
 	EventBus.combo_hit.connect(_on_combo_hit)
+	EventBus.player_buffs_changed.connect(_on_player_buffs_changed)
+	AchievementSystem.achievement_unlocked.connect(_on_achievement_unlocked)
+	FestivalSystem.festival_started.connect(_on_festival_started)
+	FestivalSystem.festival_ended.connect(_on_festival_ended)
+	WeatherSystem.weather_changed.connect(_on_weather_changed)
+	if not FestivalSystem.current_id.is_empty():
+		_on_festival_started(FestivalSystem.current_id)
 
 	_refresh_hotbar()
 	_refresh_xp()
 	_refresh_durability()
-	# MP 由上方 mana_changed 接通；FP 系统未实现，固定占位 100/100
+	# MP 由上方 mana_changed 接通；FP 由 FocusComponent 接通
 	if not (_player is Player and (_player as Player).mana):
 		_set_bar(_mp_bar, 100, 100)
-	_set_bar(_fp_bar, 100, 100)
+	if _player is Player and (_player as Player).focus:
+		var fp_c: FocusComponent = (_player as Player).focus
+		_set_bar(_fp_bar, fp_c.current_focus, fp_c.max_focus)
+		fp_c.focus_changed.connect(func(cur, m): _set_bar(_fp_bar, cur, m))
+	else:
+		_set_bar(_fp_bar, 100, 100)
 	_gold_lbl.text = str(inventory.gold)
 	_refresh_skill_bar()
 	if _minimap and _player is Node2D:
@@ -243,13 +258,36 @@ func _weather_atlas_region(index: int) -> Texture2D:
 	atlas.region = Rect2(index * 32, 0, 32, 32)
 	return atlas
 
-func _set_buffs(buffs: Array) -> void:
+func _set_buffs(buff_ids: Array) -> void:
 	for c in _buff_row.get_children():
 		c.queue_free()
-	for b in buffs:
+	for id in buff_ids:
+		var data := BuffSystem.get_buff(id) as Dictionary
+		if data.is_empty():
+			continue
 		var slot := _texture(ART + "hud_buff_slot.png", Vector2(56, 56))
 		_buff_row.add_child(slot)
-		# TODO: 在 slot 内放 32×32 buff 图标 + 24×8 倒计时条
+		var icon := TextureRect.new()
+		icon.position = Vector2(12, 12)
+		icon.size = Vector2(32, 32)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		var g: Array = data.get("icon_grid", [0, 0])
+		icon.texture = ItemDatabase.get_icon_at_grid(Vector2i(int(g[0]), int(g[1])))
+		icon.tooltip_text = "%s\n%s" % [data.get("display_name", ""), data.get("description", "")]
+		slot.add_child(icon)
+		# 倒计时显示数字（左下小字）
+		var t_lbl := Label.new()
+		t_lbl.name = "TimeLabel"
+		t_lbl.position = Vector2(4, 40)
+		t_lbl.size = Vector2(48, 12)
+		t_lbl.add_theme_font_size_override("font_size", 9)
+		t_lbl.add_theme_color_override("font_color", Color(1, 1, 1))
+		t_lbl.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.9))
+		t_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		slot.add_child(t_lbl)
+		slot.set_meta("buff_id", id)
 
 func show_event(text: String) -> void:
 	_event_lbl.text = text
@@ -271,6 +309,7 @@ func _build_top_right() -> void:
 	menu_row.custom_minimum_size = Vector2(192, 44)
 	col.add_child(menu_row)
 	menu_row.add_child(_make_menu_btn("👤", "角色", _on_menu_inventory))
+	menu_row.add_child(_make_menu_btn("📖", "图鉴/成就", _on_menu_codex))
 	menu_row.add_child(_make_menu_btn("🗺", "地图", _on_menu_map))
 	menu_row.add_child(_make_menu_btn("⚙", "设置", _on_menu_settings))
 
@@ -634,7 +673,7 @@ func _refresh_skill_bar() -> void:
 		if sd == null:
 			(entry["empty"] as Label).visible = true
 			continue
-		(entry["icon"] as TextureRect).texture = ItemDatabase.get_icon_at_grid(sd.icon_grid)
+		(entry["icon"] as TextureRect).texture = ItemDatabase.get_skill_icon(sd)
 		(entry["empty"] as Label).visible = false
 
 # ─── ⑪ 底部信息行 hud_infoslot.png 192×48 ───────────────────────────────
@@ -764,6 +803,47 @@ func _build_center_overlay() -> void:
 	_toast_label.modulate = Color(1.0, 0.95, 0.7, 0.0)
 	top_box.add_child(_toast_label)
 
+	# COMBO ×N 飘字（命中数 >= 3 时显示，越高字越大越红）
+	_combo_label = Label.new()
+	_combo_label.text = ""
+	_combo_label.add_theme_font_size_override("font_size", 32)
+	_combo_label.add_theme_color_override("font_color", Color(1, 1, 1))
+	_combo_label.add_theme_color_override("font_shadow_color", Color(1, 0.84, 0.0, 0.95))
+	_combo_label.add_theme_constant_override("shadow_offset_x", 2)
+	_combo_label.add_theme_constant_override("shadow_offset_y", 2)
+	_combo_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_combo_label.modulate = Color(1, 1, 1, 0)
+	_combo_label.pivot_offset = Vector2(60, 20)
+	top_box.add_child(_combo_label)
+	ComboSystem.combo_changed.connect(_on_combo_changed)
+
+
+func _on_combo_changed(count: int) -> void:
+	if _combo_label == null:
+		return
+	if count < ComboSystem.MIN_DISPLAY:
+		if _combo_tween != null and _combo_tween.is_running():
+			_combo_tween.kill()
+		_combo_tween = create_tween()
+		_combo_tween.tween_property(_combo_label, "modulate:a", 0.0, 0.25)
+		return
+	_combo_label.text = "COMBO ×%d" % count
+	# 颜色 / 字号 按 count 梯度（3 → 白金，20+ → 鲜红金边）
+	var t := clampf(float(count - ComboSystem.MIN_DISPLAY) / 17.0, 0.0, 1.0)
+	var col := Color(1, 1, 1).lerp(Color(1, 0.09, 0.27), t)  # → #FF1744
+	_combo_label.add_theme_color_override("font_color", col)
+	var fs := 32 + int(t * 24)
+	_combo_label.add_theme_font_size_override("font_size", fs)
+	# 弹跳 + 显现
+	if _combo_tween != null and _combo_tween.is_running():
+		_combo_tween.kill()
+	_combo_label.scale = Vector2(0.7, 0.7)
+	_combo_label.modulate.a = 1.0
+	_combo_tween = create_tween().set_parallel(true)
+	_combo_tween.tween_property(_combo_label, "scale", Vector2(1.0, 1.0), 0.14).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	# 1.0s 后自动淡出（与 ComboSystem RESET_TIME 1.5s 配合，combo_ended 时会再触发归零）
+	_combo_tween.tween_property(_combo_label, "modulate:a", 0.0, 0.5).set_delay(1.0)
+
 # ─── 公共 helper ──────────────────────────────────────────────────────────
 
 func _make_menu_btn(icon_text: String, tooltip: String, cb: Callable) -> Button:
@@ -784,6 +864,21 @@ func _on_menu_inventory() -> void:
 
 func _on_menu_map() -> void:
 	show_toast("大地图尚未实现", 1.5)
+
+func _on_menu_codex() -> void:
+	var tree := get_tree()
+	if tree == null:
+		return
+	for c in tree.get_nodes_in_group("codex_ui"):
+		if c.has_method("toggle"):
+			c.toggle()
+			return
+	# fallback：按名查找
+	var root := tree.current_scene
+	if root:
+		var node := root.find_child("CodexUI", true, false)
+		if node and node.has_method("toggle"):
+			node.toggle()
 
 func _on_menu_settings() -> void:
 	# 模拟 ESC（打开暂停菜单），暂停菜单内含设置入口
@@ -859,6 +954,46 @@ func _on_item_sold(item: ItemData, amount: int, gold_received: int) -> void:
 func _on_combo_hit(count: int) -> void:
 	show_toast("%d  COMBO!" % count, 1.0)
 
+func _tick_buff_labels() -> void:
+	if _player == null or not _player is Player:
+		return
+	var bc: BuffComponent = (_player as Player).buffs
+	if bc == null:
+		return
+	for slot in _buff_row.get_children():
+		if not slot.has_meta("buff_id"):
+			continue
+		var bid: String = slot.get_meta("buff_id")
+		var remain: float = float(bc.active.get(bid, 0.0))
+		var t_lbl: Label = slot.get_node_or_null("TimeLabel") as Label
+		if t_lbl:
+			t_lbl.text = "%ds" % int(remain)
+
+func _on_player_buffs_changed(pid: int, active: Dictionary) -> void:
+	# 只显示本地玩家的 buff
+	if _player == null or NetworkRegistry.get_id(_player) != pid:
+		return
+	_set_buffs(active.keys())
+
+func _on_achievement_unlocked(id: String) -> void:
+	for a in AchievementSystem.get_all():
+		var ad := a as Dictionary
+		if ad.get("id", "") == id:
+			show_toast("🏆 解锁成就：%s" % ad.get("display_name", id), 3.5)
+			return
+
+func _on_festival_started(_id: String) -> void:
+	show_event("🎉 %s — %s" % [FestivalSystem.display_name(), FestivalSystem.description()])
+	show_toast("🎉 %s" % FestivalSystem.display_name(), 3.0)
+
+func _on_festival_ended(_id: String) -> void:
+	if FestivalSystem.current_id.is_empty():
+		show_event("")
+
+func _on_weather_changed(_id: String) -> void:
+	if WeatherSystem.current_id != "clear":
+		show_toast("☂ %s" % WeatherSystem.display_name(), 2.5)
+
 func show_toast(text: String, duration: float = 2.0) -> void:
 	_toast_label.text = text
 	_toast_timer = duration
@@ -870,6 +1005,7 @@ func _process(delta: float) -> void:
 	# 环境信息
 	var is_night := TimeSystem.is_night()
 	_phase_icon.texture = _weather_atlas_region(1 if is_night else 0)  # 占位：用雨滴当夜晚
+	_weather_icon.texture = _weather_atlas_region(WeatherSystem.icon_index())
 	var ratio := TimeSystem.get_phase_ratio()
 	var hours: float
 	if is_night:
@@ -894,6 +1030,7 @@ func _process(delta: float) -> void:
 
 	# 技能栏冷却 / MP 状态
 	_update_skill_bar_state()
+	_tick_buff_labels()
 
 	# 危险边框呼吸
 	if _danger_active:

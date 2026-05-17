@@ -1,0 +1,203 @@
+[
+  {
+    "id": "stone_circle",
+    "display_name": "石环",
+    "footprint": [5, 5],
+    "biome_filter": ["grassland", "rocky"],
+    "weight": 1.0,
+    "required": false,
+    "prefabs": [
+      {"id": "stone", "x": 0, "y": 2},
+      {"id": "stone", "x": 2, "y": 0},
+      {"id": "stone", "x": 4, "y": 2},
+      {"id": "stone", "x": 2, "y": 4},
+      {"id": "stone", "x": 1, "y": 1},
+      {"id": "stone", "x": 3, "y": 1},
+      {"id": "stone", "x": 1, "y": 3},
+      {"id": "stone", "x": 3, "y": 3},
+      {"id": "iron_ore", "x": 2, "y": 2}
+    ]
+  },
+  {
+    "id": "forest_grove",
+    "display_name": "林间小丛",
+    "footprint": [5, 6],
+    "biome_filter": ["forest", "grassland"],
+    "weight": 1.5,
+    "required": false,
+    "prefabs": [
+      {"id": "tree", "x": 0, "y": 0},
+      {"id": "tree", "x": 4, "y": 0},
+      {"id": "tree", "x": 0, "y": 4},
+      {"id": "tree", "x": 4, "y": 4},
+      {"id": "tree", "x": 2, "y": 0},
+      {"id": "tree", "x": 0, "y": 2},
+      {"id": "tree", "x": 4, "y": 2},
+      {"id": "tree", "x": 2, "y": 4},
+      {"id": "berry_bush", "x": 2, "y": 2},
+      {"id": "mushroom", "x": 1, "y": 3},
+      {"id": "mushroom", "x": 3, "y": 3}
+    ]
+  },
+  {
+    "id": "meteor_strike",
+    "display_name": "陨石坠落",
+    "footprint": [5, 5],
+    "biome_filter": [],
+    "weight": 0.3,
+    "required": false,
+    "prefabs": [
+      {"id": "meteorite", "x": 1, "y": 1},
+      {"id": "stone", "x": 0, "y": 0},
+      {"id": "stone", "x": 4, "y": 0},
+      {"id": "stone", "x": 4, "y": 3},
+      {"id": "stone", "x": 0, "y": 3},
+      {"id": "iron_ore", "x": 3, "y": 3}
+    ]
+  },
+  {
+    "id": "dead_grove",
+    "display_name": "枯树园",
+    "footprint": [5, 5],
+    "biome_filter": ["swamp", "rocky"],
+    "weight": 0.7,
+    "required": false,
+    "prefabs": [
+      {"id": "dead_tree", "x": 0, "y": 0},
+      {"id": "dead_tree", "x": 2, "y": 1},
+      {"id": "dead_tree", "x": 4, "y": 0},
+      {"id": "dead_tree", "x": 1, "y": 3},
+      {"id": "dead_tree", "x": 3, "y": 4},
+      {"id": "coal_node", "x": 2, "y": 2},
+      {"id": "mushroom", "x": 0, "y": 4}
+    ]
+  },
+  {
+    "id": "crystal_cavern",
+    "display_name": "晶簇矿洞",
+    "footprint": [5, 5],
+    "biome_filter": ["rocky"],
+    "weight": 0.4,
+    "required": false,
+    "prefabs": [
+      {"id": "stone", "x": 0, "y": 0},
+      {"id": "stone", "x": 1, "y": 0},
+      {"id": "stone", "x": 3, "y": 0},
+      {"id": "stone", "x": 4, "y": 0},
+      {"id": "stone", "x": 0, "y": 4},
+      {"id": "stone", "x": 4, "y": 4},
+      {"id": "crystal", "x": 2, "y": 2},
+      {"id": "crystal", "x": 1, "y": 2},
+      {"id": "crystal", "x": 3, "y": 2},
+      {"id": "gold_ore", "x": 2, "y": 3},
+      {"id": "iron_ore", "x": 2, "y": 1}
+    ]
+  },
+  {
+    "id": "flower_field",
+    "display_name": "花田",
+    "footprint": [5, 5],
+    "biome_filter": ["grassland", "forest"],
+    "weight": 0.9,
+    "required": false,
+    "prefabs": [
+      {"id": "red_flower", "x": 0, "y": 0},
+      {"id": "yellow_flower", "x": 1, "y": 0},
+      {"id": "red_flower", "x": 2, "y": 1},
+      {"id": "yellow_flower", "x": 3, "y": 2},
+      {"id": "red_flower", "x": 4, "y": 3},
+      {"id": "yellow_flower", "x": 0, "y": 3},
+      {"id": "red_flower", "x": 1, "y": 4},
+      {"id": "yellow_flower", "x": 3, "y": 4},
+      {"id": "bush", "x": 2, "y": 2}
+    ]
+  },
+  {
+    "id": "pond_ring",
+    "display_name": "池塘环",
+    "footprint": [5, 5],
+    "biome_filter": ["swamp", "grassland"],
+    "weight": 0.6,
+    "required": false,
+    "prefabs": [
+      {"id": "kelp_clump", "x": 0, "y": 1},
+      {"id": "kelp_clump", "x": 4, "y": 1},
+      {"id": "kelp_clump", "x": 0, "y": 3},
+      {"id": "kelp_clump", "x": 4, "y": 3},
+      {"id": "kelp_clump", "x": 2, "y": 0},
+      {"id": "kelp_clump", "x": 2, "y": 4},
+      {"id": "clay_deposit", "x": 1, "y": 2},
+      {"id": "clay_deposit", "x": 3, "y": 2},
+      {"id": "driftwood_pile", "x": 2, "y": 2}
+    ]
+  },
+  {
+    "id": "graveyard",
+    "display_name": "神秘墓地",
+    "footprint": [5, 5],
+    "biome_filter": ["swamp", "rocky"],
+    "weight": 0.3,
+    "required": false,
+    "prefabs": [
+      {"id": "stone", "x": 0, "y": 0},
+      {"id": "stone", "x": 2, "y": 0},
+      {"id": "stone", "x": 4, "y": 0},
+      {"id": "stone", "x": 0, "y": 2},
+      {"id": "stone", "x": 2, "y": 2},
+      {"id": "stone", "x": 4, "y": 2},
+      {"id": "dead_tree", "x": 1, "y": 4},
+      {"id": "dead_tree", "x": 3, "y": 4},
+      {"id": "mushroom", "x": 2, "y": 3}
+    ]
+  },
+  {
+    "id": "merchant_tent",
+    "display_name": "商人帐篷",
+    "footprint": [4, 4],
+    "biome_filter": ["grassland"],
+    "weight": 0.4,
+    "required": false,
+    "prefabs": [
+      {"id": "stone", "x": 0, "y": 0},
+      {"id": "stone", "x": 3, "y": 0},
+      {"id": "stone", "x": 0, "y": 3},
+      {"id": "stone", "x": 3, "y": 3},
+      {"id": "bush", "x": 1, "y": 2},
+      {"id": "bush", "x": 2, "y": 2}
+    ]
+  },
+  {
+    "id": "fallen_star",
+    "display_name": "坠落星石",
+    "footprint": [5, 5],
+    "biome_filter": [],
+    "weight": 0.2,
+    "required": false,
+    "prefabs": [
+      {"id": "meteorite", "x": 2, "y": 2},
+      {"id": "crystal", "x": 1, "y": 1},
+      {"id": "crystal", "x": 3, "y": 3},
+      {"id": "stone", "x": 0, "y": 2},
+      {"id": "stone", "x": 4, "y": 2},
+      {"id": "coal_node", "x": 2, "y": 0},
+      {"id": "coal_node", "x": 2, "y": 4}
+    ]
+  },
+  {
+    "id": "campfire_remains",
+    "display_name": "营火残骸",
+    "footprint": [4, 4],
+    "biome_filter": ["forest", "grassland", "rocky"],
+    "weight": 0.5,
+    "required": false,
+    "prefabs": [
+      {"id": "dead_tree", "x": 0, "y": 0},
+      {"id": "stone", "x": 1, "y": 1},
+      {"id": "stone", "x": 2, "y": 1},
+      {"id": "stone", "x": 1, "y": 2},
+      {"id": "stone", "x": 2, "y": 2},
+      {"id": "bush", "x": 3, "y": 3},
+      {"id": "mushroom", "x": 0, "y": 3}
+    ]
+  }
+]

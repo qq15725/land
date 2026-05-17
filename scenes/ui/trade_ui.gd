@@ -43,10 +43,7 @@ func _build_layout() -> void:
 	_gold_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3))
 	header.add_child(_gold_label)
 
-	var close_btn := Button.new()
-	close_btn.text = "×"
-	close_btn.pressed.connect(hide)
-	header.add_child(close_btn)
+	header.add_child(make_close_button())
 
 	vbox.add_child(HSeparator.new())
 

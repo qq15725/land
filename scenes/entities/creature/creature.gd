@@ -12,7 +12,7 @@ var data: CreatureData
 @onready var attack_area: Area2D = $AttackArea
 @onready var attack_shape: CollisionShape2D = $AttackArea/CollisionShape2D
 
-enum State { WANDER, CHASE, ATTACK, DEAD }
+enum State { WANDER, CHASE, ATTACK, DEAD, FLEE }
 
 var _state: State = State.WANDER
 var _target: Player = null
@@ -20,19 +20,36 @@ var _wander_target: Vector2 = Vector2.ZERO
 var _spawn_pos: Vector2 = Vector2.ZERO
 var _attack_timer: float = 0.0
 var _wander_timer: float = 0.0
+var _flee_timer: float = 0.0
 var _last_damager: Player = null
+
+const HitFlashShader := preload("res://scenes/effects/hit_flash.gdshader")
+const HIT_FLASH_DURATION := 0.05
 
 # 由攻击者（Player）调用。记录归属，再走 HealthComponent 扣血。
 func take_damage_from(player: Player, amount: float) -> void:
 	_last_damager = player
 	health.take_damage(amount)
+	# passive 生物受击转 FLEE
+	if data and data.passive and _state != State.DEAD:
+		_target = player
+		_state = State.FLEE
+		_flee_timer = 4.0
 
 func _ready() -> void:
 	NetworkRegistry.attach(self)
 	if not data:
 		return
-	health.max_health = data.max_health
-	health.current_health = data.max_health
+	# 难度递增：每过 7 天 hp/伤害 +10%（封顶 +200%）。Boss 不再叠加。
+	var day_curve: float = 1.0
+	if not data.is_boss:
+		day_curve = 1.0 + minf(2.0, float(maxi(0, TimeSystem.current_day - 1)) / 7.0 * 0.1)
+	health.max_health = data.max_health * data.max_health_scale * day_curve
+	health.current_health = health.max_health
+	# Boss 视觉放大 + 加 boss group
+	if data.is_boss:
+		add_to_group("boss")
+		visual.scale *= 1.4
 	_setup_sprite_frames()
 
 	var det_circle := detection_shape.shape as CircleShape2D
@@ -46,8 +63,27 @@ func _ready() -> void:
 	_pick_wander_target()
 
 	health.died.connect(_on_died)
+	health.damaged.connect(_on_damaged_flash)
+	# 命中闪白 shader（冒险岛风格"打到了"反馈）
+	var flash_mat := ShaderMaterial.new()
+	flash_mat.shader = HitFlashShader
+	visual.material = flash_mat
 	detection_area.body_entered.connect(_on_body_entered)
 	detection_area.body_exited.connect(_on_body_exited)
+
+
+func _on_damaged_flash(_amount: float) -> void:
+	if not is_instance_valid(visual):
+		return
+	var mat := visual.material as ShaderMaterial
+	if mat == null:
+		return
+	mat.set_shader_parameter("flash_amount", 1.0)
+	await get_tree().create_timer(HIT_FLASH_DURATION).timeout
+	if is_instance_valid(self) and is_instance_valid(visual):
+		var m2 := visual.material as ShaderMaterial
+		if m2:
+			m2.set_shader_parameter("flash_amount", 0.0)
 
 func _physics_process(delta: float) -> void:
 	if _state == State.DEAD:
@@ -61,6 +97,8 @@ func _physics_process(delta: float) -> void:
 			_do_chase(delta)
 		State.ATTACK:
 			_do_attack(delta)
+		State.FLEE:
+			_do_flee(delta)
 
 func _do_wander(delta: float) -> void:
 	_wander_timer -= delta
@@ -97,6 +135,20 @@ func _do_attack(_delta: float) -> void:
 		_target.health.take_damage(data.attack_damage)
 		_attack_timer = data.attack_cooldown
 		_flash_attack()
+
+func _do_flee(delta: float) -> void:
+	_flee_timer -= delta
+	if _flee_timer <= 0.0 or not is_instance_valid(_target):
+		_state = State.WANDER
+		_target = null
+		return
+	var flee_dir := (global_position - _target.global_position)
+	if flee_dir.length() < 0.01:
+		flee_dir = Vector2(randf_range(-1, 1), randf_range(-1, 1))
+	flee_dir = flee_dir.normalized()
+	velocity = flee_dir * data.move_speed * 1.4
+	move_and_slide()
+	_update_facing()
 
 func _pick_wander_target() -> void:
 	var angle := randf() * TAU
@@ -172,6 +224,9 @@ func _flash_attack() -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	if body is Player and _state != State.DEAD:
+		# passive 生物：进入视野不主动追击，仅记录潜在威胁
+		if data and data.passive:
+			return
 		_target = body as Player
 		_state = State.CHASE
 

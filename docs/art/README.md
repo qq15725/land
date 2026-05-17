@@ -55,6 +55,7 @@ assets/sprites/items/icons.png         # 物品图标整张表
 | HUD 布局 | [hud.md](hud.md) | 游戏内 HUD 各区域部件规格（角色信息 / 快捷栏 / 小地图 / 状态栏 / 移动端控制） |
 | 主菜单美术 | [main_menu.md](main_menu.md) | 背景、标题 Logo、存档槽、菜单按钮 |
 | 战斗 VFX | [vfx.md](vfx.md) | 技能特效场景规范（挥砍 / AOE / 命中火花 / 弹道）+ 美术替换流程 |
+| 技能 / Buff 图标 | [skills.md](skills.md) | 10 主动技能 + 4 被动技能 + 4 buff + 10 成就独立图标 |
 
 ## 字体
 

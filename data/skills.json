@@ -30,5 +30,68 @@
     "base_xp": 120,
     "growth": 1.6,
     "max_level": 20
+  },
+  {
+    "id": "gathering_mastery",
+    "display_name": "采集精通",
+    "icon_grid": [7, 0],
+    "base_xp": 80,
+    "growth": 1.5,
+    "max_level": 20,
+    "passive_effect": "采集草/蘑菇/浆果有几率额外掉落 +1"
+  },
+  {
+    "id": "cooking_master",
+    "display_name": "烹饪大师",
+    "icon_grid": [4, 2],
+    "base_xp": 100,
+    "growth": 1.55,
+    "max_level": 20,
+    "passive_effect": "食物回复量 +50%"
+  },
+  {
+    "id": "merchant_eye",
+    "display_name": "商人之眼",
+    "icon_grid": [2, 0],
+    "base_xp": 110,
+    "growth": 1.6,
+    "max_level": 10,
+    "passive_effect": "商人购买价格 -10%"
+  },
+  {
+    "id": "nightwalker",
+    "display_name": "夜行者",
+    "icon_grid": [3, 1],
+    "base_xp": 100,
+    "growth": 1.55,
+    "max_level": 10,
+    "passive_effect": "夜晚移速 +20%，夜间视野扩大"
+  },
+  {
+    "id": "endurance",
+    "display_name": "坚毅",
+    "icon_grid": [4, 5],
+    "base_xp": 130,
+    "growth": 1.6,
+    "max_level": 20,
+    "passive_effect": "最大 HP +20%"
+  },
+  {
+    "id": "concentration",
+    "display_name": "专注",
+    "icon_grid": [1, 5],
+    "base_xp": 110,
+    "growth": 1.55,
+    "max_level": 20,
+    "passive_effect": "蓄力/施法速度 +30%"
+  },
+  {
+    "id": "fishing",
+    "display_name": "钓鱼",
+    "icon_grid": [5, 0],
+    "base_xp": 90,
+    "growth": 1.5,
+    "max_level": 20,
+    "passive_effect": "钓鱼成功率与稀有鱼几率提升"
   }
 ]

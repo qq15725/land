@@ -135,6 +135,7 @@ func _play_break_and_deplete(player: Player = null) -> void:
 	hint_label.hide()
 	depleted.emit()
 	EventBus.resource_depleted.emit(NetworkRegistry.get_id(self), NetworkRegistry.get_id(player) if player else 0)
+	EventBus.resource_collected.emit(resource_id, NetworkRegistry.get_id(player) if player else 0)
 
 	await _flash_hit()
 	if not is_inside_tree():

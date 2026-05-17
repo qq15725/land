@@ -9,6 +9,9 @@ var respawn_time: float = 30.0
 var tool_required: String = ""
 var spawn_weight: float = 1.0
 
+# 占用格子数（tile），决定生成时的格对齐与互斥范围。脚底锚点 = footprint 底行中心。
+var footprint: Vector2i = Vector2i(1, 1)
+
 var collision_size: Vector2 = Vector2(16, 16)
 var collision_offset_y: float = 0.0
 var visual_offset_y: float = 0.0

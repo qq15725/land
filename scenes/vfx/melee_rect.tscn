@@ -5,8 +5,19 @@
 [node name="MeleeRect" type="Node2D"]
 script = ExtResource("1_vfx")
 shape = "rect"
-size_a = 60.0
-size_b = 24.0
+size_a = 80.0
+size_b = 28.0
 lifetime = 0.2
-base_color = Color(1, 0.8, 0.4, 0.6)
-grow_scale = 1.08
+base_color = Color(1, 0.95, 0.85, 0.7)
+grow_scale = 1.1
+flash_intensity = 0.9
+emit_particles = true
+particle_count = 14
+particle_speed_min = 100.0
+particle_speed_max = 220.0
+particle_lifetime = 0.35
+particle_spread_deg = 25.0
+particle_scale = 3.2
+particle_color_core = Color(1, 1, 1, 1)
+particle_color_mid = Color(0.95, 0.85, 0.7, 0.85)
+particle_color_end = Color(0.8, 0.5, 0.3, 0)

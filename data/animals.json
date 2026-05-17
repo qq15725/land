@@ -38,5 +38,45 @@
     "produce_time": 75.0,
     "wander_radius": 70.0,
     "color": [0.95, 0.95, 0.92, 1.0]
+  },
+  {
+    "id": "duck",
+    "display_name": "鸭",
+    "feed_item_id": "animal_feed",
+    "produce_item_id": "duck_egg",
+    "produce_amount": 1,
+    "produce_time": 45.0,
+    "wander_radius": 65.0,
+    "color": [0.92, 0.88, 0.55, 1.0]
+  },
+  {
+    "id": "goose",
+    "display_name": "鹅",
+    "feed_item_id": "animal_feed",
+    "produce_item_id": "goose_egg",
+    "produce_amount": 1,
+    "produce_time": 70.0,
+    "wander_radius": 70.0,
+    "color": [0.95, 0.95, 0.88, 1.0]
+  },
+  {
+    "id": "rabbit_farm",
+    "display_name": "家兔",
+    "feed_item_id": "hay",
+    "produce_item_id": "rabbit_fur",
+    "produce_amount": 1,
+    "produce_time": 80.0,
+    "wander_radius": 60.0,
+    "color": [0.92, 0.88, 0.85, 1.0]
+  },
+  {
+    "id": "angora_goat",
+    "display_name": "山羊",
+    "feed_item_id": "hay",
+    "produce_item_id": "wool",
+    "produce_amount": 2,
+    "produce_time": 100.0,
+    "wander_radius": 75.0,
+    "color": [0.88, 0.85, 0.78, 1.0]
   }
 ]

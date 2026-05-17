@@ -26,6 +26,8 @@ const CAM_SHAKE_DECAY := 8.0     # 攻击命中屏幕震动衰减速度
 @onready var camera: Camera2D = $Camera2D
 
 var _shadow: Node2D
+var _hat_sprite: Sprite2D
+var _cape_sprite: Sprite2D
 var _bob_time: float = 0.0
 var _is_moving: bool = false
 var _cam_shake_amp: float = 0.0
@@ -33,14 +35,16 @@ var _cam_shake_amp: float = 0.0
 var skills: PlayerSkills
 var active_skills: PlayerActiveSkills
 var mana: ManaComponent
+var focus: FocusComponent
+var buffs: BuffComponent
 var skill_executor: SkillExecutor
 var anim_state: PlayerAnimState
 var peer_id: int = Network.SERVER_PEER_ID
 var display_name: String = "冒险者"
 
 # 5 个技能槽：index 0 = J（基础攻击），1 = Q，2 = E，3 = R，4 = G
-# 未来"技能装配"UI 写入此数组即可
-var equipped_skills: Array = ["basic_swing", "triple_slash", "fireball", "whirlwind", ""]
+# J 永远是 basic_swing；其余 4 槽由技能树 UI 装配（默认空）
+var equipped_skills: Array = ["basic_swing", "", "", "", ""]
 
 # 显式同步：position / hp / velocity / current_anim
 # 用 MultiplayerSynchronizer 自动 30Hz 广播
@@ -53,6 +57,11 @@ var _combo_timer: float = 0.0
 var _click_target: Vector2 = Vector2.ZERO
 var _click_moving: bool = false
 var _last_anim: String = "walk_down"
+
+# 钓鱼状态
+enum Fishing { IDLE, WAITING, HOOKED }
+var _fishing_state: Fishing = Fishing.IDLE
+var _fishing_timer: float = 0.0
 
 const CLICK_STOP_DIST := 6.0
 
@@ -71,6 +80,13 @@ func _ready() -> void:
 	mana = ManaComponent.new()
 	mana.name = "ManaComponent"
 	add_child(mana)
+	focus = FocusComponent.new()
+	focus.name = "FocusComponent"
+	add_child(focus)
+	buffs = BuffComponent.new()
+	buffs.name = "BuffComponent"
+	add_child(buffs)
+	buffs.buffs_changed.connect(_on_buffs_changed)
 	skill_executor = SkillExecutor.new()
 	skill_executor.name = "SkillExecutor"
 	add_child(skill_executor)
@@ -79,6 +95,7 @@ func _ready() -> void:
 	add_child(anim_state)
 	_setup_synchronizer()
 	_setup_shadow()
+	_setup_cosmetics()
 	_setup_camera()
 	health.died.connect(_on_died)
 	health.damaged.connect(func(amount): EventBus.player_damaged.emit(amount))
@@ -113,6 +130,24 @@ func _setup_shadow() -> void:
 	poly.polygon = pts
 	poly.color = Color(0, 0, 0, SHADOW_ALPHA)
 	_shadow.add_child(poly)
+
+func _setup_cosmetics() -> void:
+	_hat_sprite = Sprite2D.new()
+	_hat_sprite.name = "CosmeticHat"
+	_hat_sprite.position = Vector2(0, -28)
+	_hat_sprite.scale = Vector2(0.18, 0.18)
+	_hat_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_hat_sprite.z_index = ZLayer.VFX_HIT
+	_hat_sprite.visible = false
+	add_child(_hat_sprite)
+	_cape_sprite = Sprite2D.new()
+	_cape_sprite.name = "CosmeticCape"
+	_cape_sprite.position = Vector2(0, -10)
+	_cape_sprite.scale = Vector2(0.18, 0.18)
+	_cape_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_cape_sprite.z_index = -1
+	_cape_sprite.visible = false
+	add_child(_cape_sprite)
 
 func _setup_camera() -> void:
 	if not camera:
@@ -156,7 +191,8 @@ func _setup_synchronizer() -> void:
 
 
 func _on_equipment_changed(slot_type: String) -> void:
-	health.damage_reduction = inventory.total_defense()
+	health.damage_reduction = inventory.total_defense() + (buffs.defense_add() if buffs else 0.0)
+	_refresh_cosmetic_sprites()
 	# 装备变更视觉反馈：金色光晕（首次 ready 时 slot_type 为空，跳过）
 	if not slot_type.is_empty() and get_parent() != null:
 		VFXLibrary.spawn("equip_glow", get_parent(), global_position + Vector2(0, -16), 0.0, Color(1.0, 0.95, 0.5, 0.9))
@@ -208,7 +244,8 @@ func _physics_process(delta: float) -> void:
 			move_dir = Vector2.ZERO
 		else:
 			move_dir = to_target.normalized()
-	velocity = move_dir * SPEED
+	var spd_mul: float = buffs.speed_mul() if buffs else 1.0
+	velocity = move_dir * SPEED * spd_mul
 	move_and_slide()
 	_update_animation(move_dir)
 	_update_bobbing(delta, move_dir)
@@ -236,6 +273,9 @@ func _update_animation(move_dir: Vector2) -> void:
 
 # 远程同步动画 + 摄像机震动衰减（每帧跑）
 func _process(delta: float) -> void:
+	# 钓鱼计时（仅本地玩家）
+	if is_multiplayer_authority():
+		_process_fishing(delta)
 	# 摄像机抖动衰减（只对 authority 玩家有效，因为 camera 是 player 的子节点）
 	if is_multiplayer_authority() and camera:
 		if _cam_shake_amp > 0.01:
@@ -337,8 +377,18 @@ func do_use_selected_item() -> void:
 	var item := inventory.get_selected_item()
 	if not item:
 		return
-	if item.heal_amount > 0.0 and health.current_health < health.max_health:
+	# 鱼竿优先：触发钓鱼小游戏
+	if item.tool_type == "fishing_rod":
+		_handle_fishing_press()
+		return
+	if item.heal_amount > 0.0:
+		var heal_used := health.current_health < health.max_health
+		var fp_low := focus and focus.current_focus < focus.max_focus
+		if not heal_used and not fp_low:
+			return
 		health.heal(item.heal_amount)
+		if focus:
+			focus.restore(item.heal_amount * 0.6)
 		inventory.remove_item(item, 1)
 		EventBus.item_used.emit(item)
 
@@ -358,6 +408,10 @@ func do_cast_skill(skill_id: String, target_pos: Vector2) -> void:
 		return
 	if anim_state and not skill.anim_state.is_empty():
 		anim_state.play_state(skill.anim_state, skill.anim_duration)
+	# FP 消耗：技能 MP 越大 FP 也越大（基础攻击 5，主动技能 mp_cost 的一半）
+	if focus:
+		var fp_cost: float = maxf(5.0, skill.mp_cost * 0.5)
+		focus.consume(fp_cost)
 	skill_executor.cast(skill, target_pos, self)
 
 # 由 SkillExecutor 在每段命中后通知，处理 combo 等需要玩家上下文的状态
@@ -366,6 +420,26 @@ func on_skill_hit_landed(_skill: ActiveSkillData) -> void:
 	_combo_timer = COMBO_TIMEOUT
 	if _combo_count >= 2:
 		EventBus.combo_hit.emit(_combo_count)
+
+func _refresh_cosmetic_sprites() -> void:
+	var hat: ItemData = inventory.get_equipped("cosmetic_hat")
+	if _hat_sprite:
+		_hat_sprite.visible = hat != null
+		if hat:
+			_hat_sprite.texture = ItemDatabase.get_item_icon(hat)
+			_hat_sprite.modulate = hat.color
+	var cape: ItemData = inventory.get_equipped("cosmetic_cape")
+	if _cape_sprite:
+		_cape_sprite.visible = cape != null
+		if cape:
+			_cape_sprite.texture = ItemDatabase.get_item_icon(cape)
+			_cape_sprite.modulate = cape.color
+
+func _on_buffs_changed(_active: Dictionary) -> void:
+	# 防御 / damage_reduction 由装备 + buff 共同决定
+	if health and inventory:
+		health.damage_reduction = inventory.total_defense() + (buffs.defense_add() if buffs else 0.0)
+	EventBus.player_buffs_changed.emit(NetworkRegistry.get_id(self), buffs.active.duplicate() if buffs else {})
 
 
 
@@ -398,6 +472,46 @@ func _find_respawn_position() -> Vector2:
 			best = b
 			best_d = d
 	return best.global_position + Vector2(0, 16)  # 床下方一格出生
+
+func _handle_fishing_press() -> void:
+	match _fishing_state:
+		Fishing.IDLE:
+			_fishing_state = Fishing.WAITING
+			_fishing_timer = randf_range(1.2, 3.0)
+			_toast("鱼竿抛出…耐心等待")
+		Fishing.WAITING:
+			# 提前收线 → 失败
+			_fishing_state = Fishing.IDLE
+			_toast("收得太早，鱼跑了")
+		Fishing.HOOKED:
+			# 命中
+			_fishing_state = Fishing.IDLE
+			var fish := ItemDatabase.get_item("fish")
+			if fish:
+				inventory.add_item(fish, 1)
+			_toast("钓到一条鱼！")
+
+func _process_fishing(delta: float) -> void:
+	if _fishing_state == Fishing.IDLE:
+		return
+	_fishing_timer -= delta
+	if _fishing_timer <= 0.0:
+		if _fishing_state == Fishing.WAITING:
+			_fishing_state = Fishing.HOOKED
+			_fishing_timer = 1.6   # 玩家有 1.6s 反应窗口
+			_toast("🎣 上钩了！快按 F")
+		elif _fishing_state == Fishing.HOOKED:
+			_fishing_state = Fishing.IDLE
+			_toast("反应太慢，鱼跑了")
+
+func _toast(msg: String) -> void:
+	var tree := get_tree()
+	if tree == null:
+		return
+	for n in tree.get_nodes_in_group("hud"):
+		if n.has_method("show_toast"):
+			n.show_toast(msg, 1.6)
+			return
 
 # 死亡时背包非装备物品掉一半数量；装备类（equip_slot 非空）不掉。
 func _drop_inventory_on_death(pos: Vector2) -> void:

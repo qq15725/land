@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/codex_ui.gd" id="1_codex"]
+
+[node name="CodexUI" type="PanelContainer"]
+script = ExtResource("1_codex")

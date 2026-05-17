@@ -1,0 +1,102 @@
+[
+  {
+    "id": "first_tree",
+    "display_name": "第一棵树",
+    "description": "砍倒第一棵树。",
+    "icon_grid": [0, 0],
+    "event": "resource_collected",
+    "target_id": "tree",
+    "goal": 1,
+    "reward_gold": 10
+  },
+  {
+    "id": "lumberjack",
+    "display_name": "伐木工",
+    "description": "砍倒 100 棵树。",
+    "icon_grid": [0, 0],
+    "event": "resource_collected",
+    "target_id": "tree",
+    "goal": 100,
+    "reward_gold": 200
+  },
+  {
+    "id": "miner",
+    "display_name": "矿工",
+    "description": "采集 50 块石头。",
+    "icon_grid": [1, 0],
+    "event": "resource_collected",
+    "target_id": "stone",
+    "goal": 50,
+    "reward_gold": 100
+  },
+  {
+    "id": "first_kill",
+    "display_name": "首次猎杀",
+    "description": "击杀第一只怪物。",
+    "icon_grid": [4, 5],
+    "event": "creature_killed",
+    "target_id": "",
+    "goal": 1,
+    "reward_gold": 20
+  },
+  {
+    "id": "slime_slayer",
+    "display_name": "史莱姆克星",
+    "description": "击杀 25 只史莱姆。",
+    "icon_grid": [4, 5],
+    "event": "creature_killed",
+    "target_id": "slime",
+    "goal": 25,
+    "reward_gold": 150
+  },
+  {
+    "id": "first_harvest",
+    "display_name": "首次收获",
+    "description": "收获第一株作物。",
+    "icon_grid": [2, 0],
+    "event": "crop_harvested",
+    "target_id": "",
+    "goal": 1,
+    "reward_gold": 10
+  },
+  {
+    "id": "farmer",
+    "display_name": "勤劳农夫",
+    "description": "累计收获 30 株作物。",
+    "icon_grid": [2, 0],
+    "event": "crop_harvested",
+    "target_id": "",
+    "goal": 30,
+    "reward_gold": 100
+  },
+  {
+    "id": "rich",
+    "display_name": "富翁",
+    "description": "累计赚取 1000 G。",
+    "icon_grid": [3, 1],
+    "event": "item_sold_gold",
+    "target_id": "",
+    "goal": 1000,
+    "reward_gold": 100
+  },
+  {
+    "id": "survivor_7",
+    "display_name": "一周幸存者",
+    "description": "存活到第 7 天。",
+    "icon_grid": [0, 1],
+    "event": "day_milestone",
+    "target_id": "",
+    "goal": 7,
+    "reward_gold": 200
+  },
+  {
+    "id": "survivor_30",
+    "display_name": "月之幸存者",
+    "description": "存活到第 30 天。",
+    "icon_grid": [0, 1],
+    "event": "day_milestone",
+    "target_id": "",
+    "goal": 30,
+    "reward_gold": 500
+  }
+]

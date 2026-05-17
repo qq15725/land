@@ -128,8 +128,14 @@ func _make_custom_tooltip(_for_text: String) -> Object:
 		chips.append("防御 +%d" % int(_item.defense))
 	if _item.ranged:
 		chips.append("远程")
+	if _item.attack_speed > 0.0:
+		chips.append("攻速 +%d%%" % int(_item.attack_speed * 100.0))
 	if not _item.equip_slot.is_empty():
 		chips.append(_equip_slot_label(_item.equip_slot))
+	if _item.sell_price > 0:
+		chips.append("售价 %d 金" % _item.sell_price)
+	if _item.max_stack > 1:
+		chips.append("堆叠 %d" % _item.max_stack)
 	if not chips.is_empty():
 		var chip_lbl := Label.new()
 		chip_lbl.text = "  ·  ".join(chips)

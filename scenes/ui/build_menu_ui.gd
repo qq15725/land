@@ -29,10 +29,7 @@ func _build_layout() -> void:
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
 
-	var close_btn := Button.new()
-	close_btn.text = "×"
-	close_btn.pressed.connect(hide)
-	header.add_child(close_btn)
+	header.add_child(make_close_button())
 
 	vbox.add_child(HSeparator.new())
 

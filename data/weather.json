@@ -1,0 +1,62 @@
+[
+  {
+    "id": "clear",
+    "display_name": "晴",
+    "icon_index": 0,
+    "rain": false,
+    "snow": false,
+    "thunder": false,
+    "growth_multiplier": 1.0,
+    "season_weights": {
+      "spring": 6,
+      "summer": 8,
+      "autumn": 5,
+      "winter": 3
+    }
+  },
+  {
+    "id": "rain",
+    "display_name": "雨",
+    "icon_index": 1,
+    "rain": true,
+    "snow": false,
+    "thunder": false,
+    "growth_multiplier": 1.5,
+    "season_weights": {
+      "spring": 4,
+      "summer": 3,
+      "autumn": 4,
+      "winter": 0
+    }
+  },
+  {
+    "id": "snow",
+    "display_name": "雪",
+    "icon_index": 1,
+    "rain": false,
+    "snow": true,
+    "thunder": false,
+    "growth_multiplier": 1.0,
+    "season_weights": {
+      "spring": 0,
+      "summer": 0,
+      "autumn": 1,
+      "winter": 6
+    }
+  },
+  {
+    "id": "thunder",
+    "display_name": "雷暴",
+    "icon_index": 1,
+    "rain": true,
+    "snow": false,
+    "thunder": true,
+    "growth_multiplier": 1.5,
+    "season_weights": {
+      "spring": 1,
+      "summer": 2,
+      "autumn": 1,
+      "winter": 0
+    }
+  }
+]

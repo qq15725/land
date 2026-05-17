@@ -11,8 +11,9 @@
     "respawn_time": 30.0,
     "tool_required": "axe",
     "spawn_weight": 0.55,
-    "collision_size": [12, 20],
-    "collision_offset_y": -10,
+    "footprint": [1, 2],
+    "collision_size": [12, 8],
+    "collision_offset_y": -4,
     "visual_offset_y": -24,
     "frame_height": 192
   },
@@ -27,8 +28,9 @@
     "respawn_time": 60.0,
     "tool_required": "",
     "spawn_weight": 0.25,
-    "collision_size": [24, 18],
-    "collision_offset_y": -9,
+    "footprint": [1, 1],
+    "collision_size": [14, 10],
+    "collision_offset_y": -5,
     "visual_offset_y": -12,
     "frame_height": 96
   },
@@ -44,8 +46,9 @@
     "respawn_time": 120.0,
     "tool_required": "pickaxe",
     "spawn_weight": 0.08,
-    "collision_size": [22, 16],
-    "collision_offset_y": -8,
+    "footprint": [1, 1],
+    "collision_size": [14, 10],
+    "collision_offset_y": -5,
     "visual_offset_y": -10,
     "frame_height": 96
   },
@@ -60,8 +63,9 @@
     "respawn_time": 20.0,
     "tool_required": "",
     "spawn_weight": 0.08,
-    "collision_size": [20, 14],
-    "collision_offset_y": -7,
+    "footprint": [1, 1],
+    "collision_size": [12, 8],
+    "collision_offset_y": -4,
     "visual_offset_y": -16,
     "frame_height": 128
   },
@@ -76,9 +80,264 @@
     "respawn_time": 15.0,
     "tool_required": "",
     "spawn_weight": 0.04,
-    "collision_size": [12, 10],
-    "collision_offset_y": -5,
+    "footprint": [1, 1],
+    "collision_size": [8, 6],
+    "collision_offset_y": -3,
     "visual_offset_y": -12,
+    "frame_height": 96
+  },
+  {
+    "id": "meteorite",
+    "display_name": "陨石",
+    "drop_item_id": "meteorite_ore",
+    "drop_amount": 3,
+    "drop_table": [
+      {"item_id": "meteorite_ore", "amount": 3, "chance": 1.0},
+      {"item_id": "iron_ore", "amount": 2, "chance": 0.6},
+      {"item_id": "stone", "amount": 2, "chance": 0.5}
+    ],
+    "respawn_time": 0.0,
+    "tool_required": "pickaxe",
+    "spawn_weight": 0.0,
+    "footprint": [2, 2],
+    "collision_size": [28, 20],
+    "collision_offset_y": -10,
+    "visual_offset_y": -10,
+    "frame_height": 96
+  },
+  {
+    "id": "pine_tree",
+    "display_name": "松树",
+    "drop_item_id": "wood",
+    "drop_amount": 4,
+    "drop_table": [
+      {"item_id": "wood", "amount": 4, "chance": 1.0},
+      {"item_id": "fiber", "amount": 1, "chance": 0.4}
+    ],
+    "respawn_time": 40.0,
+    "tool_required": "axe",
+    "spawn_weight": 0.4,
+    "footprint": [1, 2],
+    "collision_size": [12, 8],
+    "collision_offset_y": -4,
+    "visual_offset_y": -28,
+    "frame_height": 192
+  },
+  {
+    "id": "dead_tree",
+    "display_name": "枯树",
+    "drop_item_id": "wood",
+    "drop_amount": 2,
+    "drop_table": [
+      {"item_id": "wood", "amount": 2, "chance": 1.0},
+      {"item_id": "coal", "amount": 1, "chance": 0.3}
+    ],
+    "respawn_time": 90.0,
+    "tool_required": "axe",
+    "spawn_weight": 0.1,
+    "footprint": [1, 2],
+    "collision_size": [10, 8],
+    "collision_offset_y": -4,
+    "visual_offset_y": -24,
+    "frame_height": 192
+  },
+  {
+    "id": "bush",
+    "display_name": "灌木",
+    "drop_item_id": "fiber",
+    "drop_amount": 2,
+    "drop_table": [
+      {"item_id": "fiber", "amount": 2, "chance": 1.0},
+      {"item_id": "hay",   "amount": 1, "chance": 0.4}
+    ],
+    "respawn_time": 25.0,
+    "tool_required": "",
+    "spawn_weight": 0.15,
+    "footprint": [1, 1],
+    "collision_size": [10, 6],
+    "collision_offset_y": -3,
+    "visual_offset_y": -10,
+    "frame_height": 96
+  },
+  {
+    "id": "red_flower",
+    "display_name": "红花",
+    "drop_item_id": "red_flower",
+    "drop_amount": 1,
+    "drop_table": [
+      {"item_id": "red_flower", "amount": 1, "chance": 1.0},
+      {"item_id": "fiber", "amount": 1, "chance": 0.3}
+    ],
+    "respawn_time": 35.0,
+    "tool_required": "",
+    "spawn_weight": 0.05,
+    "footprint": [1, 1],
+    "collision_size": [6, 4],
+    "collision_offset_y": -2,
+    "visual_offset_y": -8,
+    "frame_height": 96
+  },
+  {
+    "id": "yellow_flower",
+    "display_name": "黄花",
+    "drop_item_id": "yellow_flower",
+    "drop_amount": 1,
+    "drop_table": [
+      {"item_id": "yellow_flower", "amount": 1, "chance": 1.0},
+      {"item_id": "fiber", "amount": 1, "chance": 0.3}
+    ],
+    "respawn_time": 35.0,
+    "tool_required": "",
+    "spawn_weight": 0.05,
+    "footprint": [1, 1],
+    "collision_size": [6, 4],
+    "collision_offset_y": -2,
+    "visual_offset_y": -8,
+    "frame_height": 96
+  },
+  {
+    "id": "copper_ore",
+    "display_name": "铜矿",
+    "drop_item_id": "copper_ore",
+    "drop_amount": 2,
+    "drop_table": [
+      {"item_id": "copper_ore", "amount": 2, "chance": 1.0},
+      {"item_id": "stone", "amount": 1, "chance": 0.5}
+    ],
+    "respawn_time": 100.0,
+    "tool_required": "pickaxe",
+    "spawn_weight": 0.06,
+    "footprint": [1, 1],
+    "collision_size": [14, 10],
+    "collision_offset_y": -5,
+    "visual_offset_y": -10,
+    "frame_height": 96
+  },
+  {
+    "id": "gold_ore",
+    "display_name": "金矿",
+    "drop_item_id": "gold_ore",
+    "drop_amount": 1,
+    "drop_table": [
+      {"item_id": "gold_ore", "amount": 1, "chance": 1.0},
+      {"item_id": "stone", "amount": 2, "chance": 0.6}
+    ],
+    "respawn_time": 180.0,
+    "tool_required": "pickaxe",
+    "spawn_weight": 0.025,
+    "footprint": [1, 1],
+    "collision_size": [14, 10],
+    "collision_offset_y": -5,
+    "visual_offset_y": -10,
+    "frame_height": 96
+  },
+  {
+    "id": "crystal",
+    "display_name": "晶簇",
+    "drop_item_id": "crystal_shard",
+    "drop_amount": 2,
+    "drop_table": [
+      {"item_id": "crystal_shard", "amount": 2, "chance": 1.0},
+      {"item_id": "amethyst", "amount": 1, "chance": 0.25},
+      {"item_id": "ruby", "amount": 1, "chance": 0.08},
+      {"item_id": "emerald", "amount": 1, "chance": 0.08},
+      {"item_id": "sapphire", "amount": 1, "chance": 0.08}
+    ],
+    "respawn_time": 240.0,
+    "tool_required": "pickaxe",
+    "spawn_weight": 0.015,
+    "footprint": [1, 1],
+    "collision_size": [12, 8],
+    "collision_offset_y": -4,
+    "visual_offset_y": -14,
+    "frame_height": 96
+  },
+  {
+    "id": "clay_deposit",
+    "display_name": "粘土堆",
+    "drop_item_id": "clay",
+    "drop_amount": 3,
+    "drop_table": [
+      {"item_id": "clay", "amount": 3, "chance": 1.0}
+    ],
+    "respawn_time": 80.0,
+    "tool_required": "",
+    "spawn_weight": 0.05,
+    "footprint": [1, 1],
+    "collision_size": [14, 10],
+    "collision_offset_y": -5,
+    "visual_offset_y": -8,
+    "frame_height": 96
+  },
+  {
+    "id": "sand_deposit",
+    "display_name": "沙堆",
+    "drop_item_id": "sand",
+    "drop_amount": 3,
+    "drop_table": [
+      {"item_id": "sand", "amount": 3, "chance": 1.0},
+      {"item_id": "shell", "amount": 1, "chance": 0.2}
+    ],
+    "respawn_time": 70.0,
+    "tool_required": "",
+    "spawn_weight": 0.04,
+    "footprint": [1, 1],
+    "collision_size": [14, 10],
+    "collision_offset_y": -5,
+    "visual_offset_y": -6,
+    "frame_height": 96
+  },
+  {
+    "id": "driftwood_pile",
+    "display_name": "漂流木堆",
+    "drop_item_id": "driftwood",
+    "drop_amount": 2,
+    "drop_table": [
+      {"item_id": "driftwood", "amount": 2, "chance": 1.0},
+      {"item_id": "shell", "amount": 1, "chance": 0.3}
+    ],
+    "respawn_time": 90.0,
+    "tool_required": "axe",
+    "spawn_weight": 0.03,
+    "footprint": [1, 1],
+    "collision_size": [14, 10],
+    "collision_offset_y": -4,
+    "visual_offset_y": -10,
+    "frame_height": 96
+  },
+  {
+    "id": "kelp_clump",
+    "display_name": "海带丛",
+    "drop_item_id": "kelp",
+    "drop_amount": 2,
+    "drop_table": [
+      {"item_id": "kelp", "amount": 2, "chance": 1.0}
+    ],
+    "respawn_time": 45.0,
+    "tool_required": "",
+    "spawn_weight": 0.05,
+    "footprint": [1, 1],
+    "collision_size": [10, 6],
+    "collision_offset_y": -3,
+    "visual_offset_y": -10,
+    "frame_height": 96
+  },
+  {
+    "id": "coal_node",
+    "display_name": "煤矿",
+    "drop_item_id": "coal",
+    "drop_amount": 2,
+    "drop_table": [
+      {"item_id": "coal", "amount": 2, "chance": 1.0},
+      {"item_id": "stone", "amount": 1, "chance": 0.5}
+    ],
+    "respawn_time": 110.0,
+    "tool_required": "pickaxe",
+    "spawn_weight": 0.05,
+    "footprint": [1, 1],
+    "collision_size": [14, 10],
+    "collision_offset_y": -5,
+    "visual_offset_y": -10,
     "frame_height": 96
   }
 ]

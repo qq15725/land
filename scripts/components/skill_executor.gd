@@ -12,6 +12,9 @@ extends Node
 #   4. 每段命中：扣血 + 击退 + 飘字 + 手感反馈（屏震 + hit-stop）
 
 const QUERY_MASK := 4  # layer 3 = creature
+# 冒险岛风格暴击：10% 概率，伤害 ×1.5（后续可由装备 / buff 改写）
+const CRIT_CHANCE := 0.10
+const CRIT_MULT := 1.5
 
 var _in_hit_stop: bool = false
 
@@ -27,7 +30,18 @@ func cast(skill: ActiveSkillData, target_pos: Vector2, caster: Player) -> void:
 		"circle":     _exec_melee(skill, dir, caster, _hits_in_circle)
 		"rect":       _exec_melee(skill, dir, caster, _hits_in_rect)
 		"projectile": _exec_projectile(skill, dir, caster)
+		"passive":    pass  # 被动技能：仅占技能树位置，不可释放（PlayerActions 应拦截装备）
+		"buff":       _exec_self_buff(skill, caster)
 		_:            push_warning("未知 skill shape: %s" % skill.shape)
+
+# 自身 buff 技能：mp_cost + 给自己挂 buff_id 一段时间
+func _exec_self_buff(skill: ActiveSkillData, caster: Player) -> void:
+	if caster == null:
+		return
+	if not skill.vfx_id.is_empty():
+		VFXLibrary.spawn(skill.vfx_id, caster.get_parent(), caster.global_position, 0.0, skill.vfx_color)
+	if caster.buffs and not skill.buff_id.is_empty():
+		caster.buffs.add_buff(skill.buff_id)
 
 # ─── 近战公共流程（多段 tick） ─────────────────────────────────────────
 
@@ -44,24 +58,31 @@ func _exec_melee(skill: ActiveSkillData, dir: Vector2, caster: Player, hits_fn: 
 		if not is_instance_valid(caster) or caster.health.current_health <= 0.0:
 			return
 		var ratio := float(skill.hit_damage_ratios[i])
-		var dmg: float = (skill.base_damage + caster.inventory.total_damage_bonus()) * ratio
+		var buff_mul: float = caster.buffs.damage_mul() if caster.buffs else 1.0
+		var base_dmg: float = (skill.base_damage + caster.inventory.total_damage_bonus()) * ratio * buff_mul
 		var targets: Array = hits_fn.call(skill, dir, caster)
 		var hit_any := false
+		var any_crit := false
 		for body in targets:
 			if body is Creature:
 				var c := body as Creature
+				# 独立判定暴击：每个目标一次 roll
+				var is_crit := randf() < CRIT_CHANCE
+				var dmg: float = base_dmg * (CRIT_MULT if is_crit else 1.0)
 				c.take_damage_from(caster, dmg)
 				var kb_dir: Vector2 = (c.global_position - caster.global_position)
 				if kb_dir.length() > 0.01:
 					kb_dir = kb_dir.normalized()
 				else:
 					kb_dir = dir
-				c.velocity += kb_dir * skill.knockback
-				DamageNumber.spawn(caster.get_parent(), c.global_position + Vector2(0, -16), dmg, false, skill.vfx_color)
+				c.velocity += kb_dir * skill.knockback * (1.4 if is_crit else 1.0)
+				DamageNumber.spawn(caster.get_parent(), c.global_position + Vector2(0, -16), dmg, is_crit, Color(0, 0, 0, 0))
 				VFXLibrary.spawn("hit_spark", caster.get_parent(), c.global_position + Vector2(0, -12), 0.0, skill.vfx_color)
+				ComboSystem.register_hit()
 				hit_any = true
+				any_crit = any_crit or is_crit
 		if hit_any:
-			_apply_feedback(skill, caster)
+			_apply_feedback(skill, caster, any_crit)
 
 # ─── 形状命中检测（PhysicsShapeQuery，实时） ────────────────────────────
 
@@ -128,17 +149,21 @@ func _exec_projectile(skill: ActiveSkillData, dir: Vector2, caster: Player) -> v
 	caster.get_parent().add_child(proj)
 	proj.global_position = caster.global_position + Vector2(0, -16)
 	if proj.has_method("setup"):
-		proj.setup(dir, skill.base_damage + caster.inventory.total_damage_bonus(), skill.shape_size, caster)
+		var buff_mul: float = caster.buffs.damage_mul() if caster.buffs else 1.0
+		proj.setup(dir, (skill.base_damage + caster.inventory.total_damage_bonus()) * buff_mul, skill.shape_size, caster)
 
 # ─── 手感反馈 ──────────────────────────────────────────────────────────
 
-func _apply_feedback(skill: ActiveSkillData, caster: Player) -> void:
+func _apply_feedback(skill: ActiveSkillData, caster: Player, is_crit: bool = false) -> void:
+	# 暴击放大反馈：屏震 ×1.6 / hit-stop ×2（冒险岛 50ms 普通 → 100ms 暴击）
+	var shake_mul := 1.6 if is_crit else 1.0
+	var stop_mul := 2.0 if is_crit else 1.0
 	if skill.screen_shake > 0.0 and caster.has_method("_camera_shake"):
-		caster._camera_shake(skill.screen_shake)
+		caster._camera_shake(skill.screen_shake * shake_mul)
 	if caster.has_method("on_skill_hit_landed"):
 		caster.on_skill_hit_landed(skill)
 	if skill.hit_stop_ms > 0:
-		_hit_stop(skill.hit_stop_ms)
+		_hit_stop(int(skill.hit_stop_ms * stop_mul))
 
 func _hit_stop(ms: int) -> void:
 	if _in_hit_stop:

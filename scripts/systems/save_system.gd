@@ -265,21 +265,19 @@ func _load_equipped(inv: InventoryComponent, data: Dictionary) -> void:
 const _ResourceNodeScene := preload("res://scenes/world/resource.tscn")
 
 func _migrate_legacy_resource_nodes(data: Array) -> void:
+	var pending: Array = []
 	for entry in data:
 		var rid: String = entry.get("resource_id", "")
 		if rid.is_empty():
 			continue
-		var pos := Vector2(entry.get("x", 0.0), entry.get("y", 0.0))
-		var chunk := ChunkManager.world_to_chunk(pos)
-		ChunkManager.import_snapshots([{
+		pending.append({
 			"kind": "resource",
 			"id": rid,
-			"x": pos.x,
-			"y": pos.y,
+			"x": entry.get("x", 0.0),
+			"y": entry.get("y", 0.0),
 			"depleted": entry.get("depleted", false),
-			"chunk_x": chunk.x,
-			"chunk_y": chunk.y,
-		}])
+		})
+	ChunkManager.import_snapshots(pending)
 
 # ─── 建筑（含 FarmPlot） ────────────────────────────────────────────────
 

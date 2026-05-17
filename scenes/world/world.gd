@@ -13,6 +13,7 @@ const SkillUIScene := preload("res://scenes/ui/skill_ui.tscn")
 const TalentTreeScene := preload("res://scenes/ui/talent_tree.tscn")
 const ClassSelectScene := preload("res://scenes/ui/class_select.tscn")
 const PauseMenuScene := preload("res://scenes/ui/pause_menu.tscn")
+const CodexUIScene := preload("res://scenes/ui/codex_ui.tscn")
 
 # 所有动态 spawn 的 scene 路径，server 端 add_child 后 MultiplayerSpawner
 # 会自动通知 client 端 spawn 对应 scene（同节点路径下）。
@@ -25,15 +26,15 @@ const SPAWNABLE_SCENES: PackedStringArray = [
 	"res://scenes/farm/animal.tscn",
 ]
 
-const SPAWN_RADIUS_TILES := 64           # 资源覆盖半径（tile）
-const ACTIVE_RADIUS_TILES := 64          # 玩家附近多少 tile 范围内的 chunk 保持 active
-const CHUNK_UPDATE_INTERVAL := 1.0       # 每 N 秒检查一次 chunk
 const AUTOSAVE_INTERVAL := 300.0         # 自动保存间隔（秒）
 const MIN_SPAWN_DIST := 80.0
 const CREATURE_SPAWN_RADIUS := 500.0
 const CREATURE_MIN_DIST := 200.0
 
-var _chunk_update_timer: float = 0.0
+# 整图 prefab 生成参数（饥荒式一次性 loading 生成）
+const ROOM_COUNT := 60                   # Voronoi room 数（地图越大越多）
+const SPAWN_RESERVE_TILES := 4           # 玩家出生点周围 reserve 的半径（tile）
+
 var _autosave_timer: float = 0.0
 
 const TILE_SIZE := 16.0
@@ -48,6 +49,11 @@ var _hud: Control = null
 var _day_overlay: ColorRect = null
 var _canvas_modulate: CanvasModulate = null
 var _pause_menu: Control = null
+var _weather_layer: CanvasLayer = null
+var _rain_particles: CPUParticles2D = null
+var _snow_particles: CPUParticles2D = null
+var _thunder_flash: ColorRect = null
+var _thunder_timer: float = 0.0
 
 var terrain_map: TileMapLayer = null
 var terrain_seed: int = 0
@@ -55,9 +61,15 @@ var map_markers: Dictionary = {}   # "next_0"/"next_1"/"next_2"/"prev" → Vecto
 var current_map_id: String = ""    # 当前地图 id，如 "0"、"0-1"
 var _portal_cooldown: float = 0.0
 
+var _loading_layer: CanvasLayer = null
+var _loading_label: Label = null
+var _loading_bar: ProgressBar = null
+
 
 func _ready() -> void:
 	add_to_group("world")
+	_setup_loading_ui()
+	_set_loading("初始化...", 0.05)
 	ChunkManager.clear_state()
 	_setup_terrain()
 	_setup_multiplayer_spawner()
@@ -65,10 +77,20 @@ func _ready() -> void:
 	player.peer_id = Network.local_peer_id()
 	_setup_ui()
 	if SaveSystem.slot_exists(GameManager.current_save_slot):
+		_set_loading("读取存档...", 0.15)
 		await SaveSystem.load_save(GameManager.current_save_slot, self)
 	else:
+		_set_loading("生成地形...", 0.15)
 		await _load_map("0")
-	_update_chunks()
+	# 整图一次性生成 prefab（读档则还原快照，否则按 seed 程序化生成）。
+	# 多人模式下只 server 撒，client 通过 MultiplayerSpawner 自动同步。
+	if ChunkManager.has_pending_restore():
+		_set_loading("还原资源...", 0.85)
+		_restore_world_from_snapshot()
+	elif Network.is_server():
+		await _populate_world(terrain_seed)
+	_set_loading("完成", 1.0)
+	_hide_loading()
 	_maybe_show_class_select()
 	BuildingSystem.build_mode_entered.connect(_on_build_mode_entered)
 	BuildingSystem.build_mode_exited.connect(_on_build_mode_exited)
@@ -77,9 +99,69 @@ func _ready() -> void:
 	TimeSystem.day_started.connect(_on_day_started)
 	TimeSystem.day_started.connect(func(_d): _autosave("新的一天"))
 	SoundSystem.play_world_bgm()
+	_setup_weather_fx()
+	WeatherSystem.weather_changed.connect(_on_weather_changed)
+	_on_weather_changed(WeatherSystem.current_id)
 	# 多人：监听玩家进出
 	Network.peer_joined.connect(_on_peer_joined)
 	Network.peer_left.connect(_on_peer_left)
+
+func _setup_weather_fx() -> void:
+	_weather_layer = CanvasLayer.new()
+	_weather_layer.layer = 4
+	add_child(_weather_layer)
+
+	# 雨
+	_rain_particles = CPUParticles2D.new()
+	_rain_particles.amount = 200
+	_rain_particles.lifetime = 1.2
+	_rain_particles.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	_rain_particles.emission_rect_extents = Vector2(800, 8)
+	_rain_particles.position = Vector2(640, -40)
+	_rain_particles.direction = Vector2(0.1, 1.0)
+	_rain_particles.spread = 5.0
+	_rain_particles.initial_velocity_min = 720.0
+	_rain_particles.initial_velocity_max = 920.0
+	_rain_particles.scale_amount_min = 1.0
+	_rain_particles.scale_amount_max = 2.5
+	_rain_particles.color = Color(0.7, 0.85, 1.0, 0.55)
+	_rain_particles.emitting = false
+	_weather_layer.add_child(_rain_particles)
+
+	# 雪
+	_snow_particles = CPUParticles2D.new()
+	_snow_particles.amount = 120
+	_snow_particles.lifetime = 6.0
+	_snow_particles.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	_snow_particles.emission_rect_extents = Vector2(800, 8)
+	_snow_particles.position = Vector2(640, -40)
+	_snow_particles.direction = Vector2(0.0, 1.0)
+	_snow_particles.spread = 25.0
+	_snow_particles.initial_velocity_min = 60.0
+	_snow_particles.initial_velocity_max = 100.0
+	_snow_particles.angular_velocity_min = -90.0
+	_snow_particles.angular_velocity_max = 90.0
+	_snow_particles.scale_amount_min = 2.0
+	_snow_particles.scale_amount_max = 4.0
+	_snow_particles.color = Color(1.0, 1.0, 1.0, 0.85)
+	_snow_particles.emitting = false
+	_weather_layer.add_child(_snow_particles)
+
+	# 雷暴闪光
+	_thunder_flash = ColorRect.new()
+	_thunder_flash.anchor_right = 1.0
+	_thunder_flash.anchor_bottom = 1.0
+	_thunder_flash.color = Color(1, 1, 1, 0)
+	_thunder_flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_weather_layer.add_child(_thunder_flash)
+
+func _on_weather_changed(_id: String) -> void:
+	if _rain_particles:
+		_rain_particles.emitting = WeatherSystem.is_raining()
+	if _snow_particles:
+		_snow_particles.emitting = WeatherSystem.is_snowing()
+	if WeatherSystem.is_thundering():
+		_thunder_timer = randf_range(4.0, 9.0)
 
 # 在 YSortLayer 挂 MultiplayerSpawner，server 在该层 add_child 会自动同步到 client。
 # 仅多人模式启用：单机下 OfflineMultiplayerPeer 不需要同步，挂 spawner 反而会
@@ -140,6 +222,7 @@ func _load_map(map_id: String) -> void:
 		var img_path := "res://assets/maps/" + map_id + ".png"
 		if FileAccess.file_exists(img_path):
 			map_markers = await WorldGenerator.generate_from_image(terrain_map, img_path)
+			terrain_seed = img_path.hash()
 		else:
 			push_error("预设地图不存在: " + img_path + "，回退到程序化生成")
 			await _gen_random()
@@ -186,14 +269,16 @@ func _travel(marker_key: String) -> void:
 	else:
 		return
 
-	# 清除当前地图的临时实体（地图切换重置 chunk 状态）
+	# 清除当前地图的临时实体（切图时整图重生）
 	for node in y_sort_layer.get_children():
 		if node is ResourceNode or node is Creature:
 			node.queue_free()
 	ChunkManager.clear_state()
 
 	await _load_map(target_id)
-	_update_chunks()
+	_show_loading()
+	await _populate_world(terrain_seed)
+	_hide_loading()
 	_portal_cooldown = PORTAL_COOLDOWN
 
 	# 传送玩家到目标地图入口
@@ -223,6 +308,58 @@ func _find_class_select() -> Control:
 			if n:
 				return n as Control
 	return null
+
+
+func _setup_loading_ui() -> void:
+	_loading_layer = CanvasLayer.new()
+	_loading_layer.layer = 100
+	add_child(_loading_layer)
+
+	var bg := ColorRect.new()
+	bg.color = Color(0.05, 0.05, 0.08, 1.0)
+	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	bg.mouse_filter = Control.MOUSE_FILTER_STOP
+	_loading_layer.add_child(bg)
+
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_loading_layer.add_child(center)
+
+	var box := VBoxContainer.new()
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.add_theme_constant_override("separation", 16)
+	center.add_child(box)
+
+	_loading_label = Label.new()
+	_loading_label.text = "加载中..."
+	_loading_label.add_theme_font_size_override("font_size", 28)
+	_loading_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(_loading_label)
+
+	_loading_bar = ProgressBar.new()
+	_loading_bar.custom_minimum_size = Vector2(360, 14)
+	_loading_bar.max_value = 1.0
+	_loading_bar.value = 0.0
+	_loading_bar.show_percentage = false
+	box.add_child(_loading_bar)
+
+
+func _set_loading(text: String, pct: float) -> void:
+	if _loading_label:
+		_loading_label.text = text
+	if _loading_bar:
+		_loading_bar.value = pct
+
+
+func _show_loading() -> void:
+	if _loading_layer:
+		_loading_layer.visible = true
+
+
+func _hide_loading() -> void:
+	if _loading_layer:
+		_loading_layer.visible = false
 
 
 func _setup_terrain() -> void:
@@ -287,6 +424,10 @@ func _setup_ui() -> void:
 	class_select.name = "ClassSelect"
 	ui_layer.add_child(class_select)
 
+	var codex_ui := CodexUIScene.instantiate()
+	codex_ui.name = "CodexUI"
+	ui_layer.add_child(codex_ui)
+
 	_pause_menu = PauseMenuScene.instantiate()
 	ui_layer.add_child(_pause_menu)
 
@@ -301,14 +442,21 @@ func _process(delta: float) -> void:
 		_build_preview.global_position = mpos
 	_update_day_overlay()
 	_check_portals(delta)
-	_chunk_update_timer += delta
-	if _chunk_update_timer >= CHUNK_UPDATE_INTERVAL:
-		_chunk_update_timer = 0.0
-		_update_chunks()
 	_autosave_timer += delta
 	if _autosave_timer >= AUTOSAVE_INTERVAL:
 		_autosave_timer = 0.0
 		_autosave("自动保存")
+	_tick_thunder(delta)
+
+func _tick_thunder(delta: float) -> void:
+	if _thunder_flash == null:
+		return
+	if WeatherSystem.is_thundering():
+		_thunder_timer -= delta
+		if _thunder_timer <= 0.0:
+			_thunder_flash.color = Color(1, 1, 1, 0.7)
+			_thunder_timer = randf_range(5.0, 12.0)
+	_thunder_flash.color.a = move_toward(_thunder_flash.color.a, 0.0, delta * 3.0)
 
 func _autosave(reason: String) -> void:
 	SaveSystem.save(GameManager.current_save_slot, self)
@@ -391,39 +539,64 @@ func _on_building_placed(building: BuildingData, pos: Vector2) -> void:
 
 func _on_night_started(_day: int) -> void:
 	_spawn_night_creatures()
+	# 每个季节最后一天的夜晚刷 Boss
+	if TimeSystem.day_in_season() == TimeSystem.DAYS_PER_SEASON:
+		_spawn_season_boss()
+
+func _spawn_season_boss() -> void:
+	var boss_id := "season_bear"   # 先固定，后续可按季节扩展
+	var data := ItemDatabase.get_creature(boss_id)
+	if data == null or not data.is_boss:
+		return
+	# 已经有 boss 时不重复
+	if not get_tree().get_nodes_in_group("boss").is_empty():
+		return
+	var rng := RandomNumberGenerator.new()
+	rng.randomize()
+	var pos := player.global_position + Vector2(cos(rng.randf() * TAU), sin(rng.randf() * TAU)) * 320.0
+	var boss: Creature = CreatureScene.instantiate()
+	boss.data = data
+	boss.position = pos
+	y_sort_layer.add_child(boss)
+	if _hud and _hud.has_method("show_toast"):
+		_hud.show_toast("⚔ %s 出现了！" % data.display_name, 4.0)
 
 func _on_day_started(_day: int) -> void:
 	pass
 
-func _update_chunks() -> void:
+# 整图一次性生成：Voronoi room → count/distribute/setpiece 三 pass 撒 prefab。
+func _populate_world(seed_val: int) -> void:
+	_set_loading("划分区域...", 0.45)
+	var w := WorldGenerator.last_map_w
+	var h := WorldGenerator.last_map_h
+	var origin := WorldGenerator.last_map_origin
+	var graph := RoomGraph.new(self)
+	await graph.build(w, h, ROOM_COUNT, seed_val, origin)
+
+	_set_loading("撒资源...", 0.75)
+	var populator := PrefabPopulator.new(graph, y_sort_layer, ResourceNodeScene, seed_val)
+	# reserve 玩家出生点周围若干格，防止 prefab 卡住出生位置
 	var player_tile := Vector2i(
 		floori(player.global_position.x / TILE_SIZE),
 		floori(player.global_position.y / TILE_SIZE)
 	)
-	var wanted := ChunkManager.chunks_in_radius(player_tile, ACTIVE_RADIUS_TILES)
-	var wanted_set: Dictionary = {}
-	for c in wanted:
-		wanted_set[c] = true
+	var r := SPAWN_RESERVE_TILES
+	populator.reserve_world_tiles(Rect2i(
+		player_tile - Vector2i(r, r),
+		Vector2i(r * 2 + 1, r * 2 + 1)
+	))
+	await populator.populate()
 
-	# 卸载远处的 chunk
-	for chunk in ChunkManager.get_active_chunks():
-		if not wanted_set.has(chunk):
-			ChunkManager.deactivate_chunk(chunk)
+	# 新生成的 ResourceNode 登记到 ChunkManager 供存档用
+	for n in y_sort_layer.get_children():
+		if n is ResourceNode:
+			ChunkManager.register_entity(n)
 
-	# 加载新进入的 chunk
-	for chunk in wanted:
-		if not ChunkManager.is_active(chunk):
-			_activate_chunk(chunk)
 
-func _activate_chunk(chunk: Vector2i) -> void:
-	ChunkManager.mark_active(chunk)
-	if ChunkManager.has_snapshot(chunk):
-		_restore_chunk_from_snapshot(chunk)
-	else:
-		_spawn_chunk_resources(chunk)
-
-func _restore_chunk_from_snapshot(chunk: Vector2i) -> void:
-	for entry in ChunkManager.get_snapshot(chunk):
+# 读档：根据扁平 entity 快照重建所有 ResourceNode。
+func _restore_world_from_snapshot() -> void:
+	var pending := ChunkManager.consume_pending_snapshot()
+	for entry in pending:
 		if entry.get("kind", "") != "resource":
 			continue
 		var node: ResourceNode = ResourceNodeScene.instantiate()
@@ -432,78 +605,29 @@ func _restore_chunk_from_snapshot(chunk: Vector2i) -> void:
 		y_sort_layer.add_child(node)
 		if entry.get("depleted", false):
 			node.call_deferred("restore_from_save", 0.0)
-		ChunkManager.register_entity(chunk, node)
-
-func _spawn_chunk_resources(chunk: Vector2i) -> void:
-	var rng := RandomNumberGenerator.new()
-	rng.randomize()
-	var node_types := ItemDatabase.get_all_resource_nodes()
-	if node_types.is_empty():
-		return
-	var biomes_exist := not ItemDatabase.get_all_biomes().is_empty()
-	var global_total := 0.0
-	for nd in node_types:
-		global_total += nd.spawn_weight
-	for i in ChunkManager.RESOURCES_PER_CHUNK:
-		var pos := ChunkManager.random_in_chunk(rng, chunk)
-		if pos.distance_to(player.global_position) < MIN_SPAWN_DIST:
-			continue
-		var chosen: ResourceNodeData = null
-		if biomes_exist:
-			var biome := WorldGenerator.get_biome_at(pos)
-			if biome and rng.randf() > biome.spawn_density:
-				continue
-			chosen = _pick_resource_by_biome(rng, node_types, biome)
-		if chosen == null:
-			chosen = _pick_resource_global(rng, node_types, global_total)
-		if chosen == null:
-			continue
-		var node: ResourceNode = ResourceNodeScene.instantiate()
-		node.resource_id = chosen.id
-		node.position = pos
-		y_sort_layer.add_child(node)
-		ChunkManager.register_entity(chunk, node)
-
-func _pick_resource_by_biome(rng: RandomNumberGenerator, node_types: Array, biome: BiomeData) -> ResourceNodeData:
-	if biome == null or biome.resource_weights.is_empty():
-		return null
-	var total := 0.0
-	for w in biome.resource_weights.values():
-		total += float(w)
-	if total <= 0.0:
-		return null
-	var roll := rng.randf() * total
-	var acc := 0.0
-	for res_id in biome.resource_weights:
-		acc += float(biome.resource_weights[res_id])
-		if roll <= acc:
-			for nd in node_types:
-				if nd.id == res_id:
-					return nd
-			return null
-	return null
-
-func _pick_resource_global(rng: RandomNumberGenerator, node_types: Array, total_weight: float) -> ResourceNodeData:
-	if total_weight <= 0.0:
-		return null
-	var roll := rng.randf() * total_weight
-	var acc := 0.0
-	for nd in node_types:
-		acc += nd.spawn_weight
-		if roll <= acc:
-			return nd
-	return node_types[0]
+		ChunkManager.register_entity(node)
 
 func _spawn_night_creatures() -> void:
+	# 夏至日：今晚不刷怪
+	if FestivalSystem.is_active("summer_solstice"):
+		return
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
 	var all_creatures := ItemDatabase.get_all_creatures()
 	if all_creatures.is_empty():
 		return
 	var count := rng.randi_range(3, 6)
+	# 夜间只刷 nocturnal/hostile，排除 passive
+	var hostile: Array = []
+	for c in all_creatures:
+		var cd := c as CreatureData
+		if not cd.passive and not cd.is_boss:
+			hostile.append(cd)
+	if hostile.is_empty():
+		return
 	for i in count:
 		var pos := _random_pos(rng, CREATURE_MIN_DIST, CREATURE_SPAWN_RADIUS)
-		var chosen := _pick_creature_for_pos(rng, all_creatures, pos)
+		var chosen := _pick_creature_for_pos(rng, hostile, pos)
 		if chosen == null:
 			continue
 		var creature: Creature = CreatureScene.instantiate()

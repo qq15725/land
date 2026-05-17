@@ -72,5 +72,162 @@
     "drop_table": [
       {"item_id": "bone", "min": 1, "max": 1, "chance": 0.5}
     ]
+  },
+  {
+    "id": "rabbit",
+    "display_name": "兔子",
+    "max_health": 8.0,
+    "move_speed": 110.0,
+    "attack_damage": 0.0,
+    "attack_range": 0.0,
+    "attack_cooldown": 999.0,
+    "detection_radius": 100.0,
+    "wander_radius": 220.0,
+    "passive": true,
+    "nocturnal": false,
+    "drop_table": [
+      {"item_id": "meat", "min": 1, "max": 1, "chance": 0.7},
+      {"item_id": "leather", "min": 1, "max": 1, "chance": 0.5}
+    ]
+  },
+  {
+    "id": "deer",
+    "display_name": "鹿",
+    "max_health": 30.0,
+    "move_speed": 95.0,
+    "attack_damage": 0.0,
+    "attack_range": 0.0,
+    "attack_cooldown": 999.0,
+    "detection_radius": 160.0,
+    "wander_radius": 280.0,
+    "passive": true,
+    "nocturnal": false,
+    "drop_table": [
+      {"item_id": "meat", "min": 2, "max": 3, "chance": 0.9},
+      {"item_id": "leather", "min": 1, "max": 2, "chance": 0.7},
+      {"item_id": "bone", "min": 1, "max": 1, "chance": 0.4}
+    ]
+  },
+  {
+    "id": "season_bear",
+    "display_name": "山贼之熊",
+    "max_health": 240.0,
+    "max_health_scale": 1.0,
+    "move_speed": 70.0,
+    "attack_damage": 22.0,
+    "attack_range": 38.0,
+    "attack_cooldown": 1.4,
+    "detection_radius": 260.0,
+    "wander_radius": 360.0,
+    "is_boss": true,
+    "nocturnal": false,
+    "drop_table": [
+      {"item_id": "meat", "min": 4, "max": 6, "chance": 1.0},
+      {"item_id": "leather", "min": 3, "max": 5, "chance": 1.0},
+      {"item_id": "bone", "min": 2, "max": 3, "chance": 1.0},
+      {"item_id": "rare_seed", "min": 1, "max": 2, "chance": 0.7},
+      {"item_id": "blueprint", "min": 1, "max": 1, "chance": 0.5}
+    ]
+  },
+  {
+    "id": "stone_golem",
+    "display_name": "石巨人",
+    "max_health": 140.0,
+    "move_speed": 40.0,
+    "attack_damage": 24.0,
+    "attack_range": 40.0,
+    "attack_cooldown": 1.8,
+    "detection_radius": 180.0,
+    "wander_radius": 220.0,
+    "nocturnal": false,
+    "drop_table": [
+      {"item_id": "stone", "min": 3, "max": 5, "chance": 1.0},
+      {"item_id": "iron_ore", "min": 1, "max": 2, "chance": 0.5},
+      {"item_id": "crystal_shard", "min": 1, "max": 1, "chance": 0.3}
+    ]
+  },
+  {
+    "id": "wisp",
+    "display_name": "鬼火",
+    "max_health": 20.0,
+    "move_speed": 120.0,
+    "attack_damage": 10.0,
+    "attack_range": 32.0,
+    "attack_cooldown": 1.1,
+    "detection_radius": 220.0,
+    "wander_radius": 300.0,
+    "nocturnal": true,
+    "drop_table": [
+      {"item_id": "crystal_shard", "min": 1, "max": 1, "chance": 0.6},
+      {"item_id": "bone_meal", "min": 1, "max": 2, "chance": 0.4}
+    ]
+  },
+  {
+    "id": "bat_king",
+    "display_name": "蝙蝠王",
+    "max_health": 180.0,
+    "max_health_scale": 1.0,
+    "move_speed": 140.0,
+    "attack_damage": 18.0,
+    "attack_range": 30.0,
+    "attack_cooldown": 0.8,
+    "detection_radius": 280.0,
+    "wander_radius": 340.0,
+    "is_boss": true,
+    "nocturnal": true,
+    "drop_table": [
+      {"item_id": "bone", "min": 3, "max": 5, "chance": 1.0},
+      {"item_id": "leather", "min": 2, "max": 3, "chance": 0.9},
+      {"item_id": "amethyst", "min": 1, "max": 1, "chance": 0.6},
+      {"item_id": "blueprint", "min": 1, "max": 1, "chance": 0.4}
+    ]
+  },
+  {
+    "id": "venom_scorpion",
+    "display_name": "毒蝎",
+    "max_health": 55.0,
+    "move_speed": 85.0,
+    "attack_damage": 16.0,
+    "attack_range": 26.0,
+    "attack_cooldown": 0.9,
+    "detection_radius": 200.0,
+    "wander_radius": 240.0,
+    "nocturnal": false,
+    "drop_table": [
+      {"item_id": "bone", "min": 1, "max": 2, "chance": 0.7},
+      {"item_id": "leather", "min": 1, "max": 1, "chance": 0.5},
+      {"item_id": "chili", "min": 1, "max": 1, "chance": 0.2}
+    ]
+  },
+  {
+    "id": "ice_slime",
+    "display_name": "冰史莱姆",
+    "max_health": 45.0,
+    "move_speed": 60.0,
+    "attack_damage": 9.0,
+    "attack_range": 26.0,
+    "attack_cooldown": 1.4,
+    "detection_radius": 150.0,
+    "wander_radius": 200.0,
+    "drop_table": [
+      {"item_id": "crystal_shard", "min": 1, "max": 2, "chance": 0.7},
+      {"item_id": "sapphire", "min": 1, "max": 1, "chance": 0.15}
+    ]
+  },
+  {
+    "id": "fire_elemental",
+    "display_name": "火元素",
+    "max_health": 90.0,
+    "move_speed": 70.0,
+    "attack_damage": 20.0,
+    "attack_range": 36.0,
+    "attack_cooldown": 1.2,
+    "detection_radius": 220.0,
+    "wander_radius": 280.0,
+    "drop_table": [
+      {"item_id": "coal", "min": 2, "max": 4, "chance": 1.0},
+      {"item_id": "ruby", "min": 1, "max": 1, "chance": 0.2},
+      {"item_id": "crystal_shard", "min": 1, "max": 1, "chance": 0.4}
+    ]
   }
 ]

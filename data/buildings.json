@@ -153,5 +153,193 @@
       {"item_id": "wool", "amount": 2}
     ],
     "animal_id": ""
+  },
+  {
+    "id": "flowerpot",
+    "display_name": "花盆",
+    "category": "decoration",
+    "scene_path": "res://scenes/buildings/decoration.tscn",
+    "cost": [
+      {"item_id": "stone", "amount": 2},
+      {"item_id": "wood", "amount": 1}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "chair",
+    "display_name": "椅子",
+    "category": "decoration",
+    "scene_path": "res://scenes/buildings/decoration.tscn",
+    "cost": [
+      {"item_id": "wood", "amount": 4},
+      {"item_id": "wool", "amount": 1}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "lamppost",
+    "display_name": "路灯",
+    "category": "decoration",
+    "scene_path": "res://scenes/buildings/lamppost.tscn",
+    "cost": [
+      {"item_id": "iron_bar", "amount": 2},
+      {"item_id": "wood", "amount": 3}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "flag",
+    "display_name": "旗帜",
+    "category": "decoration",
+    "scene_path": "res://scenes/buildings/decoration.tscn",
+    "cost": [
+      {"item_id": "wood", "amount": 2},
+      {"item_id": "wool", "amount": 2}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "fountain",
+    "display_name": "喷泉",
+    "category": "decoration",
+    "scene_path": "res://scenes/buildings/decoration.tscn",
+    "cost": [
+      {"item_id": "stone", "amount": 20},
+      {"item_id": "iron_bar", "amount": 3}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "well",
+    "display_name": "井",
+    "category": "farm",
+    "scene_path": "res://scenes/buildings/well.tscn",
+    "cost": [
+      {"item_id": "stone", "amount": 12},
+      {"item_id": "wooden_plank", "amount": 3}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "oven",
+    "display_name": "烤炉",
+    "category": "building",
+    "scene_path": "res://scenes/buildings/oven.tscn",
+    "cost": [
+      {"item_id": "stone", "amount": 16},
+      {"item_id": "iron_bar", "amount": 2}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "anvil",
+    "display_name": "铁砧",
+    "category": "building",
+    "scene_path": "res://scenes/buildings/anvil.tscn",
+    "cost": [
+      {"item_id": "iron_bar", "amount": 8},
+      {"item_id": "wood", "amount": 4}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "mill",
+    "display_name": "磨坊",
+    "category": "farm",
+    "scene_path": "res://scenes/buildings/mill.tscn",
+    "cost": [
+      {"item_id": "wood", "amount": 12},
+      {"item_id": "stone", "amount": 8},
+      {"item_id": "wooden_plank", "amount": 6}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "smelter",
+    "display_name": "熔炉",
+    "category": "building",
+    "scene_path": "res://scenes/buildings/decoration.tscn",
+    "cost": [
+      {"item_id": "stone", "amount": 8},
+      {"item_id": "wood", "amount": 4}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "fishing_dock",
+    "display_name": "钓鱼台",
+    "category": "building",
+    "scene_path": "res://scenes/buildings/decoration.tscn",
+    "cost": [
+      {"item_id": "wood", "amount": 6},
+      {"item_id": "wooden_plank", "amount": 2}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "loom",
+    "display_name": "织布机",
+    "category": "building",
+    "scene_path": "res://scenes/buildings/decoration.tscn",
+    "cost": [
+      {"item_id": "wood", "amount": 5},
+      {"item_id": "wool", "amount": 2}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "dye_vat",
+    "display_name": "染料桶",
+    "category": "building",
+    "scene_path": "res://scenes/buildings/decoration.tscn",
+    "cost": [
+      {"item_id": "wood", "amount": 3},
+      {"item_id": "clay", "amount": 2}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "coop",
+    "display_name": "鸡舍",
+    "category": "farm",
+    "scene_path": "res://scenes/buildings/decoration.tscn",
+    "cost": [
+      {"item_id": "wood", "amount": 8},
+      {"item_id": "hay", "amount": 4}
+    ],
+    "animal_id": "chicken"
+  },
+  {
+    "id": "brewing_keg",
+    "display_name": "酿造桶",
+    "category": "building",
+    "scene_path": "res://scenes/buildings/decoration.tscn",
+    "cost": [
+      {"item_id": "wood", "amount": 6},
+      {"item_id": "iron_bar", "amount": 1}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "scarecrow",
+    "display_name": "稻草人",
+    "category": "farm",
+    "scene_path": "res://scenes/buildings/decoration.tscn",
+    "cost": [
+      {"item_id": "wood", "amount": 2},
+      {"item_id": "hay", "amount": 3}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "sign_post",
+    "display_name": "路标",
+    "category": "building",
+    "scene_path": "res://scenes/buildings/decoration.tscn",
+    "cost": [
+      {"item_id": "wood", "amount": 2},
+      {"item_id": "wooden_plank", "amount": 1}
+    ],
+    "animal_id": ""
   }
 ]

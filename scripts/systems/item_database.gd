@@ -15,6 +15,7 @@ var _creatures: Dictionary = {}
 var _merchants: Array = []
 var _resource_nodes: Array = []
 var _biomes: Array = []
+var _setpieces: Array = []
 var _active_skills: Dictionary = {}  # id → ActiveSkillData
 var _classes: Dictionary = {}        # id → ClassData
 
@@ -34,6 +35,7 @@ func _ready() -> void:
 	_load_merchants()
 	_load_resource_nodes()
 	_load_biomes()
+	_load_setpieces()
 	_load_active_skills()
 	_load_classes()
 	_resolve_refs()
@@ -131,6 +133,10 @@ func _load_creatures() -> void:
 		c.wander_radius = d.get("wander_radius", 200.0)
 		c.sprite_scale = d.get("sprite_scale", 1.0)
 		c.drop_table = d.get("drop_table", [])
+		c.passive = bool(d.get("passive", false))
+		c.nocturnal = bool(d.get("nocturnal", true))
+		c.max_health_scale = float(d.get("max_health_scale", 1.0))
+		c.is_boss = bool(d.get("is_boss", false))
 		_creatures[c.id] = c
 
 func _load_merchants() -> void:
@@ -163,6 +169,8 @@ func _load_resource_nodes() -> void:
 		n.respawn_time = d.get("respawn_time", 30.0)
 		n.tool_required = d.get("tool_required", "")
 		n.spawn_weight = d.get("spawn_weight", 1.0)
+		var fp: Array = d.get("footprint", [1, 1])
+		n.footprint = Vector2i(int(fp[0]), int(fp[1]))
 		var cs: Array = d.get("collision_size", [16, 16])
 		n.collision_size = Vector2(cs[0], cs[1])
 		n.collision_offset_y = d.get("collision_offset_y", 0.0)
@@ -176,10 +184,25 @@ func _load_biomes() -> void:
 		var b := BiomeData.new()
 		b.id = d.get("id", "")
 		b.display_name = d.get("display_name", "")
-		b.spawn_density = float(d.get("spawn_density", 1.0))
-		b.resource_weights = d.get("resource_weights", {})
+		b.room_weight = float(d.get("room_weight", 1.0))
+		b.count_prefabs = d.get("count_prefabs", {})
+		b.distribute_prefabs = d.get("distribute_prefabs", {})
+		b.distribute_percent = float(d.get("distribute_percent", 0.5))
 		b.creature_weights = d.get("creature_weights", {})
 		_biomes.append(b)
+
+func _load_setpieces() -> void:
+	for d in _read_json("res://data/setpieces.json"):
+		var s := SetpieceData.new()
+		s.id = d.get("id", "")
+		s.display_name = d.get("display_name", "")
+		var fp: Array = d.get("footprint", [1, 1])
+		s.footprint = Vector2i(int(fp[0]), int(fp[1]))
+		s.biome_filter = d.get("biome_filter", [])
+		s.weight = float(d.get("weight", 1.0))
+		s.required = bool(d.get("required", false))
+		s.prefabs = d.get("prefabs", [])
+		_setpieces.append(s)
 
 func _load_active_skills() -> void:
 	for d in _read_json("res://data/active_skills.json"):
@@ -211,6 +234,8 @@ func _load_active_skills() -> void:
 		s.knockback = float(d.get("knockback", 200.0))
 		s.anim_state = d.get("anim_state", "")
 		s.anim_duration = float(d.get("anim_duration", 0.3))
+		s.buff_id = d.get("buff_id", "")
+		s.passive_effect = d.get("passive_effect", "")
 		_active_skills[s.id] = s
 
 func _load_classes() -> void:
@@ -360,11 +385,29 @@ func get_biome(id: String) -> BiomeData:
 			return b
 	return null
 
+func get_all_setpieces() -> Array:
+	return _setpieces
+
+func get_setpiece(id: String) -> SetpieceData:
+	for s in _setpieces:
+		if s.id == id:
+			return s
+	return null
+
 func get_active_skill(id: String) -> ActiveSkillData:
 	return _active_skills.get(id, null)
 
 func get_all_active_skills() -> Array:
 	return _active_skills.values()
+
+# 技能图标加载：优先独立 PNG（skills/{id}.png），fallback 到 icon_grid 借位
+func get_skill_icon(skill: ActiveSkillData) -> Texture2D:
+	if skill == null:
+		return null
+	var per_id := AssetPaths.skill_icon(skill.id)
+	if ResourceLoader.exists(per_id):
+		return load(per_id) as Texture2D
+	return get_icon_at_grid(skill.icon_grid)
 
 func get_class_data(id: String) -> ClassData:
 	return _classes.get(id, null)

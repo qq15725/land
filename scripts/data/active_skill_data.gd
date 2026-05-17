@@ -53,3 +53,9 @@ extends Resource
 # cast_fan / cast_circle / cast_rect / cast_projectile / "" = 不切
 @export var anim_state: String = ""
 @export var anim_duration: float = 0.3
+
+# ─── 被动 / Buff 扩展 ─────────────────────────────────────────────────────
+# shape="passive" — 仅占技能树位置，不可装配释放；学习后 effect 通过 _passive_effect 字段标注
+# shape="buff"    — 自身 buff，释放时给玩家挂 buff_id 一段时间
+@export var buff_id: String = ""                # shape="buff" 时挂的 buff id
+@export var passive_effect: String = ""         # passive 文本说明（"+1% damage per level" 等）

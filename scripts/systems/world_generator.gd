@@ -1,8 +1,13 @@
 extends Node
 
 # ── 地图尺寸 ──────────────────────────────────────────────────────────────────
-const MAP_HALF := 100
+const MAP_HALF := 160
 const MAP_SIZE := MAP_HALF * 2
+
+# 最近一次生成的实际尺寸 / 原点（兼容程序化 + 预设地图两种生成路径）
+var last_map_w: int = MAP_SIZE
+var last_map_h: int = MAP_SIZE
+var last_map_origin: Vector2i = Vector2i(-MAP_HALF, -MAP_HALF)
 
 # ── Biome 噪声 ───────────────────────────────────────────────────────────────
 const BIOME_FREQ := 0.008
@@ -158,6 +163,9 @@ func _setup_blob_tile(src: TileSetAtlasSource, coords: Vector2i, terrain_id: int
 const TERRAIN_CACHE_DIR := "user://world_cache"
 
 func generate(tilemap: TileMapLayer, seed_val: int) -> void:
+	last_map_w = MAP_SIZE
+	last_map_h = MAP_SIZE
+	last_map_origin = Vector2i(-MAP_HALF, -MAP_HALF)
 	# 优先从字节流缓存载入（毫秒级）；miss 则跑慢算法 + 写盘
 	if _load_from_cache(tilemap, seed_val):
 		init_biome_noise(seed_val)
@@ -203,7 +211,8 @@ func _save_to_cache(tilemap: TileMapLayer, seed_val: int) -> void:
 	f.close()
 
 func _cache_path(seed_val: int) -> String:
-	return "%s/terrain_%d.bin" % [TERRAIN_CACHE_DIR, seed_val]
+	# 文件名带 map_size 版本，避免地图尺寸变化时读到旧字节流。
+	return "%s/terrain_%d_%d.bin" % [TERRAIN_CACHE_DIR, MAP_SIZE, seed_val]
 
 # 清除指定 seed 的缓存（存档重置时调用）
 func clear_cache(seed_val: int) -> void:
@@ -306,6 +315,9 @@ func generate_from_image(tilemap: TileMapLayer, image_path: String) -> Dictionar
 				map[iy * img_w + ix] = _match_terrain_color(col)
 
 	tilemap.clear()
+	last_map_w = img_w
+	last_map_h = img_h
+	last_map_origin = Vector2i(-half_w, -half_h)
 	await _apply_terrain(tilemap, map, img_w, img_h, -half_w, -half_h)
 	init_biome_noise(image_path.hash())
 	return markers

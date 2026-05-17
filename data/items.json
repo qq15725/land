@@ -465,5 +465,769 @@
     "color": [0.85, 0.75, 0.3, 1.0],
     "heal_amount": 0.0,
     "equip_slot": "accessory"
+  },
+  {
+    "id": "meteorite_ore",
+    "display_name": "陨石矿",
+    "icon_grid": [4, 0],
+    "max_stack": 50,
+    "description": "从陨石中开采的稀有矿物，蕴含宇宙之力。",
+    "color": [0.55, 0.5, 0.85, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 80
+  },
+  {
+    "id": "fish",
+    "display_name": "鱼",
+    "icon_grid": [2, 2],
+    "max_stack": 20,
+    "description": "新鲜的鱼，可烹饪。",
+    "color": [0.45, 0.7, 0.95, 1.0],
+    "heal_amount": 8.0,
+    "sell_price": 12
+  },
+  {
+    "id": "fishing_rod",
+    "display_name": "鱼竿",
+    "icon_grid": [5, 3],
+    "max_stack": 1,
+    "description": "用于在水域钓鱼。",
+    "color": [0.55, 0.4, 0.2, 1.0],
+    "heal_amount": 0.0,
+    "tool_type": "fishing_rod"
+  },
+  {
+    "id": "hat_straw",
+    "display_name": "草帽",
+    "icon_grid": [6, 0],
+    "max_stack": 1,
+    "description": "农夫的草帽，可作为装扮佩戴。",
+    "color": [0.92, 0.78, 0.4, 1.0],
+    "heal_amount": 0.0,
+    "equip_slot": "cosmetic_hat"
+  },
+  {
+    "id": "cape_red",
+    "display_name": "红披风",
+    "icon_grid": [4, 5],
+    "max_stack": 1,
+    "description": "鲜红的披风，仅装扮。",
+    "color": [0.85, 0.2, 0.2, 1.0],
+    "heal_amount": 0.0,
+    "equip_slot": "cosmetic_cape"
+  },
+  {
+    "id": "flour",
+    "display_name": "面粉",
+    "icon_grid": [6, 0],
+    "max_stack": 99,
+    "description": "用磨坊磨制小麦得到，烘焙原料。",
+    "color": [0.96, 0.94, 0.85, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 8
+  },
+  {
+    "id": "copper_ore",
+    "display_name": "铜矿石",
+    "icon_grid": [0, 9],
+    "max_stack": 99,
+    "description": "采集自铜矿节点，需要熔炼。",
+    "color": [0.78, 0.42, 0.22, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 4
+  },
+  {
+    "id": "copper_bar",
+    "display_name": "铜锭",
+    "icon_grid": [4, 0],
+    "max_stack": 50,
+    "description": "熔炼后的铜块，用于中级工具和电路。",
+    "color": [0.85, 0.5, 0.25, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 10
+  },
+  {
+    "id": "gold_ore",
+    "display_name": "金矿石",
+    "icon_grid": [0, 9],
+    "max_stack": 99,
+    "description": "闪闪发光的金矿原矿。",
+    "color": [0.95, 0.78, 0.22, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 12
+  },
+  {
+    "id": "gold_bar",
+    "display_name": "金锭",
+    "icon_grid": [4, 0],
+    "max_stack": 50,
+    "description": "熔炼后的金条，制作高级护身符的核心。",
+    "color": [1.0, 0.85, 0.25, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 28
+  },
+  {
+    "id": "coal",
+    "display_name": "煤炭",
+    "icon_grid": [1, 0],
+    "max_stack": 99,
+    "description": "燃料，熔炉和精炼必备。",
+    "color": [0.18, 0.18, 0.2, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 5
+  },
+  {
+    "id": "clay",
+    "display_name": "粘土",
+    "icon_grid": [1, 0],
+    "max_stack": 99,
+    "description": "湿润的粘土，可以烧制成陶器。",
+    "color": [0.7, 0.5, 0.35, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 3
+  },
+  {
+    "id": "sand",
+    "display_name": "沙子",
+    "icon_grid": [1, 0],
+    "max_stack": 99,
+    "description": "细腻沙粒，烧制玻璃用。",
+    "color": [0.93, 0.85, 0.6, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 2
+  },
+  {
+    "id": "glass",
+    "display_name": "玻璃",
+    "icon_grid": [1, 0],
+    "max_stack": 50,
+    "description": "由沙子烧制，制作灯笼和装饰。",
+    "color": [0.78, 0.92, 0.95, 0.85],
+    "heal_amount": 0.0,
+    "sell_price": 14
+  },
+  {
+    "id": "ruby",
+    "display_name": "红宝石",
+    "icon_grid": [2, 1],
+    "max_stack": 30,
+    "description": "炽红宝石，价值连城。",
+    "color": [0.9, 0.15, 0.2, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 80
+  },
+  {
+    "id": "emerald",
+    "display_name": "翡翠",
+    "icon_grid": [2, 1],
+    "max_stack": 30,
+    "description": "翠绿宝石，蕴含森林之力。",
+    "color": [0.2, 0.85, 0.45, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 75
+  },
+  {
+    "id": "sapphire",
+    "display_name": "蓝宝石",
+    "icon_grid": [2, 1],
+    "max_stack": 30,
+    "description": "深蓝宝石，海洋的馈赠。",
+    "color": [0.2, 0.45, 0.95, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 75
+  },
+  {
+    "id": "amethyst",
+    "display_name": "紫水晶",
+    "icon_grid": [2, 1],
+    "max_stack": 30,
+    "description": "宁静的紫色晶簇。",
+    "color": [0.7, 0.4, 0.85, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 50
+  },
+  {
+    "id": "crystal_shard",
+    "display_name": "晶簇碎片",
+    "icon_grid": [2, 1],
+    "max_stack": 50,
+    "description": "从晶簇上敲下的碎片，附魔材料。",
+    "color": [0.85, 0.92, 1.0, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 18
+  },
+  {
+    "id": "shell",
+    "display_name": "贝壳",
+    "icon_grid": [7, 1],
+    "max_stack": 30,
+    "description": "海边的贝壳，工艺品材料。",
+    "color": [0.95, 0.85, 0.78, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 8
+  },
+  {
+    "id": "pearl",
+    "display_name": "珍珠",
+    "icon_grid": [2, 1],
+    "max_stack": 20,
+    "description": "贝壳中孕育的珍珠，价值不菲。",
+    "color": [0.95, 0.95, 0.9, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 90
+  },
+  {
+    "id": "kelp",
+    "display_name": "海带",
+    "icon_grid": [0, 2],
+    "max_stack": 30,
+    "description": "海藻，可烹饪或制作染料。",
+    "color": [0.25, 0.45, 0.3, 1.0],
+    "heal_amount": 5.0,
+    "sell_price": 6
+  },
+  {
+    "id": "driftwood",
+    "display_name": "漂流木",
+    "icon_grid": [0, 0],
+    "max_stack": 50,
+    "description": "海浪冲来的木头，纹理斑驳。",
+    "color": [0.65, 0.55, 0.45, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 4
+  },
+  {
+    "id": "salmon",
+    "display_name": "鲑鱼",
+    "icon_grid": [2, 2],
+    "max_stack": 20,
+    "description": "肥美的鲑鱼，烹饪可恢复大量生命。",
+    "color": [0.95, 0.55, 0.42, 1.0],
+    "heal_amount": 12.0,
+    "sell_price": 22
+  },
+  {
+    "id": "trout",
+    "display_name": "鳟鱼",
+    "icon_grid": [2, 2],
+    "max_stack": 20,
+    "description": "河流中常见的鳟鱼。",
+    "color": [0.55, 0.65, 0.5, 1.0],
+    "heal_amount": 9.0,
+    "sell_price": 14
+  },
+  {
+    "id": "catfish",
+    "display_name": "鲶鱼",
+    "icon_grid": [2, 2],
+    "max_stack": 20,
+    "description": "沼泽中的大鲶鱼。",
+    "color": [0.4, 0.35, 0.25, 1.0],
+    "heal_amount": 10.0,
+    "sell_price": 18
+  },
+  {
+    "id": "legendary_fish",
+    "display_name": "传说之鱼",
+    "icon_grid": [2, 2],
+    "max_stack": 5,
+    "description": "罕见的巨型鱼，钓鱼者的荣耀。",
+    "color": [0.7, 0.85, 0.95, 1.0],
+    "heal_amount": 30.0,
+    "sell_price": 300
+  },
+  {
+    "id": "fish_bait",
+    "display_name": "鱼饵",
+    "icon_grid": [3, 5],
+    "max_stack": 99,
+    "description": "提高钓鱼概率与品质。",
+    "color": [0.7, 0.55, 0.4, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 2
+  },
+  {
+    "id": "fiber",
+    "display_name": "植物纤维",
+    "icon_grid": [5, 0],
+    "max_stack": 99,
+    "description": "灌木和野花提供，可纺线。",
+    "color": [0.78, 0.85, 0.45, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 2
+  },
+  {
+    "id": "cloth",
+    "display_name": "布料",
+    "icon_grid": [6, 3],
+    "max_stack": 50,
+    "description": "由羊毛或纤维纺织而成，缝制装备。",
+    "color": [0.92, 0.88, 0.78, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 12
+  },
+  {
+    "id": "red_dye",
+    "display_name": "红色染料",
+    "icon_grid": [6, 2],
+    "max_stack": 30,
+    "description": "由红花炼制，染色服装用。",
+    "color": [0.9, 0.2, 0.2, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 8
+  },
+  {
+    "id": "yellow_dye",
+    "display_name": "黄色染料",
+    "icon_grid": [6, 2],
+    "max_stack": 30,
+    "description": "由黄花炼制。",
+    "color": [0.95, 0.85, 0.2, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 8
+  },
+  {
+    "id": "blue_dye",
+    "display_name": "蓝色染料",
+    "icon_grid": [6, 2],
+    "max_stack": 30,
+    "description": "由海带与矿物炼制。",
+    "color": [0.2, 0.45, 0.9, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 10
+  },
+  {
+    "id": "red_flower",
+    "display_name": "红花",
+    "icon_grid": [7, 1],
+    "max_stack": 30,
+    "description": "鲜艳的红色野花。",
+    "color": [0.95, 0.25, 0.3, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 5
+  },
+  {
+    "id": "yellow_flower",
+    "display_name": "黄花",
+    "icon_grid": [7, 1],
+    "max_stack": 30,
+    "description": "黄色的太阳花。",
+    "color": [0.95, 0.85, 0.25, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 5
+  },
+  {
+    "id": "spinach",
+    "display_name": "菠菜",
+    "icon_grid": [0, 4],
+    "max_stack": 20,
+    "description": "翠绿的菠菜，富含铁质。",
+    "color": [0.25, 0.7, 0.3, 1.0],
+    "heal_amount": 6.0,
+    "sell_price": 8
+  },
+  {
+    "id": "spinach_seed",
+    "display_name": "菠菜种子",
+    "icon_grid": [0, 9],
+    "max_stack": 20,
+    "description": "",
+    "color": [0.3, 0.6, 0.25, 1.0],
+    "heal_amount": 0.0
+  },
+  {
+    "id": "parsnip",
+    "display_name": "欧防风",
+    "icon_grid": [2, 0],
+    "max_stack": 20,
+    "description": "春季新鲜的欧防风。",
+    "color": [0.92, 0.85, 0.55, 1.0],
+    "heal_amount": 6.0,
+    "sell_price": 7
+  },
+  {
+    "id": "parsnip_seed",
+    "display_name": "欧防风种子",
+    "icon_grid": [0, 9],
+    "max_stack": 20,
+    "description": "",
+    "color": [0.85, 0.78, 0.45, 1.0],
+    "heal_amount": 0.0
+  },
+  {
+    "id": "green_bean",
+    "display_name": "绿豆",
+    "icon_grid": [0, 4],
+    "max_stack": 30,
+    "description": "嫩绿的豆角。",
+    "color": [0.4, 0.75, 0.3, 1.0],
+    "heal_amount": 4.0,
+    "sell_price": 6
+  },
+  {
+    "id": "green_bean_seed",
+    "display_name": "绿豆种子",
+    "icon_grid": [0, 9],
+    "max_stack": 20,
+    "description": "",
+    "color": [0.35, 0.65, 0.25, 1.0],
+    "heal_amount": 0.0
+  },
+  {
+    "id": "chili",
+    "display_name": "辣椒",
+    "icon_grid": [5, 1],
+    "max_stack": 20,
+    "description": "热辣的红辣椒。",
+    "color": [0.92, 0.2, 0.15, 1.0],
+    "heal_amount": 3.0,
+    "sell_price": 11
+  },
+  {
+    "id": "chili_seed",
+    "display_name": "辣椒种子",
+    "icon_grid": [6, 1],
+    "max_stack": 20,
+    "description": "",
+    "color": [0.8, 0.2, 0.15, 1.0],
+    "heal_amount": 0.0
+  },
+  {
+    "id": "blueberry",
+    "display_name": "蓝莓",
+    "icon_grid": [7, 1],
+    "max_stack": 30,
+    "description": "夏季成熟的蓝莓。",
+    "color": [0.25, 0.35, 0.7, 1.0],
+    "heal_amount": 6.0,
+    "sell_price": 10
+  },
+  {
+    "id": "blueberry_seed",
+    "display_name": "蓝莓种子",
+    "icon_grid": [0, 9],
+    "max_stack": 20,
+    "description": "",
+    "color": [0.3, 0.4, 0.6, 1.0],
+    "heal_amount": 0.0
+  },
+  {
+    "id": "grape",
+    "display_name": "葡萄",
+    "icon_grid": [7, 1],
+    "max_stack": 30,
+    "description": "饱满的紫葡萄。",
+    "color": [0.6, 0.3, 0.7, 1.0],
+    "heal_amount": 7.0,
+    "sell_price": 12
+  },
+  {
+    "id": "grape_seed",
+    "display_name": "葡萄种子",
+    "icon_grid": [0, 9],
+    "max_stack": 20,
+    "description": "",
+    "color": [0.5, 0.3, 0.6, 1.0],
+    "heal_amount": 0.0
+  },
+  {
+    "id": "garlic",
+    "display_name": "大蒜",
+    "icon_grid": [2, 0],
+    "max_stack": 20,
+    "description": "香味浓郁的大蒜。",
+    "color": [0.95, 0.92, 0.78, 1.0],
+    "heal_amount": 3.0,
+    "sell_price": 9
+  },
+  {
+    "id": "garlic_seed",
+    "display_name": "大蒜种子",
+    "icon_grid": [0, 9],
+    "max_stack": 20,
+    "description": "",
+    "color": [0.85, 0.82, 0.7, 1.0],
+    "heal_amount": 0.0
+  },
+  {
+    "id": "coffee_bean",
+    "display_name": "咖啡豆",
+    "icon_grid": [7, 4],
+    "max_stack": 50,
+    "description": "提神的咖啡豆。",
+    "color": [0.35, 0.2, 0.1, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 18
+  },
+  {
+    "id": "coffee_seed",
+    "display_name": "咖啡种子",
+    "icon_grid": [0, 9],
+    "max_stack": 20,
+    "description": "",
+    "color": [0.3, 0.18, 0.1, 1.0],
+    "heal_amount": 0.0
+  },
+  {
+    "id": "sunflower",
+    "display_name": "向日葵",
+    "icon_grid": [7, 1],
+    "max_stack": 20,
+    "description": "金灿灿的向日葵。",
+    "color": [0.95, 0.78, 0.15, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 14
+  },
+  {
+    "id": "sunflower_seed",
+    "display_name": "向日葵种子",
+    "icon_grid": [0, 9],
+    "max_stack": 30,
+    "description": "可榨油也可种植。",
+    "color": [0.4, 0.3, 0.18, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 4
+  },
+  {
+    "id": "duck_egg",
+    "display_name": "鸭蛋",
+    "icon_grid": [0, 1],
+    "max_stack": 20,
+    "description": "比鸡蛋更大更香。",
+    "color": [0.85, 0.92, 0.78, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 14
+  },
+  {
+    "id": "goose_egg",
+    "display_name": "鹅蛋",
+    "icon_grid": [0, 1],
+    "max_stack": 15,
+    "description": "巨大的鹅蛋，营养丰富。",
+    "color": [0.92, 0.95, 0.82, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 22
+  },
+  {
+    "id": "rabbit_fur",
+    "display_name": "兔毛",
+    "icon_grid": [6, 3],
+    "max_stack": 50,
+    "description": "柔软的兔毛皮。",
+    "color": [0.92, 0.88, 0.85, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 16
+  },
+  {
+    "id": "salmon_steak",
+    "display_name": "煎鲑鱼排",
+    "icon_grid": [1, 1],
+    "max_stack": 10,
+    "description": "外焦里嫩的鲑鱼排。",
+    "color": [0.85, 0.4, 0.3, 1.0],
+    "heal_amount": 50.0,
+    "sell_price": 75
+  },
+  {
+    "id": "fish_stew",
+    "display_name": "鱼汤",
+    "icon_grid": [4, 4],
+    "max_stack": 5,
+    "description": "鲜美的鱼汤，温暖人心。",
+    "color": [0.7, 0.8, 0.9, 1.0],
+    "heal_amount": 60.0,
+    "sell_price": 95
+  },
+  {
+    "id": "salad",
+    "display_name": "蔬菜沙拉",
+    "icon_grid": [4, 4],
+    "max_stack": 10,
+    "description": "清爽的蔬菜沙拉。",
+    "color": [0.5, 0.8, 0.4, 1.0],
+    "heal_amount": 40.0,
+    "sell_price": 55
+  },
+  {
+    "id": "blueberry_pie",
+    "display_name": "蓝莓派",
+    "icon_grid": [6, 4],
+    "max_stack": 5,
+    "description": "甜蜜的蓝莓派。",
+    "color": [0.4, 0.3, 0.6, 1.0],
+    "heal_amount": 65.0,
+    "sell_price": 120
+  },
+  {
+    "id": "grape_wine",
+    "display_name": "葡萄酒",
+    "icon_grid": [4, 4],
+    "max_stack": 10,
+    "description": "陈酿的葡萄酒。",
+    "color": [0.5, 0.15, 0.35, 1.0],
+    "heal_amount": 30.0,
+    "sell_price": 110
+  },
+  {
+    "id": "spicy_stew",
+    "display_name": "辣味炖菜",
+    "icon_grid": [4, 4],
+    "max_stack": 10,
+    "description": "辣椒与肉炖煮，暖身。",
+    "color": [0.9, 0.35, 0.15, 1.0],
+    "heal_amount": 70.0,
+    "sell_price": 130
+  },
+  {
+    "id": "garlic_bread",
+    "display_name": "蒜香面包",
+    "icon_grid": [6, 4],
+    "max_stack": 10,
+    "description": "香喷喷的蒜香面包。",
+    "color": [0.92, 0.78, 0.45, 1.0],
+    "heal_amount": 45.0,
+    "sell_price": 65
+  },
+  {
+    "id": "pumpkin_pie",
+    "display_name": "南瓜派",
+    "icon_grid": [6, 4],
+    "max_stack": 5,
+    "description": "金黄香甜的南瓜派。",
+    "color": [0.92, 0.55, 0.2, 1.0],
+    "heal_amount": 70.0,
+    "sell_price": 140
+  },
+  {
+    "id": "coffee_drink",
+    "display_name": "咖啡",
+    "icon_grid": [4, 4],
+    "max_stack": 10,
+    "description": "提神咖啡，短时间提升移速。",
+    "color": [0.3, 0.18, 0.1, 1.0],
+    "heal_amount": 10.0,
+    "sell_price": 50
+  },
+  {
+    "id": "omelette",
+    "display_name": "煎蛋卷",
+    "icon_grid": [1, 1],
+    "max_stack": 10,
+    "description": "蓬松的煎蛋卷。",
+    "color": [0.95, 0.82, 0.4, 1.0],
+    "heal_amount": 40.0,
+    "sell_price": 60
+  },
+  {
+    "id": "sunflower_oil",
+    "display_name": "葵花籽油",
+    "icon_grid": [4, 4],
+    "max_stack": 30,
+    "description": "金黄色食用油，烹饪用。",
+    "color": [0.92, 0.8, 0.25, 1.0],
+    "heal_amount": 0.0,
+    "sell_price": 22
+  },
+  {
+    "id": "ward_charm",
+    "display_name": "守护护身符",
+    "icon_grid": [6, 5],
+    "max_stack": 1,
+    "description": "宝石与金锭制成，受伤时有几率免伤。",
+    "color": [0.85, 0.85, 1.0, 1.0],
+    "heal_amount": 0.0,
+    "equip_slot": "accessory"
+  },
+  {
+    "id": "speed_charm",
+    "display_name": "疾风护符",
+    "icon_grid": [6, 5],
+    "max_stack": 1,
+    "description": "翡翠护符，提升移速。",
+    "color": [0.5, 0.95, 0.5, 1.0],
+    "heal_amount": 0.0,
+    "equip_slot": "accessory"
+  },
+  {
+    "id": "lantern",
+    "display_name": "提灯",
+    "icon_grid": [4, 5],
+    "max_stack": 1,
+    "description": "夜晚照亮周围的提灯。",
+    "color": [0.95, 0.85, 0.45, 1.0],
+    "heal_amount": 0.0,
+    "equip_slot": "accessory"
+  },
+  {
+    "id": "copper_sword",
+    "display_name": "铜剑",
+    "icon_grid": [0, 5],
+    "max_stack": 1,
+    "description": "比木剑更耐用的铜剑。",
+    "color": [0.85, 0.5, 0.25, 1.0],
+    "heal_amount": 0.0,
+    "equip_slot": "weapon",
+    "damage": 8.0
+  },
+  {
+    "id": "gold_sword",
+    "display_name": "金剑",
+    "icon_grid": [1, 5],
+    "max_stack": 1,
+    "description": "贵气十足的金剑。",
+    "color": [1.0, 0.85, 0.25, 1.0],
+    "heal_amount": 0.0,
+    "equip_slot": "weapon",
+    "damage": 18.0
+  },
+  {
+    "id": "copper_pickaxe",
+    "display_name": "铜镐",
+    "icon_grid": [2, 3],
+    "max_stack": 1,
+    "description": "可以开采铜矿与金矿。",
+    "color": [0.85, 0.5, 0.25, 1.0],
+    "heal_amount": 0.0,
+    "tool_type": "pickaxe"
+  },
+  {
+    "id": "iron_pickaxe",
+    "display_name": "铁镐",
+    "icon_grid": [2, 3],
+    "max_stack": 1,
+    "description": "可以开采宝石与晶簇。",
+    "color": [0.7, 0.7, 0.75, 1.0],
+    "heal_amount": 0.0,
+    "tool_type": "pickaxe"
+  },
+  {
+    "id": "iron_axe",
+    "display_name": "铁斧",
+    "icon_grid": [1, 3],
+    "max_stack": 1,
+    "description": "锋利的铁斧，砍树更快。",
+    "color": [0.7, 0.7, 0.75, 1.0],
+    "heal_amount": 0.0,
+    "tool_type": "axe"
+  },
+  {
+    "id": "hoe",
+    "display_name": "锄头",
+    "icon_grid": [1, 3],
+    "max_stack": 1,
+    "description": "翻土耕地的工具。",
+    "color": [0.55, 0.4, 0.2, 1.0],
+    "heal_amount": 0.0,
+    "tool_type": "hoe"
+  },
+  {
+    "id": "watering_can",
+    "display_name": "洒水壶",
+    "icon_grid": [5, 3],
+    "max_stack": 1,
+    "description": "为作物浇水。",
+    "color": [0.55, 0.7, 0.85, 1.0],
+    "heal_amount": 0.0,
+    "tool_type": "watering_can"
   }
 ]

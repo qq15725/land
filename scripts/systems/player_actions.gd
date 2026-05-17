@@ -287,7 +287,9 @@ func _do_sell(peer_id: int, item_id: String, amount: int) -> void:
 	if not p.inventory.has_item(item, amount):
 		return
 	p.inventory.remove_item(item, amount)
-	var revenue: int = item.sell_price * amount
+	# 雪人节：售价 +20%
+	var multi: float = 1.2 if FestivalSystem.is_active("winter_snowman") else 1.0
+	var revenue: int = int(round(item.sell_price * amount * multi))
 	p.inventory.add_gold(revenue)
 	EventBus.item_sold.emit(item, amount, revenue)
 

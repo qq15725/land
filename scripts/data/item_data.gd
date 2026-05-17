@@ -20,3 +20,15 @@ var ranged: bool = false
 var ammo_item_id: String = ""      # 远程武器消耗的弹药 id
 # 商人收购单价（金币/个）。0 表示不可出售。
 var sell_price: int = 0
+
+# 背包 UI 分类：根据 tool_type / equip_slot / heal_amount / ammo_item_id 自动推导
+func get_category() -> String:
+	if not equip_slot.is_empty():
+		return "equip"
+	if not tool_type.is_empty():
+		return "tool"
+	if heal_amount > 0.0:
+		return "consumable"
+	if not ammo_item_id.is_empty():
+		return "weapon"
+	return "resource"

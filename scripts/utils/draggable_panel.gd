@@ -9,6 +9,28 @@ var _drag_offset := Vector2.ZERO
 func _ready() -> void:
 	theme = UIStyle.theme
 
+func _process(_d: float) -> void:
+	# 标题拖拽区显示 MOVE cursor
+	if not visible:
+		return
+	var mp := get_local_mouse_position()
+	if Rect2(Vector2.ZERO, size).has_point(mp) and mp.y <= DRAG_REGION_HEIGHT:
+		mouse_default_cursor_shape = Control.CURSOR_MOVE
+	else:
+		mouse_default_cursor_shape = Control.CURSOR_ARROW
+
+# 统一关闭按钮工厂。所有面板用此创建关闭按钮，样式 / 行为一致。
+func make_close_button() -> Button:
+	var b := Button.new()
+	b.text = "×"
+	b.custom_minimum_size = Vector2(28, 28)
+	b.tooltip_text = "关闭"
+	b.add_theme_font_size_override("font_size", 16)
+	b.add_theme_color_override("font_color", Color(0.92, 0.85, 0.72))
+	b.add_theme_color_override("font_hover_color", Color(1.0, 0.4, 0.4))
+	b.pressed.connect(hide)
+	return b
+
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton

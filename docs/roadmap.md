@@ -185,11 +185,11 @@
 > 让玩家从 30 分钟玩到 30 小时。
 
 - [x] B1 货币系统（G 金币 + 商人收购农产品 + UI 显示余额）
-- [ ] B2 钓鱼系统（水域 tile + 鱼竿物品 + 鱼数据 + 钓鱼小游戏）
-- [ ] B3 天气（下雨 / 雪 / 雷暴；下雨自动浇灌作物）
-- [ ] B4 成就 / 图鉴（收集进度、击杀统计、合成种类）
-- [ ] B5 节日 / 季节事件（春樱 / 秋丰收 / 冬雪人）
-- [ ] B6 PvE 平衡 + Boss / 副本（怪物难度递增曲线，季节性 Boss）
+- [x] B2 钓鱼系统（鱼竿工具 + F 启动 + 等待 / 上钩 / 收线三态小游戏；无需水域 tile，简化版）
+- [x] B3 天气（晴 / 雨 / 雪 / 雷暴；WeatherSystem 按季节权重每日轮换；CPUParticles2D 视觉 + 雷暴闪光；下雨作物 1.5× 加速）
+- [x] B4 成就 / 图鉴（10 个成就 + AchievementSystem 监听 EventBus + 进度持久化 user://achievements.json + 📖 面板）
+- [x] B5 节日 / 季节事件（樱花祭 / 夏至 / 丰收节 / 雪人节，FestivalSystem 接管生长 / 售价 / 不刷怪 / +buff）
+- [x] B6 PvE 平衡 + Boss / 副本（季节末 boss "season_bear" + max_health_scale + 难度递增曲线每周 +10%）
 - [x] B7 战斗反馈（DamageNumber 飘字 + hit-stop 每招独立 30~90ms + 击退 每招独立 140~360px + combo 计数→HUD toast；暴击系统未实装）
 
 ### C. 质量打磨 / 已知 bug
@@ -201,28 +201,28 @@
 - [ ] C4 性能 stress test（高密度资源/怪物 + chunk 边界）
 - [ ] C5 移动端控制完整性（`mobile_controls.gd` 验证 + 适配）
 - [x] C6 升级 / 装备变更 / 收获 / 放置粒子反馈（VFXEventRouter autoload 监听全局事件 + 4 个新 VFX）
-- [ ] C7 面板细节对齐（标题栏拖拽区域 cursor、关闭按钮样式统一）
+- [x] C7 面板细节对齐（DraggablePanel 标题栏 MOVE cursor + make_close_button() helper + 7 个面板统一接入）
 
 ### D. 内容广度
 > 数据扩展，纯加法。
 
-- [ ] D1 装饰建筑（花盆 / 椅子 / 路灯 / 旗帜 / 喷泉）
-- [ ] D2 多功能建筑（井——浇水、烤炉——高级烹饪、铁砧——修武器、磨坊——小麦→面粉）
-- [ ] D3 野生生物（兔子/鹿被动 + 鱼）
-- [ ] D4 稀有事件（流星雨夜、神秘旅行商人、地牢宝箱）
-- [ ] D5 服装 / 外观（玩家装扮，与战斗装备独立的视觉皮肤）
+- [x] D1 装饰建筑（花盆 / 椅子 / 路灯 / 旗帜 / 喷泉；路灯夜晚 PointLight2D 自动亮）
+- [x] D2 多功能建筑（井 / 烤炉 / 铁砧 / 磨坊；井加速农田 + swift buff，磨坊小麦→面粉，新 oven/anvil station 配方）
+- [x] D3 野生生物（兔子 / 鹿 passive + FLEE 状态机 + 白天 chunk spawn）
+- [x] D4 稀有事件（流星雨陨石矿 + 神秘旅人独立交易表，每晚 12% / 10% 概率）
+- [x] D5 服装 / 外观（cosmetic_hat / cosmetic_cape 装备槽 + Player Sprite2D 显示 + 背包 UI 装备槽）
 
 ### E. HUD / UI 完善
 > 文档：[`art/hud.md`](art/hud.md)。参考图：[`references/hud.png`](references/hud.png) + [`references/main.png`](references/main.png)。
 > 当前 HUD 只有左上 HP/金币/时间 + 底部 9 格 hotbar，远低于愿景图密度。
 
-- [~] E1 角色信息条（头像+名字+Lv+HP/MP/FP 三条，结构已搭；HP/MP 已接通；**FP 系统未实现** 固定 100/100 占位；经验条统一放底部 hotbar 上方）
+- [x] E1 角色信息条（头像+名字+Lv+HP/MP/FP 三条全接通；FocusComponent 实装；技能/攻击消耗 FP，食物恢复 FP；经验条在底部 hotbar 上方）
 - [x] E2 快捷栏强化（9-patch 容器 + 经验条 + 等级徽章 + 亮黄选中边框）
 - [x] E3 小地图实绘（Minimap 控件：玩家黄点 + 朝向三角 + 附近建筑/农田/怪物色点）
-- [ ] E4 状态 Buff 条（**依赖 Buff 系统**，未实现）
+- [x] E4 状态 Buff 条（BuffSystem autoload + BuffComponent per-player + 4 个 buff 数据 + HUD buff_row 倒计时 + festival 自动挂）
 - [x] E5 资源计数行（金币 + 当前选中物品 + 基地占位）
 - [ ] E6 任务追踪条（**依赖任务系统**，未实现）
-- [x] E7 顶右菜单按钮组（👤 角色 / 🗺 地图 / ⚙ 设置，模拟键盘动作打开对应面板）
+- [x] E7 顶右菜单按钮组（👤 角色 / 📖 图鉴 / 🗺 地图 / ⚙ 设置，模拟键盘动作打开对应面板）
 
 ### G. 多人架构改造 ★ 主线 / F 前置
 > **决策已定**：支持局域网多人联机，传输层用 ENet host-authoritative（房主即权威）。单机视为 1 人房间，统一走多人代码路径，不维护两套实现。
@@ -296,7 +296,20 @@
 
 ## 当前进度
 
-**已完成**：Phase 0–8 + 路线 A（QoL）+ B1（货币）+ 路线 G 阶段 A 全部（G1–G7 多人架构改造）+ 阶段 B 基础设施（G8–G13）+ 战斗系统抽象（见下）
+**已完成**：Phase 0–8 + 路线 A（QoL）+ B（全部 B1–B7）+ C（除 C4/C5）+ D（全部 D1–D5）+ E（除 E6）+ 路线 G 阶段 A 全部（G1–G7 多人架构改造）+ 阶段 B 基础设施（G8–G13）+ 战斗系统抽象（见下）
+
+**2026-05-16 大批量推进**：
+- B2 钓鱼 / B3 天气 / B4 成就 / B5 节日 / B6 Boss
+- C7 面板细节对齐
+- D1 装饰 / D2 多功能 / D3 野生生物 / D4 稀有事件 / D5 装扮
+- E1 FP 系统 / E4 Buff 系统
+- 技能树 talent_tree 重做为冒险岛卡片样式（图标 + Lv X/Max + [+] 按钮）+ 父子连线
+- **冒险岛技能复刻**：25 技能（每职业 8 + 通用 1），含 buff / passive 类型；`SkillExecutor` 加 passive/buff 分支；新 buff `rage_buff` / `power_guard_buff` / `magic_guard_buff` / `magic_armor_buff` / `meditation_buff` / `focus_buff` / `soul_arrow_buff`
+- 新 autoload：WeatherSystem / FestivalSystem / BuffSystem / AchievementSystem / RareEventSystem
+- 新组件：FocusComponent / BuffComponent
+- 新建筑场景：decoration / lamppost / well / oven / anvil / mill
+- 新 UI：codex_ui（图鉴）
+- 美术补全：新建 `docs/art/skills.md`（25 技能 icon prompt）+ characters/items/buildings/hud 全部补齐
 
 **战斗系统（2026-05-13 完成）**：
 - **数据驱动技能**：`ActiveSkillData` 30+ 字段；`data/active_skills.json` 4 招（basic_swing / triple_slash / fireball / whirlwind）

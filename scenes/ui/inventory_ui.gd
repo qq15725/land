@@ -1,14 +1,29 @@
 extends DraggablePanel
 
 const EQUIP_SLOTS: Array[Dictionary] = [
-	{"type": "weapon",    "label": "武器"},
-	{"type": "armor",     "label": "护甲"},
-	{"type": "accessory", "label": "饰品"},
+	{"type": "weapon",        "label": "武器"},
+	{"type": "armor",         "label": "护甲"},
+	{"type": "accessory",     "label": "饰品"},
+	{"type": "cosmetic_hat",  "label": "帽子"},
+	{"type": "cosmetic_cape", "label": "披风"},
+]
+
+const FILTER_TABS: Array[Dictionary] = [
+	{"id": "all",        "label": "全部"},
+	{"id": "tool",       "label": "工具"},
+	{"id": "weapon",     "label": "武器"},
+	{"id": "equip",      "label": "装备"},
+	{"id": "consumable", "label": "食物"},
+	{"id": "resource",   "label": "材料"},
 ]
 
 var _inventory: InventoryComponent
 var _grid: GridContainer
 var _equip_row: HBoxContainer
+var _filter_row: HBoxContainer
+var _search_edit: LineEdit
+var _current_filter: String = "all"
+var _search_text: String = ""
 
 func _ready() -> void:
 	super()
@@ -44,10 +59,7 @@ func _build_layout() -> void:
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
 
-	var close_btn := Button.new()
-	close_btn.text = "×"
-	close_btn.pressed.connect(hide)
-	header.add_child(close_btn)
+	header.add_child(make_close_button())
 
 	vbox.add_child(HSeparator.new())
 
@@ -64,11 +76,49 @@ func _build_layout() -> void:
 
 	vbox.add_child(HSeparator.new())
 
+	_filter_row = HBoxContainer.new()
+	_filter_row.add_theme_constant_override("separation", 4)
+	vbox.add_child(_filter_row)
+	_build_filter_tabs()
+
+	_search_edit = LineEdit.new()
+	_search_edit.placeholder_text = "搜索..."
+	_search_edit.custom_minimum_size = Vector2(0, 24)
+	_search_edit.add_theme_font_size_override("font_size", 11)
+	_search_edit.text_changed.connect(_on_search_changed)
+	vbox.add_child(_search_edit)
+
 	_grid = GridContainer.new()
 	_grid.columns = 5
 	_grid.add_theme_constant_override("h_separation", 4)
 	_grid.add_theme_constant_override("v_separation", 4)
 	vbox.add_child(_grid)
+
+
+func _build_filter_tabs() -> void:
+	for child in _filter_row.get_children():
+		child.queue_free()
+	for tab in FILTER_TABS:
+		var btn := Button.new()
+		btn.text = tab["label"]
+		btn.flat = (tab["id"] != _current_filter)
+		btn.focus_mode = Control.FOCUS_NONE
+		btn.add_theme_font_size_override("font_size", 11)
+		btn.custom_minimum_size = Vector2(0, 22)
+		var tab_id: String = tab["id"]
+		btn.pressed.connect(func(): _on_filter_changed(tab_id))
+		_filter_row.add_child(btn)
+
+
+func _on_filter_changed(filter_id: String) -> void:
+	_current_filter = filter_id
+	_build_filter_tabs()
+	_refresh_grid()
+
+
+func _on_search_changed(text: String) -> void:
+	_search_text = text.strip_edges().to_lower()
+	_refresh_grid()
 
 func setup(inventory: InventoryComponent) -> void:
 	_inventory = inventory
@@ -136,8 +186,29 @@ func _make_slot(index: int) -> Control:
 		icon.show_item(slot.item, slot.amount)
 	btn.add_child(icon)
 
+	# 过滤器染色：当前 filter 下不匹配的格子半透明
+	if not _slot_matches_filter(slot):
+		btn.modulate = Color(1, 1, 1, 0.28)
+
 	btn.pressed.connect(func(): _on_slot_clicked(index))
 	return btn
+
+
+func _slot_matches_filter(slot: Dictionary) -> bool:
+	var it: ItemData = slot.get("item", null)
+	# 分类过滤
+	if _current_filter != "all":
+		if it == null:
+			return false
+		if it.get_category() != _current_filter:
+			return false
+	# 搜索过滤
+	if not _search_text.is_empty():
+		if it == null:
+			return false
+		if _search_text not in it.display_name.to_lower() and _search_text not in it.id.to_lower():
+			return false
+	return true
 
 # 点击背包格：装备物品直接装备，非装备物品做选中
 func _on_slot_clicked(index: int) -> void:
