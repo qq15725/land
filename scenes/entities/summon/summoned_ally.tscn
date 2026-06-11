@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://csummonally01"]
+
+[ext_resource type="Script" path="res://scenes/entities/summon/summoned_ally.gd" id="1_sa"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_sa"]
+radius = 6.0
+
+[node name="SummonedAlly" type="CharacterBody2D"]
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_sa")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -8)
+shape = SubResource("CircleShape2D_sa")

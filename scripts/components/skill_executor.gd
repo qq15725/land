@@ -12,6 +12,7 @@ extends Node
 #   4. 每段命中：扣血 + 击退 + 飘字 + 手感反馈（屏震 + hit-stop）
 
 const QUERY_MASK := 4  # layer 3 = creature
+const SummonedAllyScene := preload("res://scenes/entities/summon/summoned_ally.tscn")
 # 冒险岛风格暴击：10% 概率，伤害 ×1.5（后续可由装备 / buff 改写）
 const CRIT_CHANCE := 0.10
 const CRIT_MULT := 1.5
@@ -30,12 +31,15 @@ func cast(skill: ActiveSkillData, target_pos: Vector2, caster: Player) -> void:
 		"circle":     _exec_melee(skill, dir, caster, _hits_in_circle)
 		"rect":       _exec_melee(skill, dir, caster, _hits_in_rect)
 		"aoe":        _exec_aoe(skill, target_pos, caster)
+		"chain":      _exec_chain(skill, dir, caster)
+		"dash":       _exec_dash(skill, dir, caster)
+		"summon":     _exec_summon(skill, caster)
 		"projectile": _exec_projectile(skill, dir, caster)
-		"passive":    pass  # 被动技能：仅占技能树位置，不可释放（PlayerActions 应拦截装备）
+		"passive":    pass  # 被动技能：效果在 _hit_targets / mp_eater 注入，不走释放
 		"buff":       _exec_self_buff(skill, caster)
 		_:            push_warning("未知 skill shape: %s" % skill.shape)
 
-# 自身 buff 技能：mp_cost + 给自己挂 buff_id 一段时间
+# 自身 buff 技能：mp_cost + 给自己挂 buff_id；heal_amount>0 时同时回血（治疗技能）
 func _exec_self_buff(skill: ActiveSkillData, caster: Player) -> void:
 	if caster == null:
 		return
@@ -43,6 +47,8 @@ func _exec_self_buff(skill: ActiveSkillData, caster: Player) -> void:
 		VFXLibrary.spawn(skill.vfx_id, caster.get_parent(), caster.global_position, 0.0, skill.vfx_color)
 	if caster.buffs and not skill.buff_id.is_empty():
 		caster.buffs.add_buff(skill.buff_id)
+	if skill.heal_amount > 0.0 and caster.health:
+		caster.health.heal(skill.heal_amount)
 
 # ─── 近战公共流程（多段 tick） ─────────────────────────────────────────
 
@@ -84,14 +90,18 @@ func _exec_aoe(skill: ActiveSkillData, target_pos: Vector2, caster: Player) -> v
 func _hit_targets(skill: ActiveSkillData, i: int, targets: Array, caster: Player, kb_origin: Vector2, fallback_dir: Vector2) -> void:
 	var ratio := float(skill.hit_damage_ratios[i])
 	var buff_mul: float = caster.buffs.damage_mul() if caster.buffs else 1.0
-	var base_dmg: float = (skill.base_damage + caster.inventory.total_damage_bonus()) * ratio * buff_mul
+	# 被动技能加成：剑/弓精通(伤害) + 致命射击(暴击) + 终结一击(追加)
+	var passive_mul: float = caster.active_skills.passive_damage_mult() if caster.active_skills else 1.0
+	var crit_chance: float = CRIT_CHANCE + (caster.active_skills.passive_crit_bonus() if caster.active_skills else 0.0)
+	var final_atk_chance: float = caster.active_skills.passive_final_attack_chance() if caster.active_skills else 0.0
+	var base_dmg: float = (skill.base_damage + caster.inventory.total_damage_bonus()) * ratio * buff_mul * passive_mul
 	var hit_any := false
 	var any_crit := false
 	for body in targets:
 		if body is Creature:
 			var c := body as Creature
 			# 独立判定暴击：每个目标一次 roll
-			var is_crit := randf() < CRIT_CHANCE
+			var is_crit := randf() < crit_chance
 			var dmg: float = base_dmg * (CRIT_MULT if is_crit else 1.0)
 			c.take_damage_from(caster, dmg)
 			var kb_dir: Vector2 = (c.global_position - kb_origin)
@@ -106,11 +116,91 @@ func _hit_targets(skill: ActiveSkillData, i: int, targets: Array, caster: Player
 			VFXLibrary.spawn("hit_spark", caster.get_parent(), c.global_position + Vector2(0, -12), 0.0, spark_col)
 			if is_crit:
 				VFXLibrary.spawn("hit_spark", caster.get_parent(), c.global_position + Vector2(0, -12), PI, spark_col)
+			# 终结一击：几率追加半额伤害
+			if final_atk_chance > 0.0 and randf() < final_atk_chance and is_instance_valid(c):
+				var extra := base_dmg * 0.5
+				c.take_damage_from(caster, extra)
+				DamageNumber.spawn(caster.get_parent(), c.global_position + Vector2(0, -28), extra, true, Color(0, 0, 0, 0))
 			ComboSystem.register_hit()
 			hit_any = true
 			any_crit = any_crit or is_crit
 	if hit_any:
 		_apply_feedback(skill, caster, any_crit)
+
+# ─── chain：闪电链逐个跳跃 ─────────────────────────────────────────────────
+func _exec_chain(skill: ActiveSkillData, dir: Vector2, caster: Player) -> void:
+	var n: int = mini(skill.hit_ticks.size(), skill.hit_damage_ratios.size())
+	var hit_list: Array = []
+	var from_pos := caster.global_position
+	var prev_t := 0.0
+	for i in n:
+		var t := float(skill.hit_ticks[i])
+		var dt := maxf(0.0, t - prev_t)
+		prev_t = t
+		if dt > 0.0:
+			await get_tree().create_timer(dt).timeout
+		if not is_instance_valid(caster) or caster.health.current_health <= 0.0:
+			return
+		var next := _nearest_creature(from_pos, skill.shape_size, hit_list, caster)
+		if next == null:
+			break
+		hit_list.append(next)
+		if not skill.vfx_id.is_empty():
+			VFXLibrary.spawn(skill.vfx_id, caster.get_parent(), next.global_position, 0.0, skill.vfx_color)
+		_hit_targets(skill, i, [next], caster, from_pos, dir)
+		from_pos = next.global_position
+
+# 找 pos 半径内最近、且不在 exclude 中的 Creature
+func _nearest_creature(pos: Vector2, radius: float, exclude: Array, caster: Player) -> Creature:
+	var bodies := _query_shape(_make_circle(radius), Transform2D(0.0, pos), caster)
+	var best: Creature = null
+	var best_d := INF
+	for b in bodies:
+		if not (b is Creature) or b in exclude:
+			continue
+		var d := pos.distance_to((b as Node2D).global_position)
+		if d < best_d:
+			best_d = d
+			best = b as Creature
+	return best
+
+# ─── dash：暗影冲刺，沿途矩形范围伤害 ──────────────────────────────────────
+func _exec_dash(skill: ActiveSkillData, dir: Vector2, caster: Player) -> void:
+	var start := caster.global_position
+	var dist := skill.shape_size
+	var end_pos := start + dir * dist
+	if not skill.vfx_id.is_empty():
+		VFXLibrary.spawn(skill.vfx_id, caster.get_parent(), start, dir.angle(), skill.vfx_color)
+	# 玩家位移（短 tween，施法时通常不会同时按移动键）
+	var tw := caster.create_tween()
+	tw.tween_property(caster, "global_position", end_pos, 0.18)
+	var rect := RectangleShape2D.new()
+	rect.size = Vector2(dist, 48.0)
+	var center := (start + end_pos) * 0.5
+	var prev_t := 0.0
+	var n: int = mini(skill.hit_ticks.size(), skill.hit_damage_ratios.size())
+	for i in n:
+		var t := float(skill.hit_ticks[i])
+		var dt := maxf(0.0, t - prev_t)
+		prev_t = t
+		if dt > 0.0:
+			await get_tree().create_timer(dt).timeout
+		if not is_instance_valid(caster):
+			return
+		var targets := _query_shape(rect, Transform2D(dir.angle(), center), caster)
+		_hit_targets(skill, i, targets, caster, start, dir)
+
+# ─── summon：召唤协战单位 ─────────────────────────────────────────────────
+func _exec_summon(skill: ActiveSkillData, caster: Player) -> void:
+	var parent := caster.get_parent()
+	if parent == null:
+		return
+	for j in maxi(1, skill.summon_count):
+		var ally := SummonedAllyScene.instantiate()
+		parent.add_child(ally)
+		ally.global_position = caster.global_position + Vector2(randf_range(-28, 28), randf_range(-28, 28))
+		if ally.has_method("setup"):
+			ally.setup(caster, skill.vfx_color, skill.summon_duration)
 
 # ─── 形状命中检测（PhysicsShapeQuery，实时） ────────────────────────────
 

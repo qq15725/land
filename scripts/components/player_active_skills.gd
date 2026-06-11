@@ -26,6 +26,9 @@ func _ready() -> void:
 			learned[sd.id] = 1
 	# 本地 PlayerSkills 升级 → +1 SP（用 player 本地 signal 避免多玩家串扰）
 	call_deferred("_hook_local_skills")
+	# mp_eater 被动：击杀回蓝（仅 server 改 MP，单机即 server）
+	if Network.is_server():
+		EventBus.creature_killed.connect(_on_creature_killed_mp)
 
 func _hook_local_skills() -> void:
 	var p := get_parent()
@@ -141,7 +144,34 @@ func try_cast(skill: ActiveSkillData, mana: ManaComponent) -> bool:
 	cooldown_started.emit(skill.id, skill.cooldown)
 	return true
 
+# ─── 被动技能效果（学习等级越高效果越强） ────────────────────────────────────
+# 攻击伤害倍率：剑术精通 / 弓术精通（无 miss 机制，命中加成折算为伤害）每级 +1%
+func passive_damage_mult() -> float:
+	var m := 1.0
+	m += get_skill_level("sword_mastery") * 0.01
+	m += get_skill_level("bow_mastery") * 0.01
+	return m
+
+# 额外暴击率：致命射击 每级 +1%
+func passive_crit_bonus() -> float:
+	return get_skill_level("critical_shot") * 0.01
+
+# 终结一击触发率：剑/弓 final_attack 每级 +2%（命中后几率追加半伤）
+func passive_final_attack_chance() -> float:
+	return (get_skill_level("final_attack_sword") + get_skill_level("final_attack_bow")) * 0.02
+
 # ─── 事件 ────────────────────────────────────────────────────────────────
+
+func _on_creature_killed_mp(_creature: CreatureData, player_id: int) -> void:
+	if player_id != _player_id():
+		return
+	var lvl := get_skill_level("mp_eater")
+	if lvl <= 0:
+		return
+	var p := get_parent()
+	var mana = p.get("mana") if p else null
+	if mana:
+		mana.restore(mana.max_mana * 0.02 * lvl)
 
 func _on_passive_leveled_up(_skill_id: String, _new_level: int) -> void:
 	# 同 player 的 PlayerSkills 升级 → +1 SP

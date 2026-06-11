@@ -236,6 +236,10 @@ func _load_active_skills() -> void:
 		s.anim_duration = float(d.get("anim_duration", 0.3))
 		s.buff_id = d.get("buff_id", "")
 		s.passive_effect = d.get("passive_effect", "")
+		s.heal_amount = float(d.get("heal_amount", 0.0))
+		s.summon_creature_id = d.get("summon_creature_id", "")
+		s.summon_duration = float(d.get("summon_duration", 30.0))
+		s.summon_count = int(d.get("summon_count", 1))
 		_active_skills[s.id] = s
 
 func _load_classes() -> void:

@@ -59,3 +59,11 @@ extends Resource
 # shape="buff"    — 自身 buff，释放时给玩家挂 buff_id 一段时间
 @export var buff_id: String = ""                # shape="buff" 时挂的 buff id
 @export var passive_effect: String = ""         # passive 文本说明（"+1% damage per level" 等）
+
+# ─── 召唤 / 治疗扩展 ───────────────────────────────────────────────────────
+# shape="buff" 且 heal_amount>0 — 释放时回复自身 HP（治疗技能）
+# shape="summon" — 召唤协战单位
+@export var heal_amount: float = 0.0            # 释放时回血量
+@export var summon_creature_id: String = ""     # 召唤物标识（视觉/属性档）
+@export var summon_duration: float = 30.0       # 召唤持续秒数
+@export var summon_count: int = 1               # 召唤数量

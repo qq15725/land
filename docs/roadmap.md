@@ -307,11 +307,7 @@
 - 代码重构（DRY）：抽取 `SpriteFrameBuilder`（4 方向动画，player/creature/animal/merchant 4 处合一）/ `VisualEffects`（受击闪白 2 处合一）/ `UINotify`（toast 2 处合一），净减 55 行
 - 技能 shape `aoe` 实装：`SkillExecutor._exec_aoe`（目标位置圆形爆炸 + 多段 tick），修复 ice_storm / arrow_rain / smoke_bomb / summon_shark / battleship_call 这 5 个此前释放即静默失败的技能
 
-**⚠️ 已检索出但仍未实装的技能（学了装备后释放无效，待决策补全）**：
-- shape `chain`（chain_lightning，链式跳跃）：中
-- shape `dash`（shadow_dash，冲刺位移 + 沿途伤害）：中
-- shape `summon`（summon_elemental / summon_hawk / shadow_clone，需召唤生物系统 + creatures.json 扩展）：大
-- shape `passive` 共 6 个被动技能（sword_mastery / final_attack 等）：数据有 `passive_effect` 描述但无伤害公式接通，学了仅占位
+- 技能全 shape 实装：`chain`（闪电链跳 5 目标，逐跳递减）/ `dash`（暗影冲刺 + 沿途矩形伤害 + 玩家位移）/ `summon`（`SummonedAlly` 协战单位：索敌 AI + 限时存活 + 击杀归属召唤者，shadow_clone 召 2 个）/ `heal`（buff 技能 `heal_amount` 回血）；6 个 `passive` 被动接通到伤害链：剑/弓精通（+伤害）、致命射击（+暴击率）、终结一击 ×2（几率追加半伤）、吞噬（击杀回蓝）。**至此 active_skills.json 全部 25 个技能均有实际效果**
 
 **2026-05-16 大批量推进**：
 - B2 钓鱼 / B3 天气 / B4 成就 / B5 节日 / B6 Boss
