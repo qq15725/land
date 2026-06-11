@@ -202,6 +202,7 @@
 - [ ] C5 移动端控制完整性（`mobile_controls.gd` 验证 + 适配）
 - [x] C6 升级 / 装备变更 / 收获 / 放置粒子反馈（VFXEventRouter autoload 监听全局事件 + 4 个新 VFX）
 - [x] C7 面板细节对齐（DraggablePanel 标题栏 MOVE cursor + make_close_button() helper + 7 个面板统一接入）
+- [ ] **C8 正式美术接入** —— 适配层已就绪（`ArtProfile` + `SpriteFrameBuilder` 行序/scale 可配），按 [`docs/art/asset_pack_integration.md`](art/asset_pack_integration.md) 接入正式美术包（推荐 Cute Fantasy RPG $2.99 / Sprout Lands 免费）。**待用户操作**
 
 ### D. 内容广度
 > 数据扩展，纯加法。
