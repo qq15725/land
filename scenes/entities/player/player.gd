@@ -204,7 +204,8 @@ func _setup_sprite_frames() -> void:
 	var tex := load(AssetPaths.character_sprite(SPRITE_ID)) as Texture2D
 	if tex == null:
 		return
-	visual.sprite_frames = SpriteFrameBuilder.build_4way(tex, ANIM_FPS, FRAME_COLS)
+	visual.sprite_frames = ArtProfile.character_frames(tex, ArtProfile.PLAYER_FPS)
+	visual.scale = Vector2.ONE * ArtProfile.scale_for(tex, ArtProfile.CHARACTER_TARGET_H)
 	visual.play(_last_anim)
 
 

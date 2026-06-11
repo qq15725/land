@@ -32,7 +32,8 @@ func _setup_sprite_frames() -> void:
 	var tex := load(data.sprite_path) as Texture2D
 	if tex == null:
 		return
-	visual.sprite_frames = SpriteFrameBuilder.build_4way(tex, 6.0)
+	visual.sprite_frames = ArtProfile.character_frames(tex, ArtProfile.ANIMAL_FPS)
+	visual.scale = Vector2.ONE * ArtProfile.scale_for(tex, ArtProfile.ANIMAL_TARGET_H)
 	visual.play("walk_down")
 
 func _physics_process(delta: float) -> void:

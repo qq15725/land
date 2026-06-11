@@ -23,7 +23,8 @@ func _setup_sprite_frames() -> void:
 	var tex := load(AssetPaths.character_sprite("merchant")) as Texture2D
 	if tex == null:
 		return
-	visual.sprite_frames = SpriteFrameBuilder.build_4way(tex, 6.0)
+	visual.sprite_frames = ArtProfile.character_frames(tex, ArtProfile.MERCHANT_FPS)
+	visual.scale = Vector2.ONE * ArtProfile.scale_for(tex, ArtProfile.MERCHANT_TARGET_H)
 	visual.play("walk_down")
 
 func setup(merchant_data: MerchantData, post_pos: Vector2) -> void:

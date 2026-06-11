@@ -43,10 +43,9 @@ func _ready() -> void:
 		day_curve = 1.0 + minf(2.0, float(maxi(0, TimeSystem.current_day - 1)) / 7.0 * 0.1)
 	health.max_health = data.max_health * data.max_health_scale * day_curve
 	health.current_health = health.max_health
-	# Boss 视觉放大 + 加 boss group
+	# Boss 加 group（视觉放大在 _setup_sprite_frames 里基于适配 scale 处理）
 	if data.is_boss:
 		add_to_group("boss")
-		visual.scale *= 1.4
 	_setup_sprite_frames()
 
 	var det_circle := detection_shape.shape as CircleShape2D
@@ -148,7 +147,10 @@ func _setup_sprite_frames() -> void:
 		tex = load(data.sprite_path) as Texture2D
 	if tex == null:
 		tex = _make_fallback_texture()
-	visual.sprite_frames = SpriteFrameBuilder.build_4way(tex, 6.0)
+	visual.sprite_frames = ArtProfile.character_frames(tex, ArtProfile.CREATURE_FPS)
+	visual.scale = Vector2.ONE * ArtProfile.scale_for(tex, ArtProfile.CREATURE_TARGET_H)
+	if data and data.is_boss:
+		visual.scale *= 1.4   # Boss 在适配 scale 基础上再放大
 	visual.play("walk_down")
 
 

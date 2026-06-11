@@ -36,7 +36,7 @@ func _apply_visual() -> void:
 	if visual == null:
 		visual = Sprite2D.new()
 		visual.name = "Visual"
-		visual.scale = Vector2(0.25, 0.25)
+		visual.scale = Vector2.ONE * ArtProfile.BUILDING_SCALE
 		visual.position = Vector2(0, -20)
 		add_child(visual)
 	visual.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
