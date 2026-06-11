@@ -29,6 +29,7 @@ func cast(skill: ActiveSkillData, target_pos: Vector2, caster: Player) -> void:
 		"fan":        _exec_melee(skill, dir, caster, _hits_in_fan)
 		"circle":     _exec_melee(skill, dir, caster, _hits_in_circle)
 		"rect":       _exec_melee(skill, dir, caster, _hits_in_rect)
+		"aoe":        _exec_aoe(skill, target_pos, caster)
 		"projectile": _exec_projectile(skill, dir, caster)
 		"passive":    pass  # 被动技能：仅占技能树位置，不可释放（PlayerActions 应拦截装备）
 		"buff":       _exec_self_buff(skill, caster)
@@ -57,36 +58,59 @@ func _exec_melee(skill: ActiveSkillData, dir: Vector2, caster: Player, hits_fn: 
 			await get_tree().create_timer(dt).timeout
 		if not is_instance_valid(caster) or caster.health.current_health <= 0.0:
 			return
-		var ratio := float(skill.hit_damage_ratios[i])
-		var buff_mul: float = caster.buffs.damage_mul() if caster.buffs else 1.0
-		var base_dmg: float = (skill.base_damage + caster.inventory.total_damage_bonus()) * ratio * buff_mul
 		var targets: Array = hits_fn.call(skill, dir, caster)
-		var hit_any := false
-		var any_crit := false
-		for body in targets:
-			if body is Creature:
-				var c := body as Creature
-				# 独立判定暴击：每个目标一次 roll
-				var is_crit := randf() < CRIT_CHANCE
-				var dmg: float = base_dmg * (CRIT_MULT if is_crit else 1.0)
-				c.take_damage_from(caster, dmg)
-				var kb_dir: Vector2 = (c.global_position - caster.global_position)
-				if kb_dir.length() > 0.01:
-					kb_dir = kb_dir.normalized()
-				else:
-					kb_dir = dir
-				c.velocity += kb_dir * skill.knockback * (1.4 if is_crit else 1.0)
-				DamageNumber.spawn(caster.get_parent(), c.global_position + Vector2(0, -16), dmg, is_crit, Color(0, 0, 0, 0))
-				# 暴击命中：金色火花叠加，强化"打出暴击"的视觉爽点
-				var spark_col: Color = Color(1.0, 0.85, 0.2) if is_crit else skill.vfx_color
-				VFXLibrary.spawn("hit_spark", caster.get_parent(), c.global_position + Vector2(0, -12), 0.0, spark_col)
-				if is_crit:
-					VFXLibrary.spawn("hit_spark", caster.get_parent(), c.global_position + Vector2(0, -12), PI, spark_col)
-				ComboSystem.register_hit()
-				hit_any = true
-				any_crit = any_crit or is_crit
-		if hit_any:
-			_apply_feedback(skill, caster, any_crit)
+		# 近战击退从施法者向外；同位置时退回攻击方向
+		_hit_targets(skill, i, targets, caster, caster.global_position, dir)
+
+# aoe：在目标位置（鼠标处）做圆形范围爆炸，多段 tick，击退从爆炸中心向外。
+func _exec_aoe(skill: ActiveSkillData, target_pos: Vector2, caster: Player) -> void:
+	if not skill.vfx_id.is_empty():
+		VFXLibrary.spawn(skill.vfx_id, caster.get_parent(), target_pos, 0.0, skill.vfx_color)
+	var n: int = mini(skill.hit_ticks.size(), skill.hit_damage_ratios.size())
+	var prev_t := 0.0
+	for i in n:
+		var t := float(skill.hit_ticks[i])
+		var dt := maxf(0.0, t - prev_t)
+		prev_t = t
+		if dt > 0.0:
+			await get_tree().create_timer(dt).timeout
+		if not is_instance_valid(caster) or caster.health.current_health <= 0.0:
+			return
+		var targets: Array = _query_shape(_make_circle(skill.shape_size), Transform2D(0.0, target_pos), caster)
+		_hit_targets(skill, i, targets, caster, target_pos, Vector2.RIGHT)
+
+# 对一组目标施加第 i 段伤害（含暴击 / 击退 / 飘字 / 火花 / 反馈）。
+# kb_origin 为击退力来源点（近战=施法者，aoe=爆炸中心）；fallback_dir 用于目标与来源重合时。
+func _hit_targets(skill: ActiveSkillData, i: int, targets: Array, caster: Player, kb_origin: Vector2, fallback_dir: Vector2) -> void:
+	var ratio := float(skill.hit_damage_ratios[i])
+	var buff_mul: float = caster.buffs.damage_mul() if caster.buffs else 1.0
+	var base_dmg: float = (skill.base_damage + caster.inventory.total_damage_bonus()) * ratio * buff_mul
+	var hit_any := false
+	var any_crit := false
+	for body in targets:
+		if body is Creature:
+			var c := body as Creature
+			# 独立判定暴击：每个目标一次 roll
+			var is_crit := randf() < CRIT_CHANCE
+			var dmg: float = base_dmg * (CRIT_MULT if is_crit else 1.0)
+			c.take_damage_from(caster, dmg)
+			var kb_dir: Vector2 = (c.global_position - kb_origin)
+			if kb_dir.length() > 0.01:
+				kb_dir = kb_dir.normalized()
+			else:
+				kb_dir = fallback_dir
+			c.velocity += kb_dir * skill.knockback * (1.4 if is_crit else 1.0)
+			DamageNumber.spawn(caster.get_parent(), c.global_position + Vector2(0, -16), dmg, is_crit, Color(0, 0, 0, 0))
+			# 暴击命中：金色火花叠加，强化"打出暴击"的视觉爽点
+			var spark_col: Color = Color(1.0, 0.85, 0.2) if is_crit else skill.vfx_color
+			VFXLibrary.spawn("hit_spark", caster.get_parent(), c.global_position + Vector2(0, -12), 0.0, spark_col)
+			if is_crit:
+				VFXLibrary.spawn("hit_spark", caster.get_parent(), c.global_position + Vector2(0, -12), PI, spark_col)
+			ComboSystem.register_hit()
+			hit_any = true
+			any_crit = any_crit or is_crit
+	if hit_any:
+		_apply_feedback(skill, caster, any_crit)
 
 # ─── 形状命中检测（PhysicsShapeQuery，实时） ────────────────────────────
 

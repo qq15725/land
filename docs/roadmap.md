@@ -304,6 +304,14 @@
 - 新手引导：新增 `TutorialSystem` autoload —— 4 阶段任务链（采集木头 → 建工作台 → 收获作物 → 与商人交易），事件驱动 + HUD 任务框实绘 + 完成 toast，全局只跑一遍（`user://tutorial.json`）
 - 操作便利：掉落物吸附（玩家近身自动吸取）/ 背包一键整理（合并堆叠 + 按名排序）/ 储物箱「全部存入·全部取出」/ 建造连续放置（材料够就保持建造模式）
 - 数值平衡（修异常，保留休闲定位）：战斗经验 HP×0.5→0.8；菠菜效率碾压 → 生长 18→26；`coffee_drink` 负利润 → 售价 50→66；`battleship_call` 冷却 240→120；补全种子 / 武器 / 护甲的 `sell_price`（此前无法回收）
+- 代码重构（DRY）：抽取 `SpriteFrameBuilder`（4 方向动画，player/creature/animal/merchant 4 处合一）/ `VisualEffects`（受击闪白 2 处合一）/ `UINotify`（toast 2 处合一），净减 55 行
+- 技能 shape `aoe` 实装：`SkillExecutor._exec_aoe`（目标位置圆形爆炸 + 多段 tick），修复 ice_storm / arrow_rain / smoke_bomb / summon_shark / battleship_call 这 5 个此前释放即静默失败的技能
+
+**⚠️ 已检索出但仍未实装的技能（学了装备后释放无效，待决策补全）**：
+- shape `chain`（chain_lightning，链式跳跃）：中
+- shape `dash`（shadow_dash，冲刺位移 + 沿途伤害）：中
+- shape `summon`（summon_elemental / summon_hawk / shadow_clone，需召唤生物系统 + creatures.json 扩展）：大
+- shape `passive` 共 6 个被动技能（sword_mastery / final_attack 等）：数据有 `passive_effect` 描述但无伤害公式接通，学了仅占位
 
 **2026-05-16 大批量推进**：
 - B2 钓鱼 / B3 天气 / B4 成就 / B5 节日 / B6 Boss
