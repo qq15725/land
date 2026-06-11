@@ -6,6 +6,7 @@ signal building_placed(building: BuildingData, pos: Vector2)
 
 var current_building: BuildingData = null
 var is_building: bool = false
+var current_facing: int = 1   # 0上 1右 2下 3左（自动化建筑朝向，R 键旋转）
 
 var _thumb_cache: Dictionary = {}
 
@@ -55,7 +56,11 @@ func can_afford(building: BuildingData, player: Player) -> bool:
 func enter_build_mode(building: BuildingData) -> void:
 	current_building = building
 	is_building = true
+	current_facing = 1
 	build_mode_entered.emit(building)
+
+func rotate_current(step: int = 1) -> void:
+	current_facing = ((current_facing + step) % 4 + 4) % 4
 
 func exit_build_mode() -> void:
 	current_building = null

@@ -498,6 +498,13 @@ func _unhandled_input(event: InputEvent) -> void:
 			return
 	if not BuildingSystem.is_building:
 		return
+	# R 键旋转当前建筑朝向（自动化建筑用）
+	if event is InputEventKey and event.pressed and not event.echo and (event as InputEventKey).physical_keycode == KEY_R:
+		BuildingSystem.rotate_current()
+		if _build_preview and _build_preview.has_method("set_facing"):
+			_build_preview.set_facing(BuildingSystem.current_facing)
+		get_viewport().set_input_as_handled()
+		return
 	if event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton
 		if mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT:
@@ -524,6 +531,8 @@ func _on_build_mode_entered(building: BuildingData) -> void:
 	y_sort_layer.add_child(_build_preview)
 	if _build_preview.has_method("setup_preview"):
 		_build_preview.setup_preview(building)
+	if _build_preview.has_method("set_facing"):
+		_build_preview.set_facing(BuildingSystem.current_facing)
 
 func _on_build_mode_exited() -> void:
 	if _build_preview:
@@ -536,6 +545,8 @@ func _on_building_placed(building: BuildingData, pos: Vector2) -> void:
 	y_sort_layer.add_child(node)
 	if node.has_method("on_placed"):
 		node.on_placed(building)
+	if node.has_method("set_facing"):
+		node.set_facing(BuildingSystem.current_facing)
 
 func _on_night_started(_day: int) -> void:
 	_spawn_night_creatures()

@@ -341,5 +341,43 @@
       {"item_id": "wooden_plank", "amount": 1}
     ],
     "animal_id": ""
+  },
+  {
+    "id": "conveyor",
+    "display_name": "传送带",
+    "category": "building",
+    "scene_path": "res://scenes/buildings/conveyor.tscn",
+    "custom_render": true,
+    "connects": true,
+    "cost": [
+      {"item_id": "iron_bar", "amount": 1}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "extractor",
+    "display_name": "抽取器",
+    "category": "building",
+    "scene_path": "res://scenes/buildings/extractor.tscn",
+    "custom_render": true,
+    "connects": true,
+    "cost": [
+      {"item_id": "iron_bar", "amount": 2},
+      {"item_id": "wood", "amount": 2}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "inserter",
+    "display_name": "放入器",
+    "category": "building",
+    "scene_path": "res://scenes/buildings/inserter.tscn",
+    "custom_render": true,
+    "connects": true,
+    "cost": [
+      {"item_id": "iron_bar", "amount": 2},
+      {"item_id": "wood", "amount": 2}
+    ],
+    "animal_id": ""
   }
 ]
