@@ -428,6 +428,10 @@ func _setup_ui() -> void:
 	codex_ui.name = "CodexUI"
 	ui_layer.add_child(codex_ui)
 
+	var automation_overview := AutomationOverview.new()
+	automation_overview.name = "AutomationOverview"
+	ui_layer.add_child(automation_overview)
+
 	_pause_menu = PauseMenuScene.instantiate()
 	ui_layer.add_child(_pause_menu)
 

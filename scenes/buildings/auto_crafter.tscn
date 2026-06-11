@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://bautocrafter01"]
+
+[ext_resource type="Script" path="res://scenes/buildings/auto_crafter.gd" id="1_ac"]
+
+[node name="AutoCrafter" type="StaticBody2D"]
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_ac")

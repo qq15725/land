@@ -72,6 +72,15 @@ func interact(player: Player) -> void:
 	else:
 		hint_label.text = "需要：" + data.feed_item.display_name
 
+# 自动化喂食（放入器调用）
+func auto_feed(item: ItemData) -> bool:
+	if _is_fed or data == null or item != data.feed_item:
+		return false
+	_is_fed = true
+	_produce_timer = data.produce_time
+	hint_label.text = "已喂食..."
+	return true
+
 func _pick_wander_target() -> void:
 	var radius := data.wander_radius if data else 60.0
 	var angle := randf() * TAU

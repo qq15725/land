@@ -37,6 +37,32 @@ func find_storage_at(cell: Vector2i, layer: Node) -> Node:
 				return c
 	return null
 
+# 找某格子上可对接的建筑（储物箱 / 农田 / 动物围栏），供抽取器/放入器分派。
+func building_at(cell: Vector2i, layer: Node) -> Node:
+	if layer == null:
+		return null
+	for c in layer.get_children():
+		if (c is BuildingBase or c is FarmPlot) and world_to_grid(c.global_position) == cell:
+			return c
+	return null
+
+# 生产线总览统计
+func get_stats() -> Dictionary:
+	var counts := {}
+	var items_on_belts := 0
+	for n in _nodes.values():
+		if not is_instance_valid(n):
+			continue
+		var t: String = n.get_class() if n.get_script() == null else n.get_script().get_global_name()
+		counts[t] = int(counts.get(t, 0)) + 1
+		if n is Conveyor and n.peek_item() != null:
+			items_on_belts += 1
+	return {
+		"total": _nodes.size(),
+		"by_type": counts,
+		"items_on_belts": items_on_belts,
+	}
+
 func _process(delta: float) -> void:
 	if not Network.is_server():
 		return

@@ -99,6 +99,37 @@ func _on_body_exited(body: Node2D) -> void:
 	if body is Player:
 		hint_label.hide()
 
+# ─── 自动化接口（抽取器/放入器调用，无需 player） ───
+func is_ready() -> bool:
+	return _state == State.READY
+
+func is_empty() -> bool:
+	return _state == State.EMPTY
+
+func auto_harvest() -> Dictionary:
+	if _state != State.READY or _current_crop == null:
+		return {}
+	var bonus_mul := 1.5 if FestivalSystem.is_active("autumn_harvest") else 1.0
+	var amt: int = int(ceil(_current_crop.output_amount * bonus_mul))
+	var item: ItemData = _current_crop.output_item
+	EventBus.crop_harvested.emit(_current_crop, 0)
+	_current_crop = null
+	_state = State.EMPTY
+	_apply_state_visual()
+	return {"item": item, "amount": amt}
+
+func auto_plant(seed_item: ItemData) -> bool:
+	if _state != State.EMPTY:
+		return false
+	var crop := ItemDatabase.get_crop_for_seed(seed_item)
+	if crop == null or not TimeSystem.is_season_allowed(crop.allowed_seasons):
+		return false
+	_current_crop = crop
+	_state = State.GROWING
+	_grow_timer = crop.growth_time
+	_apply_state_visual()
+	return true
+
 func get_save_state() -> Dictionary:
 	return {
 		"state": _state,

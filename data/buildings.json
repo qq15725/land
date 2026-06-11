@@ -379,5 +379,42 @@
       {"item_id": "wood", "amount": 2}
     ],
     "animal_id": ""
+  },
+  {
+    "id": "auto_crafter",
+    "display_name": "自动合成机",
+    "category": "building",
+    "scene_path": "res://scenes/buildings/auto_crafter.tscn",
+    "custom_render": true,
+    "connects": true,
+    "cost": [
+      {"item_id": "iron_bar", "amount": 4},
+      {"item_id": "wooden_plank", "amount": 4}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "splitter",
+    "display_name": "分流器",
+    "category": "building",
+    "scene_path": "res://scenes/buildings/splitter.tscn",
+    "custom_render": true,
+    "connects": true,
+    "cost": [
+      {"item_id": "iron_bar", "amount": 2}
+    ],
+    "animal_id": ""
+  },
+  {
+    "id": "filter_conveyor",
+    "display_name": "过滤传送带",
+    "category": "building",
+    "scene_path": "res://scenes/buildings/filter_conveyor.tscn",
+    "custom_render": true,
+    "connects": true,
+    "cost": [
+      {"item_id": "iron_bar", "amount": 2}
+    ],
+    "animal_id": ""
   }
 ]
