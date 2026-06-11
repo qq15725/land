@@ -42,7 +42,7 @@ func building_at(cell: Vector2i, layer: Node) -> Node:
 	if layer == null:
 		return null
 	for c in layer.get_children():
-		if (c is BuildingBase or c is FarmPlot) and world_to_grid(c.global_position) == cell:
+		if (c is BuildingBase or c is FarmPlot or c is ResourceNode) and world_to_grid(c.global_position) == cell:
 			return c
 	return null
 

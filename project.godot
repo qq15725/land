@@ -42,7 +42,7 @@ SoundSystem="*res://scripts/systems/sound_system.gd"
 VFXLibrary="*res://scripts/systems/vfx_library.gd"
 VFXEventRouter="*res://scripts/systems/vfx_event_router.gd"
 ComboSystem="*res://scripts/systems/combo_system.gd"
-TutorialSystem="*res://scripts/systems/tutorial_system.gd"
+QuestSystem="*res://scripts/systems/quest_system.gd"
 AutomationSystem="*res://scripts/systems/automation_system.gd"
 
 [display]

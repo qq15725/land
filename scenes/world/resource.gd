@@ -157,6 +157,15 @@ func _respawn() -> void:
 	_collision.set_deferred("disabled", false)
 	respawned.emit()
 
+# 自动化采集（抽取器调用）：无视工具需求，采一次并触发再生周期
+func auto_harvest() -> Dictionary:
+	if depleted_flag or item == null:
+		return {}
+	var it := item
+	var amt := drop_amount
+	_play_break_and_deplete(null)
+	return {"item": it, "amount": amt}
+
 func is_depleted() -> bool:
 	return depleted_flag
 

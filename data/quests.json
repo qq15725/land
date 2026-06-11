@@ -1,0 +1,9 @@
+[
+  {"id": "q_wood", "name": "采集木头（砍树）", "type": "gather", "target": "wood", "count": 5, "reward_gold": 20},
+  {"id": "q_workbench", "name": "建造工作台", "type": "build", "target": "workbench", "count": 1, "reward_gold": 30},
+  {"id": "q_harvest", "name": "收获一次作物", "type": "harvest", "target": "", "count": 1, "reward_gold": 30},
+  {"id": "q_craft", "name": "合成/烹饪 3 次", "type": "craft", "target": "", "count": 3, "reward_gold": 40},
+  {"id": "q_kill", "name": "击败 8 只怪物", "type": "kill", "target": "", "count": 8, "reward_gold": 60},
+  {"id": "q_build", "name": "建造 10 个建筑", "type": "build", "target": "", "count": 10, "reward_gold": 80},
+  {"id": "q_sell", "name": "累计卖出赚 300 金", "type": "earn", "target": "", "count": 300, "reward_item": "lucky_charm", "reward_amount": 1}
+]

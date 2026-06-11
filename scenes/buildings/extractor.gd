@@ -27,13 +27,12 @@ func tick() -> void:
 	var src := AutomationSystem.building_at(back_cell(), get_parent())
 	if src == null:
 		return
-	# 农田：成熟则收获进缓冲
-	if src is FarmPlot:
-		if src.is_ready():
-			var r: Dictionary = src.auto_harvest()
-			if r.has("item"):
-				_pending_item = r["item"]
-				_pending_count = int(r["amount"])
+	# 农田(成熟) / 资源节点(未耗尽)：auto_harvest 内部各自判断条件
+	if src.has_method("auto_harvest"):
+		var r: Dictionary = src.auto_harvest()
+		if r.has("item"):
+			_pending_item = r["item"]
+			_pending_count = int(r["amount"])
 		return
 	# 储物箱
 	if src is BuildingBase and ("storage" in src) and src.get("storage") != null:

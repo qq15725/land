@@ -221,7 +221,7 @@
 - [x] E3 小地图实绘（Minimap 控件：玩家黄点 + 朝向三角 + 附近建筑/农田/怪物色点）
 - [x] E4 状态 Buff 条（BuffSystem autoload + BuffComponent per-player + 4 个 buff 数据 + HUD buff_row 倒计时 + festival 自动挂）
 - [x] E5 资源计数行（金币 + 当前选中物品 + 基地占位）
-- [ ] E6 任务追踪条（**依赖任务系统**，未实现）
+- [x] E6 任务追踪条（`QuestSystem`：数据驱动线性任务链 `quests.json`，监听 EventBus 推进 + 金币/物品奖励 + HUD 任务框 + `user://quests.json` 持久化；取代旧 TutorialSystem，前几个任务即新手引导）
 - [x] E7 顶右菜单按钮组（👤 角色 / 📖 图鉴 / 🗺 地图 / ⚙ 设置，模拟键盘动作打开对应面板）
 
 ### G. 多人架构改造 ★ 主线 / F 前置
@@ -268,7 +268,7 @@
 
 - [x] F1 物品流核心（`AutomationSystem` autoload + 格子注册表 + 0.5s tick + 两阶段防跳格；决策：无能源 / 方格+朝向 / 补充手动 / 主世界）
 - [x] F2 传送带建筑（`Conveyor` 单槽推进 + 朝向 R 键旋转 + 物品 icon 显示 + 存档）
-- [x] F3 抽取器（`Extractor`：储物箱→传送带 / 成熟农田自动收获 / 动物围栏收集产出掉落；多产出用 _pending 逐 tick 送出）
+- [x] F3 抽取器（`Extractor`：储物箱 / 成熟农田自动收获 / 动物围栏收集产出 / 资源节点(树·矿)自动采集；多产出用 _pending 逐 tick 送出）
 - [x] F4 放入器（`Inserter`：传送带→储物箱 / 空农田自动播种 / 动物围栏自动喂食；放得下才取走防丢件）
 - [x] F5 自动合成机（`AutoCrafter`：任意方向进料入缓冲，自动匹配配方合成，成品从朝向输出；配方自动匹配，无 station 限制）
 - [x] F6 农田自动化接口（`FarmPlot.auto_harvest / auto_plant / is_ready / is_empty`，配合抽取器收获 + 放入器播种成闭环）
