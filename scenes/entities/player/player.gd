@@ -19,9 +19,6 @@ const IDLE_FLOAT_FREQ := 2.5
 const SHADOW_ALPHA := 0.55
 const CAM_SHAKE_DECAY := 8.0     # 攻击命中屏幕震动衰减速度
 
-const HitFlashShader := preload("res://scenes/effects/hit_flash.gdshader")
-const HIT_FLASH_DURATION := 0.05
-
 @onready var inventory: InventoryComponent = $InventoryComponent
 @onready var health: HealthComponent = $HealthComponent
 @onready var interaction_area: Area2D = $InteractionArea
@@ -105,14 +102,14 @@ func _ready() -> void:
 	health.died.connect(func(): EventBus.player_died.emit())
 	health.damaged.connect(func(_a):
 		_camera_shake(2.0)
-		_flash_hit()
+		VisualEffects.flash_hit(visual)
 		if anim_state:
 			anim_state.play_state("hit", 0.25)
 	)
 	inventory.equipment_changed.connect(_on_equipment_changed)
 	add_to_group("player")
 	_setup_sprite_frames()
-	_setup_hit_flash()
+	VisualEffects.setup_hit_flash(visual)
 	_on_equipment_changed("")
 
 # 脚下椭圆软阴影：Y-sort 不参与，z_index 低于 visual
@@ -207,23 +204,7 @@ func _setup_sprite_frames() -> void:
 	var tex := load(AssetPaths.character_sprite(SPRITE_ID)) as Texture2D
 	if tex == null:
 		return
-	var frames := SpriteFrames.new()
-	if frames.has_animation("default"):
-		frames.remove_animation("default")
-	# 行序：0=下 1=上 2=左 3=右
-	var anims := [["walk_down", 0], ["walk_up", 1], ["walk_left", 2], ["walk_right", 3]]
-	for entry in anims:
-		var anim_name: String = entry[0]
-		var row: int = entry[1]
-		frames.add_animation(anim_name)
-		frames.set_animation_speed(anim_name, ANIM_FPS)
-		frames.set_animation_loop(anim_name, true)
-		for col in FRAME_COLS:
-			var atlas := AtlasTexture.new()
-			atlas.atlas = tex
-			atlas.region = Rect2(col * FRAME_W, row * FRAME_H, FRAME_W, FRAME_H)
-			frames.add_frame(anim_name, atlas)
-	visual.sprite_frames = frames
+	visual.sprite_frames = SpriteFrameBuilder.build_4way(tex, ANIM_FPS, FRAME_COLS)
 	visual.play(_last_anim)
 
 
@@ -309,27 +290,6 @@ func _update_bobbing(delta: float, move_dir: Vector2) -> void:
 
 func _camera_shake(amplitude: float) -> void:
 	_cam_shake_amp = maxf(_cam_shake_amp, amplitude)
-
-# 受击闪白：与怪物受击反馈对称（冒险岛风格"被打到"提示）
-func _setup_hit_flash() -> void:
-	if visual == null:
-		return
-	var mat := ShaderMaterial.new()
-	mat.shader = HitFlashShader
-	visual.material = mat
-
-func _flash_hit() -> void:
-	if not is_instance_valid(visual):
-		return
-	var mat := visual.material as ShaderMaterial
-	if mat == null:
-		return
-	mat.set_shader_parameter("flash_amount", 1.0)
-	await get_tree().create_timer(HIT_FLASH_DURATION).timeout
-	if is_instance_valid(visual):
-		var m2 := visual.material as ShaderMaterial
-		if m2:
-			m2.set_shader_parameter("flash_amount", 0.0)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -531,13 +491,7 @@ func _process_fishing(delta: float) -> void:
 			_toast("反应太慢，鱼跑了")
 
 func _toast(msg: String) -> void:
-	var tree := get_tree()
-	if tree == null:
-		return
-	for n in tree.get_nodes_in_group("hud"):
-		if n.has_method("show_toast"):
-			n.show_toast(msg, 1.6)
-			return
+	UINotify.toast(get_tree(), msg, 1.6)
 
 # 死亡时背包非装备物品掉一半数量；装备类（equip_slot 非空）不掉。
 func _drop_inventory_on_death(pos: Vector2) -> void:

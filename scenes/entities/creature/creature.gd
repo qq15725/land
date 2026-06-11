@@ -23,9 +23,6 @@ var _wander_timer: float = 0.0
 var _flee_timer: float = 0.0
 var _last_damager: Player = null
 
-const HitFlashShader := preload("res://scenes/effects/hit_flash.gdshader")
-const HIT_FLASH_DURATION := 0.05
-
 # 由攻击者（Player）调用。记录归属，再走 HealthComponent 扣血。
 func take_damage_from(player: Player, amount: float) -> void:
 	_last_damager = player
@@ -64,26 +61,13 @@ func _ready() -> void:
 
 	health.died.connect(_on_died)
 	health.damaged.connect(_on_damaged_flash)
-	# 命中闪白 shader（冒险岛风格"打到了"反馈）
-	var flash_mat := ShaderMaterial.new()
-	flash_mat.shader = HitFlashShader
-	visual.material = flash_mat
+	VisualEffects.setup_hit_flash(visual)
 	detection_area.body_entered.connect(_on_body_entered)
 	detection_area.body_exited.connect(_on_body_exited)
 
 
 func _on_damaged_flash(_amount: float) -> void:
-	if not is_instance_valid(visual):
-		return
-	var mat := visual.material as ShaderMaterial
-	if mat == null:
-		return
-	mat.set_shader_parameter("flash_amount", 1.0)
-	await get_tree().create_timer(HIT_FLASH_DURATION).timeout
-	if is_instance_valid(self) and is_instance_valid(visual):
-		var m2 := visual.material as ShaderMaterial
-		if m2:
-			m2.set_shader_parameter("flash_amount", 0.0)
+	VisualEffects.flash_hit(visual)
 
 func _physics_process(delta: float) -> void:
 	if _state == State.DEAD:
@@ -164,23 +148,7 @@ func _setup_sprite_frames() -> void:
 		tex = load(data.sprite_path) as Texture2D
 	if tex == null:
 		tex = _make_fallback_texture()
-	var fw := tex.get_width() / 4
-	var fh := tex.get_height() / 4
-	var frames := SpriteFrames.new()
-	if frames.has_animation("default"):
-		frames.remove_animation("default")
-	for entry in [["walk_down", 0], ["walk_up", 1], ["walk_left", 2], ["walk_right", 3]]:
-		var anim_name: String = entry[0]
-		var row: int = entry[1]
-		frames.add_animation(anim_name)
-		frames.set_animation_speed(anim_name, 6.0)
-		frames.set_animation_loop(anim_name, true)
-		for col in 4:
-			var atlas := AtlasTexture.new()
-			atlas.atlas = tex
-			atlas.region = Rect2(col * fw, row * fh, fw, fh)
-			frames.add_frame(anim_name, atlas)
-	visual.sprite_frames = frames
+	visual.sprite_frames = SpriteFrameBuilder.build_4way(tex, 6.0)
 	visual.play("walk_down")
 
 

@@ -72,13 +72,7 @@ func _on_trade_completed(_give: ItemData, _receive: ItemData) -> void:
 	_advance("first_trade", 1)
 
 func _toast(msg: String) -> void:
-	var tree := get_tree()
-	if tree == null:
-		return
-	for n in tree.get_nodes_in_group("hud"):
-		if n.has_method("show_toast"):
-			n.show_toast(msg, 2.4)
-			return
+	UINotify.toast(get_tree(), msg, 2.4)
 
 func _save() -> void:
 	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)

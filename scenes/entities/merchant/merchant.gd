@@ -23,23 +23,7 @@ func _setup_sprite_frames() -> void:
 	var tex := load(AssetPaths.character_sprite("merchant")) as Texture2D
 	if tex == null:
 		return
-	var fw := tex.get_width() / 4
-	var fh := tex.get_height() / 4
-	var frames := SpriteFrames.new()
-	if frames.has_animation("default"):
-		frames.remove_animation("default")
-	for entry in [["walk_down", 0], ["walk_up", 1], ["walk_left", 2], ["walk_right", 3]]:
-		var anim_name: String = entry[0]
-		var row: int = entry[1]
-		frames.add_animation(anim_name)
-		frames.set_animation_speed(anim_name, 6.0)
-		frames.set_animation_loop(anim_name, true)
-		for col in 4:
-			var atlas := AtlasTexture.new()
-			atlas.atlas = tex
-			atlas.region = Rect2(col * fw, row * fh, fw, fh)
-			frames.add_frame(anim_name, atlas)
-	visual.sprite_frames = frames
+	visual.sprite_frames = SpriteFrameBuilder.build_4way(tex, 6.0)
 	visual.play("walk_down")
 
 func setup(merchant_data: MerchantData, post_pos: Vector2) -> void:
