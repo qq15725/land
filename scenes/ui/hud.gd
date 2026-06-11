@@ -47,6 +47,7 @@ var _event_lbl: Label
 # ⑤ ⑥ 小地图 + 任务
 var _coord_lbl: Label
 var _minimap: Minimap
+var _large_map: LargeMap
 var _quest_box: VBoxContainer
 
 # ⑦ Hotbar
@@ -152,6 +153,11 @@ func setup(health: HealthComponent, inventory: InventoryComponent) -> void:
 	_refresh_skill_bar()
 	if _minimap and _player is Node2D:
 		_minimap.setup(_player as Node2D)
+	if _large_map == null:
+		_large_map = LargeMap.new()
+		add_child(_large_map)
+	if _player is Node2D:
+		_large_map.setup(_player as Node2D)
 
 # ─── ① 角色信息条 hud_charinfo.png 320×128 ──────────────────────────────
 
@@ -867,7 +873,8 @@ func _on_menu_inventory() -> void:
 	Input.parse_input_event(ev)
 
 func _on_menu_map() -> void:
-	show_toast("大地图尚未实现", 1.5)
+	if _large_map:
+		_large_map.toggle()
 
 func _on_menu_codex() -> void:
 	var tree := get_tree()
