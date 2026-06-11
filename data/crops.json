@@ -60,7 +60,7 @@
     "seed_item_id": "spinach_seed",
     "output_item_id": "spinach",
     "output_amount": 4,
-    "growth_time": 18.0,
+    "growth_time": 26.0,
     "allowed_seasons": ["spring"]
   },
   {

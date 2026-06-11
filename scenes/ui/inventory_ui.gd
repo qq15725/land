@@ -59,6 +59,13 @@ func _build_layout() -> void:
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
 
+	var sort_btn := Button.new()
+	sort_btn.text = "整理"
+	sort_btn.focus_mode = Control.FOCUS_NONE
+	sort_btn.add_theme_font_size_override("font_size", 11)
+	sort_btn.pressed.connect(_on_sort_pressed)
+	header.add_child(sort_btn)
+
 	header.add_child(make_close_button())
 
 	vbox.add_child(HSeparator.new())
@@ -119,6 +126,10 @@ func _on_filter_changed(filter_id: String) -> void:
 func _on_search_changed(text: String) -> void:
 	_search_text = text.strip_edges().to_lower()
 	_refresh_grid()
+
+func _on_sort_pressed() -> void:
+	if _inventory:
+		_inventory.sort_and_compact()
 
 func setup(inventory: InventoryComponent) -> void:
 	_inventory = inventory

@@ -165,10 +165,6 @@ GrowthComponent       # 作物/动物生长状态
 - 新增内容优先加数据文件，不改核心系统
 - 不写多余注释，命名即文档
 
-## 提交规范
-
-- git commit 信息不加 `Co-Authored-By`
-
 ## 美术 / 代码比例约定
 
 美术文档（`docs/art/`）只描述源文件像素尺寸，不包含 Godot scale/zoom。代码层独立维护：

@@ -19,6 +19,9 @@ const IDLE_FLOAT_FREQ := 2.5
 const SHADOW_ALPHA := 0.55
 const CAM_SHAKE_DECAY := 8.0     # 攻击命中屏幕震动衰减速度
 
+const HitFlashShader := preload("res://scenes/effects/hit_flash.gdshader")
+const HIT_FLASH_DURATION := 0.05
+
 @onready var inventory: InventoryComponent = $InventoryComponent
 @onready var health: HealthComponent = $HealthComponent
 @onready var interaction_area: Area2D = $InteractionArea
@@ -102,12 +105,14 @@ func _ready() -> void:
 	health.died.connect(func(): EventBus.player_died.emit())
 	health.damaged.connect(func(_a):
 		_camera_shake(2.0)
+		_flash_hit()
 		if anim_state:
 			anim_state.play_state("hit", 0.25)
 	)
 	inventory.equipment_changed.connect(_on_equipment_changed)
 	add_to_group("player")
 	_setup_sprite_frames()
+	_setup_hit_flash()
 	_on_equipment_changed("")
 
 # 脚下椭圆软阴影：Y-sort 不参与，z_index 低于 visual
@@ -304,6 +309,27 @@ func _update_bobbing(delta: float, move_dir: Vector2) -> void:
 
 func _camera_shake(amplitude: float) -> void:
 	_cam_shake_amp = maxf(_cam_shake_amp, amplitude)
+
+# 受击闪白：与怪物受击反馈对称（冒险岛风格"被打到"提示）
+func _setup_hit_flash() -> void:
+	if visual == null:
+		return
+	var mat := ShaderMaterial.new()
+	mat.shader = HitFlashShader
+	visual.material = mat
+
+func _flash_hit() -> void:
+	if not is_instance_valid(visual):
+		return
+	var mat := visual.material as ShaderMaterial
+	if mat == null:
+		return
+	mat.set_shader_parameter("flash_amount", 1.0)
+	await get_tree().create_timer(HIT_FLASH_DURATION).timeout
+	if is_instance_valid(visual):
+		var m2 := visual.material as ShaderMaterial
+		if m2:
+			m2.set_shader_parameter("flash_amount", 0.0)
 
 
 func _unhandled_input(event: InputEvent) -> void:

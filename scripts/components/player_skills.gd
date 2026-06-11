@@ -54,8 +54,8 @@ func _on_crop_harvested(_crop: CropData, player_id: int) -> void:
 func _on_creature_killed(creature: CreatureData, player_id: int) -> void:
 	if creature == null or player_id != NetworkRegistry.get_id(get_parent()):
 		return
-	var amount := int(creature.max_health * 0.5)
-	add_xp("combat", maxi(5, amount))
+	var amount := int(creature.max_health * 0.8)
+	add_xp("combat", maxi(8, amount))
 
 # ─── 查询 ────────────────────────────────────────────────────────────────
 

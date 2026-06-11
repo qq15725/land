@@ -71,5 +71,7 @@ func place_building(pos: Vector2, player: Player) -> bool:
 	for cost in current_building.cost:
 		player.inventory.remove_item(cost["item"], cost["amount"])
 	building_placed.emit(current_building, pos)
-	exit_build_mode()
+	# 连续建造：材料仍足够再造一个就保持建造模式，否则自动退出
+	if not can_afford(current_building, player):
+		exit_build_mode()
 	return true

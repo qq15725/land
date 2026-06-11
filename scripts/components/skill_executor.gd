@@ -77,7 +77,11 @@ func _exec_melee(skill: ActiveSkillData, dir: Vector2, caster: Player, hits_fn: 
 					kb_dir = dir
 				c.velocity += kb_dir * skill.knockback * (1.4 if is_crit else 1.0)
 				DamageNumber.spawn(caster.get_parent(), c.global_position + Vector2(0, -16), dmg, is_crit, Color(0, 0, 0, 0))
-				VFXLibrary.spawn("hit_spark", caster.get_parent(), c.global_position + Vector2(0, -12), 0.0, skill.vfx_color)
+				# 暴击命中：金色火花叠加，强化"打出暴击"的视觉爽点
+				var spark_col: Color = Color(1.0, 0.85, 0.2) if is_crit else skill.vfx_color
+				VFXLibrary.spawn("hit_spark", caster.get_parent(), c.global_position + Vector2(0, -12), 0.0, spark_col)
+				if is_crit:
+					VFXLibrary.spawn("hit_spark", caster.get_parent(), c.global_position + Vector2(0, -12), PI, spark_col)
 				ComboSystem.register_hit()
 				hit_any = true
 				any_crit = any_crit or is_crit

@@ -86,7 +86,8 @@
     "max_stack": 20,
     "description": "",
     "color": [0.9, 0.55, 0.1, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 1
   },
   {
     "id": "wheat",
@@ -105,7 +106,8 @@
     "max_stack": 20,
     "description": "",
     "color": [0.85, 0.78, 0.3, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 1
   },
   {
     "id": "potato",
@@ -124,7 +126,8 @@
     "max_stack": 20,
     "description": "",
     "color": [0.75, 0.62, 0.3, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 1
   },
   {
     "id": "tomato",
@@ -143,7 +146,8 @@
     "max_stack": 20,
     "description": "",
     "color": [0.8, 0.18, 0.12, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 2
   },
   {
     "id": "berry",
@@ -329,7 +333,8 @@
     "max_stack": 20,
     "description": "",
     "color": [0.85, 0.72, 0.22, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 2
   },
   {
     "id": "pumpkin",
@@ -348,7 +353,8 @@
     "max_stack": 20,
     "description": "",
     "color": [0.7, 0.55, 0.25, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 4
   },
   {
     "id": "mushroom_soup",
@@ -399,7 +405,8 @@
     "color": [0.7, 0.55, 0.3, 1.0],
     "heal_amount": 0.0,
     "equip_slot": "weapon",
-    "damage": 5.0
+    "damage": 5.0,
+    "sell_price": 6
   },
   {
     "id": "iron_sword",
@@ -410,7 +417,8 @@
     "color": [0.7, 0.7, 0.75, 1.0],
     "heal_amount": 0.0,
     "equip_slot": "weapon",
-    "damage": 12.0
+    "damage": 12.0,
+    "sell_price": 28
   },
   {
     "id": "bow",
@@ -423,7 +431,8 @@
     "equip_slot": "weapon",
     "damage": 8.0,
     "ranged": true,
-    "ammo_item_id": "arrow"
+    "ammo_item_id": "arrow",
+    "sell_price": 14
   },
   {
     "id": "arrow",
@@ -443,7 +452,8 @@
     "color": [0.55, 0.35, 0.2, 1.0],
     "heal_amount": 0.0,
     "equip_slot": "armor",
-    "defense": 5.0
+    "defense": 5.0,
+    "sell_price": 12
   },
   {
     "id": "iron_armor",
@@ -454,7 +464,8 @@
     "color": [0.65, 0.65, 0.7, 1.0],
     "heal_amount": 0.0,
     "equip_slot": "armor",
-    "defense": 12.0
+    "defense": 12.0,
+    "sell_price": 35
   },
   {
     "id": "lucky_charm",
@@ -464,7 +475,8 @@
     "description": "提升采集额外掉落概率",
     "color": [0.85, 0.75, 0.3, 1.0],
     "heal_amount": 0.0,
-    "equip_slot": "accessory"
+    "equip_slot": "accessory",
+    "sell_price": 30
   },
   {
     "id": "meteorite_ore",
@@ -833,7 +845,8 @@
     "max_stack": 20,
     "description": "",
     "color": [0.3, 0.6, 0.25, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 2
   },
   {
     "id": "parsnip",
@@ -852,7 +865,8 @@
     "max_stack": 20,
     "description": "",
     "color": [0.85, 0.78, 0.45, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 1
   },
   {
     "id": "green_bean",
@@ -871,7 +885,8 @@
     "max_stack": 20,
     "description": "",
     "color": [0.35, 0.65, 0.25, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 1
   },
   {
     "id": "chili",
@@ -890,7 +905,8 @@
     "max_stack": 20,
     "description": "",
     "color": [0.8, 0.2, 0.15, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 2
   },
   {
     "id": "blueberry",
@@ -909,7 +925,8 @@
     "max_stack": 20,
     "description": "",
     "color": [0.3, 0.4, 0.6, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 2
   },
   {
     "id": "grape",
@@ -928,7 +945,8 @@
     "max_stack": 20,
     "description": "",
     "color": [0.5, 0.3, 0.6, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 2
   },
   {
     "id": "garlic",
@@ -947,7 +965,8 @@
     "max_stack": 20,
     "description": "",
     "color": [0.85, 0.82, 0.7, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 2
   },
   {
     "id": "coffee_bean",
@@ -966,7 +985,8 @@
     "max_stack": 20,
     "description": "",
     "color": [0.3, 0.18, 0.1, 1.0],
-    "heal_amount": 0.0
+    "heal_amount": 0.0,
+    "sell_price": 4
   },
   {
     "id": "sunflower",
@@ -1106,7 +1126,7 @@
     "description": "提神咖啡，短时间提升移速。",
     "color": [0.3, 0.18, 0.1, 1.0],
     "heal_amount": 10.0,
-    "sell_price": 50
+    "sell_price": 66
   },
   {
     "id": "omelette",
@@ -1136,7 +1156,8 @@
     "description": "宝石与金锭制成，受伤时有几率免伤。",
     "color": [0.85, 0.85, 1.0, 1.0],
     "heal_amount": 0.0,
-    "equip_slot": "accessory"
+    "equip_slot": "accessory",
+    "sell_price": 25
   },
   {
     "id": "speed_charm",
@@ -1146,7 +1167,8 @@
     "description": "翡翠护符，提升移速。",
     "color": [0.5, 0.95, 0.5, 1.0],
     "heal_amount": 0.0,
-    "equip_slot": "accessory"
+    "equip_slot": "accessory",
+    "sell_price": 25
   },
   {
     "id": "lantern",
@@ -1156,7 +1178,8 @@
     "description": "夜晚照亮周围的提灯。",
     "color": [0.95, 0.85, 0.45, 1.0],
     "heal_amount": 0.0,
-    "equip_slot": "accessory"
+    "equip_slot": "accessory",
+    "sell_price": 20
   },
   {
     "id": "copper_sword",
@@ -1167,7 +1190,8 @@
     "color": [0.85, 0.5, 0.25, 1.0],
     "heal_amount": 0.0,
     "equip_slot": "weapon",
-    "damage": 8.0
+    "damage": 8.0,
+    "sell_price": 14
   },
   {
     "id": "gold_sword",
@@ -1178,7 +1202,8 @@
     "color": [1.0, 0.85, 0.25, 1.0],
     "heal_amount": 0.0,
     "equip_slot": "weapon",
-    "damage": 18.0
+    "damage": 18.0,
+    "sell_price": 55
   },
   {
     "id": "copper_pickaxe",

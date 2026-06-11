@@ -36,10 +36,19 @@ func _build_layout() -> void:
 
 	vbox.add_child(HSeparator.new())
 
+	var chest_row := HBoxContainer.new()
+	vbox.add_child(chest_row)
 	var chest_lbl := Label.new()
 	chest_lbl.text = "箱子内容（点击取出）"
 	chest_lbl.add_theme_font_size_override("font_size", 12)
-	vbox.add_child(chest_lbl)
+	chest_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	chest_row.add_child(chest_lbl)
+	var take_all := Button.new()
+	take_all.text = "全部取出"
+	take_all.focus_mode = Control.FOCUS_NONE
+	take_all.add_theme_font_size_override("font_size", 11)
+	take_all.pressed.connect(func(): _transfer_all(_storage_inventory, _player_inventory))
+	chest_row.add_child(take_all)
 
 	_storage_grid = GridContainer.new()
 	_storage_grid.columns = 5
@@ -49,10 +58,19 @@ func _build_layout() -> void:
 
 	vbox.add_child(HSeparator.new())
 
+	var player_row := HBoxContainer.new()
+	vbox.add_child(player_row)
 	var player_lbl := Label.new()
 	player_lbl.text = "我的背包（点击存入）"
 	player_lbl.add_theme_font_size_override("font_size", 12)
-	vbox.add_child(player_lbl)
+	player_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	player_row.add_child(player_lbl)
+	var store_all := Button.new()
+	store_all.text = "全部存入"
+	store_all.focus_mode = Control.FOCUS_NONE
+	store_all.add_theme_font_size_override("font_size", 11)
+	store_all.pressed.connect(func(): _transfer_all(_player_inventory, _storage_inventory))
+	player_row.add_child(store_all)
 
 	_player_grid = GridContainer.new()
 	_player_grid.columns = 5
@@ -111,6 +129,17 @@ func _transfer(item: ItemData, amount: int, from: InventoryComponent, to: Invent
 	var transferred := amount - leftover
 	if transferred > 0:
 		from.remove_item(item, transferred)
+
+func _transfer_all(from: InventoryComponent, to: InventoryComponent) -> void:
+	if from == null or to == null:
+		return
+	# 先快照待转移项，避免边遍历边修改 slots
+	var moves: Array = []
+	for slot in from.slots:
+		if slot.item != null and slot.amount > 0:
+			moves.append([slot.item, slot.amount])
+	for m in moves:
+		_transfer(m[0], m[1], from, to)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel") and visible:

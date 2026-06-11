@@ -360,6 +360,10 @@ func _build_top_right() -> void:
 	_quest_box.add_theme_constant_override("separation", 0)
 	quest_col.add_child(_quest_box)
 	set_quests([])
+	# 接入新手引导任务链：监听其变化并主动拉取当前任务
+	if not TutorialSystem.quests_changed.is_connected(set_quests):
+		TutorialSystem.quests_changed.connect(set_quests)
+	TutorialSystem.refresh()
 
 func set_quests(quests: Array) -> void:
 	for c in _quest_box.get_children():

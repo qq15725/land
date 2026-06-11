@@ -57,6 +57,36 @@ func remove_item(item: ItemData, amount: int = 1) -> bool:
 				return true
 	return true
 
+# 一键整理：合并相同物品的分散堆叠 + 按名称排序，消除碎片化
+func sort_and_compact() -> void:
+	var bucket: Array = []  # [ItemData, total]
+	for slot in slots:
+		if slot.item == null or slot.amount <= 0:
+			continue
+		var found := false
+		for e in bucket:
+			if e[0] == slot.item:
+				e[1] += slot.amount
+				found = true
+				break
+		if not found:
+			bucket.append([slot.item, slot.amount])
+	bucket.sort_custom(func(a, b): return String(a[0].display_name) < String(b[0].display_name))
+	for i in slots.size():
+		slots[i] = {item = null, amount = 0}
+	var idx := 0
+	for e in bucket:
+		var item: ItemData = e[0]
+		var amt: int = e[1]
+		while amt > 0 and idx < slots.size():
+			var put: int = mini(amt, item.max_stack)
+			slots[idx] = {item = item, amount = put}
+			amt -= put
+			idx += 1
+	selected_slot = -1
+	changed.emit()
+	selection_changed.emit(selected_slot)
+
 func has_item(item: ItemData, amount: int = 1) -> bool:
 	var total := 0
 	for slot in slots:

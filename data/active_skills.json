@@ -2025,7 +2025,7 @@
     "max_level": 20,
     "sp_cost": 3,
     "mp_cost": 90,
-    "cooldown": 240.0,
+    "cooldown": 120.0,
     "shape": "aoe",
     "shape_size": 180,
     "shape_angle": 360,

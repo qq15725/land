@@ -215,6 +215,20 @@ func _do_set_class(peer_id: int, class_id: String) -> void:
 	if not p.active_skills.class_id.is_empty():
 		return
 	p.active_skills.set_class(class_id)
+	_grant_starter_kit(p)
+
+# 新游戏选定职业时发放开局工具包，解决开局空手无从下手的问题。
+# 只在首次锁定职业时调用一次；读档时玩家已有 class_id，不会触发。
+const STARTER_KIT := [
+	["axe", 1], ["pickaxe", 1],
+	["wooden_plank", 8], ["cooked_carrot", 3],
+]
+
+func _grant_starter_kit(p: Player) -> void:
+	for entry in STARTER_KIT:
+		var item := ItemDatabase.get_item(entry[0])
+		if item:
+			p.inventory.add_item(item, entry[1])
 
 func _do_equip_skill(peer_id: int, slot: int, skill_id: String) -> void:
 	var p := _player_for(peer_id)
