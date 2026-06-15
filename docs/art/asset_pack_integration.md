@@ -58,5 +58,15 @@ var char_row_order := [0,1,2,3] # ← 改成 [下,上,左,右] 各取第几行
 ### 7. 验证
 跑游戏看：角色四向行走对不对、朝向是否一致（不对就调 `char_row_order`）、大小是否合适（调 `*_TARGET_H`）、物品图标是否错位（调 `ICON_GRID_COLS` / `icon_grid`）。
 
-## 三、最省心路线
+## 三、已接入（测试，验证适配层）
+
+**玩家角色** 已替换为一套 CC0 真实角色作为概念验证：
+- 来源：OpenGameArt「32x64 Female Base Sprite (walking 4 directions)」**CC0**
+  https://opengameart.org/content/32x64-female-base-sprite-walking-4-directions
+- 处理：原始 `strip16`（512×64，16 帧横排，帧 32×64）→ 用 PIL 重排为游戏的 4 行×4 列布局（128×256，帧 32×64）→ `assets/sprites/characters/player.png`
+- **适配层自动生效**：源帧高 64，`scale_for` 自动算出 scale=0.5，让它和其他占位角色一样显示 32 高——证明换不同尺寸的源贴图无需改代码。
+- ⚠️ **若四向行走方向对应错乱**（如按"下"却朝上走）：strip 的方向段顺序与假设的"下/上/左/右"不同，改 `ArtProfile.char_row_order`（如 `[0,2,3,1]`）即可，无需重新处理图。
+- 其他角色/怪物/动物/建筑仍是占位，按本指引逐类替换即可。
+
+## 四、最省心路线
 Cute Fantasy RPG（$2.99）主力 → 免费怪物包补 wolf/zombie/bat → 自动化保留几何占位。总成本 ~$3，覆盖 95%。
