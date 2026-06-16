@@ -39,4 +39,7 @@ static func projectile_scene(id: String) -> String:
 static func resolve(override: String, default_fn: Callable, id: String) -> String:
 	if not override.is_empty():
 		return override
-	return default_fn.call(id)
+	# 约定路径下的资源可能尚未制作；缺失时返回空串，让调用方回退到占位贴图，
+	# 避免对不存在的文件调用 load() 触发引擎级 ERROR 刷屏。
+	var path: String = default_fn.call(id)
+	return path if ResourceLoader.exists(path) else ""

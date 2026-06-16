@@ -6,8 +6,7 @@ var _list: VBoxContainer
 
 func _ready() -> void:
 	super()
-	custom_minimum_size = Vector2(320, 320)
-	set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	center_with_size(Vector2(320, 320))
 	visible = false
 	_build_layout()
 	EventBus.skill_leveled_up.connect(func(_id, _lv): if visible: _refresh())

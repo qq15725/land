@@ -18,7 +18,7 @@ func tick() -> void:
 			_item = null
 			_update_item_visual()
 
-func can_accept(_item_in: ItemData) -> bool:
+func can_accept(_item_in: ItemData) -> bool:  # 基类标注 ItemData，子类 super 调用可推断类型
 	return _item == null and not _moved_this_tick
 
 func push_item(item: ItemData) -> bool:

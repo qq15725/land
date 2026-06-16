@@ -13,8 +13,7 @@ var _current_tab: int = Tab.TRADE
 
 func _ready() -> void:
 	super()
-	custom_minimum_size = Vector2(420, 460)
-	set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	center_with_size(Vector2(420, 460))
 	visible = false
 	_build_layout()
 	EventBus.open_trade.connect(_on_open_trade)

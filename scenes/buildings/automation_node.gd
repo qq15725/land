@@ -8,6 +8,7 @@ const DIRS := [Vector2i(0, -1), Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0)]
 
 var facing: int = 1
 var grid_pos: Vector2i
+@warning_ignore("unused_private_class_variable")
 var _moved_this_tick := false
 var _arrow: Polygon2D
 var _node_built := false

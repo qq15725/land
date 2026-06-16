@@ -62,10 +62,10 @@ func make_slot_style(selected: bool) -> StyleBox:
 			s.border_color = Color.WHITE
 			s.set_border_width_all(2)
 		return s
-	var s := _slot_base.duplicate() as StyleBoxTexture
+	var sb := _slot_base.duplicate() as StyleBoxTexture
 	if selected:
-		s.modulate_color = Color(1.4, 1.2, 0.45)
-	return s
+		sb.modulate_color = Color(1.4, 1.2, 0.45)
+	return sb
 
 
 func _crop(img: Image, region: Rect2i, ml: int, mr: int, mt: int, mb: int) -> StyleBoxTexture:

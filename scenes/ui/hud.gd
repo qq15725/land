@@ -187,9 +187,9 @@ func _build_char_info() -> void:
 
 	# 3 条进度条：HP（红）/ MP（蓝）/ FP（橙）。坐标对应 hud_charinfo.png 底图凹陷槽位。
 	# 经验条不在此处，只在底部 hotbar 上方显示。
-	_hp_bar = _bar_overlay(tex, 130, 44, 174, 12, Color(0.92, 0.22, 0.22))
-	_mp_bar = _bar_overlay(tex, 130, 66, 174, 12, Color(0.30, 0.55, 1.00))
-	_fp_bar = _bar_overlay(tex, 130, 88, 174, 12, Color(1.00, 0.70, 0.20))
+	_hp_bar = _bar_overlay(tex, 104, 49, 210, 12, Color(0.92, 0.22, 0.22))
+	_mp_bar = _bar_overlay(tex, 104, 70, 210, 12, Color(0.30, 0.55, 1.00))
+	_fp_bar = _bar_overlay(tex, 104, 92, 210, 12, Color(1.00, 0.70, 0.20))
 
 # ─── ② ③ ④ 顶部居中 ────────────────────────────────────────────────────
 
@@ -304,7 +304,7 @@ func show_event(text: String) -> void:
 func _build_top_right() -> void:
 	var col := VBoxContainer.new()
 	col.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	col.position = Vector2(-204, 12)
+	col.position = Vector2(-268, 12)
 	col.add_theme_constant_override("separation", 10)
 	add_child(col)
 
@@ -585,7 +585,7 @@ func _build_skill_bar() -> void:
 		empty.text = "—"
 		empty.modulate = Color(0.55, 0.55, 0.55)
 		empty.add_theme_font_size_override("font_size", 24)
-		empty.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+		empty.set_anchors_and_offsets_preset(Control.PRESET_CENTER, Control.PRESET_MODE_MINSIZE)
 		slot.add_child(empty)
 
 		# 冷却遮罩 + 冷却数字（默认隐藏）
@@ -912,7 +912,22 @@ func _texture(path: String, fixed_size: Vector2) -> TextureRect:
 # 代码绘制圆角胶囊进度条。要求底图槽位是"空槽"（不画填充色），代码 fill
 # 完全控制颜色。fill 宽度由 _set_bar() 按 ratio 动态调整。
 func _bar_overlay(parent: Control, x: int, y: int, w: int, h: int, fill_color: Color) -> Dictionary:
+	@warning_ignore("integer_division")
 	var radius: int = h / 2
+	# 空槽遮罩：盖住底图里画死的旧彩条，使非满值时露出的是干净空槽而非残留色块
+	var bg := Panel.new()
+	var bgsb := StyleBoxFlat.new()
+	bgsb.bg_color = Color(0.098, 0.098, 0.094)
+	bgsb.corner_radius_top_left = radius
+	bgsb.corner_radius_top_right = radius
+	bgsb.corner_radius_bottom_left = radius
+	bgsb.corner_radius_bottom_right = radius
+	bg.add_theme_stylebox_override("panel", bgsb)
+	bg.position = Vector2(x, y)
+	bg.size = Vector2(w, h)
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(bg)
+
 	var fill := Panel.new()
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = fill_color

@@ -93,7 +93,7 @@ func _do_wander(delta: float) -> void:
 	move_and_slide()
 	_update_facing()
 
-func _do_chase(delta: float) -> void:
+func _do_chase(_delta: float) -> void:
 	if not is_instance_valid(_target):
 		_state = State.WANDER
 		return

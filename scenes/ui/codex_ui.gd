@@ -7,8 +7,7 @@ var _list: VBoxContainer
 
 func _ready() -> void:
 	super()
-	custom_minimum_size = Vector2(520, 480)
-	set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	center_with_size(Vector2(520, 480))
 	visible = false
 	_build_layout()
 	AchievementSystem.achievement_unlocked.connect(_on_unlocked)

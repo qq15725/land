@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "gopeak": {
+      "command": "npx",
+      "args": ["-y", "gopeak"]
+    }
+  }
+}

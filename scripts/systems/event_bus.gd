@@ -4,6 +4,7 @@ extends Node
 # /CropData/RecipeData/MerchantData 等数据对象保持原对象引用，因为它们有
 # string id，多人 RPC 时可以用 id 重新查 ItemDatabase）。
 
+@warning_ignore_start("unused_signal")  # EventBus 信号由别的脚本 emit/connect，LSP 查不到
 signal item_picked_up(item: ItemData, amount: int)
 signal player_damaged(amount: float)
 signal player_died
@@ -26,3 +27,4 @@ signal skill_points_changed(player_id: int, new_total: int)
 signal active_skill_learned(player_id: int, skill_id: String, new_level: int)
 signal player_class_changed(player_id: int, class_id: String)
 signal player_buffs_changed(player_id: int, active: Dictionary)
+@warning_ignore_restore("unused_signal")

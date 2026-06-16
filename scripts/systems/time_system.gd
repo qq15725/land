@@ -2,6 +2,7 @@ extends Node
 
 signal day_started(day: int)
 signal night_started(day: int)
+@warning_ignore("unused_signal")
 signal hour_changed(hour: int)
 signal season_changed(season: String)
 
@@ -55,6 +56,7 @@ func get_phase_ratio() -> float:
 # ─── 季节 ────────────────────────────────────────────────────────────────────
 
 func current_season() -> String:
+	@warning_ignore("integer_division")
 	var idx := ((current_day - 1) / DAYS_PER_SEASON) % SEASONS.size()
 	return SEASONS[idx]
 

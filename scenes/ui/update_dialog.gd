@@ -8,8 +8,7 @@ var _update_btn: Button
 var _cancel_btn: Button
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(400, 300)
-	set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	center_with_size(Vector2(400, 300))
 	visible = false
 	z_index = ZLayer.UI_DIALOG
 	_build_layout()

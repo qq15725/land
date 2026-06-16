@@ -9,6 +9,20 @@ var _drag_offset := Vector2.ZERO
 func _ready() -> void:
 	theme = UIStyle.theme
 
+# 居中显示：手动设 anchor 0.5 + offset = ±半尺寸，不依赖运行时 size。
+# （_ready 当帧 minimum_size 尚未生效，PRESET_CENTER + MODE_MINSIZE 会按 0 算偏移，
+#  导致面板从屏幕中心向右下扩。用显式半尺寸 offset 可稳定居中。）
+func center_with_size(sz: Vector2) -> void:
+	custom_minimum_size = sz
+	anchor_left = 0.5
+	anchor_top = 0.5
+	anchor_right = 0.5
+	anchor_bottom = 0.5
+	offset_left = -sz.x / 2.0
+	offset_right = sz.x / 2.0
+	offset_top = -sz.y / 2.0
+	offset_bottom = sz.y / 2.0
+
 func _process(_d: float) -> void:
 	# 标题拖拽区显示 MOVE cursor
 	if not visible:

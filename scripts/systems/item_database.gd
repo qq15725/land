@@ -25,6 +25,7 @@ var _icon_cache: Dictionary = {}
 func _ready() -> void:
 	_icon_sheet = load(ICON_SHEET_PATH) as Texture2D
 	if _icon_sheet:
+		@warning_ignore("integer_division")
 		_icon_size = _icon_sheet.get_width() / ICON_GRID_COLS
 	_load_items()
 	_load_buildings()

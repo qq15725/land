@@ -131,6 +131,7 @@
   },
   {
     "id": "stone_golem",
+    "sprite_path": "res://assets/creatures/zombie.png",
     "display_name": "石巨人",
     "max_health": 140.0,
     "move_speed": 40.0,
@@ -148,6 +149,7 @@
   },
   {
     "id": "wisp",
+    "sprite_path": "res://assets/creatures/bat.png",
     "display_name": "鬼火",
     "max_health": 20.0,
     "move_speed": 120.0,
@@ -184,6 +186,7 @@
   },
   {
     "id": "venom_scorpion",
+    "sprite_path": "res://assets/creatures/wolf.png",
     "display_name": "毒蝎",
     "max_health": 55.0,
     "move_speed": 85.0,
@@ -216,6 +219,7 @@
   },
   {
     "id": "fire_elemental",
+    "sprite_path": "res://assets/creatures/slime.png",
     "display_name": "火元素",
     "max_health": 90.0,
     "move_speed": 70.0,

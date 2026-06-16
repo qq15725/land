@@ -7,8 +7,7 @@ var _player_grid: GridContainer
 
 func _ready() -> void:
 	super()
-	custom_minimum_size = Vector2(320, 480)
-	set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	center_with_size(Vector2(320, 480))
 	visible = false
 	_build_layout()
 	EventBus.open_storage.connect(_on_open_storage)

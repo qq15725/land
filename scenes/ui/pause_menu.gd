@@ -1,6 +1,7 @@
 extends Control
 
 signal resumed
+@warning_ignore("unused_signal")
 signal saved_and_quit
 
 var _settings_menu: SettingsMenu = null
