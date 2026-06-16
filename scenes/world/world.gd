@@ -60,6 +60,7 @@ var terrain_seed: int = 0
 var map_markers: Dictionary = {}   # "next_0"/"next_1"/"next_2"/"prev" → Vector2i
 var current_map_id: String = ""    # 当前地图 id，如 "0"、"0-1"
 var _portal_cooldown: float = 0.0
+var _fog_overlay_mat: ShaderMaterial = null
 
 var _loading_layer: CanvasLayer = null
 var _loading_label: Label = null
@@ -105,6 +106,8 @@ func _ready() -> void:
 	# 多人：监听玩家进出
 	Network.peer_joined.connect(_on_peer_joined)
 	Network.peer_left.connect(_on_peer_left)
+	_setup_fog_overlay()
+	_setup_fog()
 
 func _setup_weather_fx() -> void:
 	_weather_layer = CanvasLayer.new()
@@ -212,6 +215,40 @@ func _find_local_player() -> Player:
 			return pl
 	return null
 
+# 视野迷雾：网格取当前地图边界，观察者为本地玩家，遮挡来自已生成的树/建筑。
+func _setup_fog() -> void:
+	FogSystem.setup_grid(WorldGenerator.last_map_origin, WorldGenerator.last_map_w, WorldGenerator.last_map_h, current_map_id)
+	FogSystem.set_observer(_find_local_player())
+	FogSystem.rebuild_blockers(y_sort_layer)
+	if _fog_overlay_mat:
+		_fog_overlay_mat.set_shader_parameter("fog_tex", FogSystem.get_fog_texture())
+		_fog_overlay_mat.set_shader_parameter("grid_world_origin", FogSystem.grid_world_origin())
+		_fog_overlay_mat.set_shader_parameter("grid_world_size", FogSystem.grid_world_size())
+
+# 迷雾遮罩层：layer=3，在世界(YSortLayer)之上、WeatherLayer(4)/HUD(5) 之下，不盖 UI。
+func _setup_fog_overlay() -> void:
+	var layer := CanvasLayer.new()
+	layer.layer = 3
+	add_child(layer)
+	var rect := ColorRect.new()
+	rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fog_overlay_mat = ShaderMaterial.new()
+	_fog_overlay_mat.shader = load("res://scenes/world/fog.gdshader")
+	rect.material = _fog_overlay_mat
+	layer.add_child(rect)
+
+# 每帧把"屏幕可视的世界矩形"传给 shader，让它把像素映射回网格采样。
+func _update_fog_overlay() -> void:
+	if _fog_overlay_mat == null:
+		return
+	var vp := get_viewport()
+	var inv := vp.get_canvas_transform().affine_inverse()
+	var size: Vector2 = vp.get_visible_rect().size
+	var tl: Vector2 = inv * Vector2.ZERO
+	var br: Vector2 = inv * size
+	_fog_overlay_mat.set_shader_parameter("cam_world_rect", Vector4(tl.x, tl.y, br.x - tl.x, br.y - tl.y))
+
 func _on_entity_spawned(node: Node) -> void:
 	if node is Player and (node as Player).peer_id == Network.local_peer_id():
 		_hud.setup((node as Player).health, (node as Player).inventory)
@@ -278,6 +315,7 @@ func _travel(marker_key: String) -> void:
 	await _load_map(target_id)
 	_show_loading()
 	await _populate_world(terrain_seed)
+	_setup_fog()
 	_hide_loading()
 	_portal_cooldown = PORTAL_COOLDOWN
 
@@ -445,6 +483,8 @@ func _process(delta: float) -> void:
 			mpos = mpos.snapped(Vector2(TILE_SIZE, TILE_SIZE))
 		_build_preview.global_position = mpos
 	_update_day_overlay()
+	FogSystem.update_visibility()
+	_update_fog_overlay()
 	_check_portals(delta)
 	_autosave_timer += delta
 	if _autosave_timer >= AUTOSAVE_INTERVAL:

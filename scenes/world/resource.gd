@@ -26,6 +26,7 @@ var _frame_count: int = 1  # sprite 是否真的有 3 帧
 
 func _ready() -> void:
 	NetworkRegistry.attach(self)
+	FogSystem.register_dynamic(self)
 	if not resource_id.is_empty():
 		var data: ResourceNodeData = ItemDatabase.get_resource_node(resource_id)
 		if data:

@@ -94,6 +94,7 @@ func _collect(world: Node2D) -> Dictionary:
 		"version": VERSION,
 		"saved_at": Time.get_datetime_string_from_system(),
 		"world": {
+			"map_id": world.get("current_map_id"),
 			"day": TimeSystem.current_day,
 			"phase": "night" if TimeSystem.is_night() else "day",
 			"phase_elapsed": TimeSystem.phase_elapsed,
@@ -101,6 +102,7 @@ func _collect(world: Node2D) -> Dictionary:
 			"chunk_snapshots": ChunkManager.export_snapshots(),
 			"buildings": _save_buildings(world),
 			"network_registry": NetworkRegistry.export_state(),
+			"fog": FogSystem.export_state(),
 		},
 		"players": _collect_players(world),
 	}
@@ -169,6 +171,7 @@ func _apply_v1(data: Dictionary, world: Node2D) -> void:
 # ─── 子流程：world ───────────────────────────────────────────────────────
 
 func _apply_world(world_data: Dictionary, world: Node2D) -> void:
+	world.set("current_map_id", world_data.get("map_id", "0"))
 	TimeSystem.current_day = world_data.get("day", 1)
 	TimeSystem.phase_elapsed = world_data.get("phase_elapsed", 0.0)
 	TimeSystem.current_phase = TimeSystem.Phase.NIGHT if world_data.get("phase") == "night" else TimeSystem.Phase.DAY
@@ -182,6 +185,7 @@ func _apply_world(world_data: Dictionary, world: Node2D) -> void:
 		await WorldGenerator.generate(tm, seed_val)
 
 	NetworkRegistry.import_state(world_data.get("network_registry", {}))
+	FogSystem.import_state(world_data.get("fog", {}))
 	ChunkManager.clear_state()
 	if world_data.has("chunk_snapshots"):
 		ChunkManager.import_snapshots(world_data["chunk_snapshots"])

@@ -37,6 +37,7 @@ VFXEventRouter="*res://scripts/systems/vfx_event_router.gd"
 ComboSystem="*res://scripts/systems/combo_system.gd"
 QuestSystem="*res://scripts/systems/quest_system.gd"
 AutomationSystem="*res://scripts/systems/automation_system.gd"
+FogSystem="*res://scripts/systems/fog_system.gd"
 MCPRuntime="*res://addons/godot_mcp_runtime/mcp_runtime_autoload.gd"
 
 [display]

@@ -35,6 +35,7 @@ func take_damage_from(player: Player, amount: float) -> void:
 
 func _ready() -> void:
 	NetworkRegistry.attach(self)
+	FogSystem.register_dynamic(self)
 	if not data:
 		return
 	# 难度递增：每过 7 天 hp/伤害 +10%（封顶 +200%）。Boss 不再叠加。

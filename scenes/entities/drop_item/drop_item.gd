@@ -14,6 +14,7 @@ var _spawn_time: float = 0.0
 
 func _ready() -> void:
 	NetworkRegistry.attach(self)
+	FogSystem.register_dynamic(self)
 	body_entered.connect(_on_body_entered)
 	_refresh_visual()
 
