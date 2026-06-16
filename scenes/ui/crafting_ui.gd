@@ -6,8 +6,7 @@ var _current_station: String = ""
 
 func _ready() -> void:
 	super()
-	custom_minimum_size = Vector2(360, 440)
-	set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	center_with_size(Vector2(360, 440))
 	visible = false
 	_build_layout()
 	EventBus.open_crafting.connect(_on_open_crafting)
@@ -96,9 +95,9 @@ func _add_recipe_entry(recipe: RecipeData) -> void:
 
 	_recipe_list.add_child(HSeparator.new())
 
-func _make_chip(item: ItemData, amount: int, size: int) -> Control:
+func _make_chip(item: ItemData, amount: int, icon_size: int) -> Control:
 	var chip := ItemIcon.new()
-	chip.custom_minimum_size = Vector2(size, size)
+	chip.custom_minimum_size = Vector2(icon_size, icon_size)
 	chip.show_item(item, amount)
 	return chip
 

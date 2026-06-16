@@ -27,7 +27,7 @@ func attach(node: Node, forced_id: int = 0) -> int:
 		id = _allocate_id()
 	if _id_to_node.has(id):
 		var old: Node = _id_to_node[id]
-		push_warning("[NetworkRegistry] id %d collision: existing=%s new=%s" % [id, old.name if old else "<freed>", node.name])
+		push_warning("[NetworkRegistry] id %d collision: existing=%s new=%s" % [id, String(old.name) if old else "<freed>", node.name])
 	_id_to_node[id] = node
 	_node_to_id[node] = id
 	node.set_meta("network_id", id)

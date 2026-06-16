@@ -83,7 +83,7 @@ func _world() -> Node:
 		return w
 	return null
 
-func _local_player(_world: Node) -> Player:
+func _local_player(_world_ref: Node) -> Player:
 	var tree := Engine.get_main_loop() as SceneTree
 	if tree == null:
 		return null

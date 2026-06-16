@@ -19,8 +19,8 @@ var _atk_timer := 0.0
 var _color := Color(0.6, 0.8, 1.0, 0.85)
 var _body_poly: Polygon2D
 
-func setup(owner: Player, color: Color, duration: float) -> void:
-	_owner_player = owner
+func setup(owner_player: Player, color: Color, duration: float) -> void:
+	_owner_player = owner_player
 	_life = duration
 	_color = color
 	if _body_poly:

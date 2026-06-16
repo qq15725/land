@@ -11,8 +11,7 @@ const TYPE_NAMES := {
 
 func _ready() -> void:
 	super._ready()
-	custom_minimum_size = Vector2(240, 220)
-	set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	center_with_size(Vector2(240, 220))
 	visible = false
 	_build()
 

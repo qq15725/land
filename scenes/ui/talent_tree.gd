@@ -42,8 +42,7 @@ class TreeCanvas extends Control:
 
 func _ready() -> void:
 	super()
-	custom_minimum_size = Vector2(720, 540)
-	set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	center_with_size(Vector2(720, 540))
 	visible = false
 	_build_layout()
 	EventBus.skill_points_changed.connect(_on_sp_changed)
@@ -262,7 +261,7 @@ func _make_node(skill: ActiveSkillData) -> Control:
 	if not parent_ok or (not is_learned and not unlocked):
 		var lock := Label.new()
 		lock.text = "🔒"
-		lock.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+		lock.set_anchors_and_offsets_preset(Control.PRESET_CENTER, Control.PRESET_MODE_MINSIZE)
 		lock.add_theme_font_size_override("font_size", 20)
 		lock.add_theme_color_override("font_color", Color(0.95, 0.85, 0.4))
 		icon_box.add_child(lock)

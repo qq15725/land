@@ -502,6 +502,7 @@ func _drop_inventory_on_death(pos: Vector2) -> void:
 			continue
 		if not slot.item.equip_slot.is_empty():
 			continue
+		@warning_ignore("integer_division")
 		var drop_amount: int = int(slot.amount) / 2
 		if drop_amount <= 0:
 			continue

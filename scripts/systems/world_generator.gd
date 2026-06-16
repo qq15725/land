@@ -77,6 +77,7 @@ func create_tileset() -> TileSet:
 		src.texture = _load_terrain_texture(terrain_id)
 		src.texture_region_size = TILE_SIZE
 		for idx in blob_tiles.size():
+			@warning_ignore("integer_division")
 			var coords := Vector2i(idx % ATLAS_COLS, idx / ATLAS_COLS)
 			_setup_blob_tile(src, coords, terrain_id, blob_tiles[idx])
 			# 中心 tile（4 边 4 角全连）加 3 个 flip 变体，让引擎按 probability 加权随机选
@@ -90,7 +91,7 @@ func create_tileset() -> TileSet:
 
 # 中心 tile 的 4 种 flip 组合（原 + h / + v / + h&v）作为同 peering 的备选。
 # 由于中心 tile 8 邻接全连通，flip 不破坏 autotile 视觉。其它 bitmask 不可 flip。
-func _add_flip_variants(src: TileSetAtlasSource, coords: Vector2i, terrain_id: int, b: Dictionary) -> void:
+func _add_flip_variants(src: TileSetAtlasSource, coords: Vector2i, terrain_id: int, _b: Dictionary) -> void:
 	const FLIPS := [
 		[true,  false, false],
 		[false, true,  false],
@@ -297,7 +298,9 @@ func generate_from_image(tilemap: TileMapLayer, image_path: String) -> Dictionar
 
 	var img_w  := img.get_width()
 	var img_h  := img.get_height()
+	@warning_ignore("integer_division")
 	var half_w := img_w / 2
+	@warning_ignore("integer_division")
 	var half_h := img_h / 2
 
 	var map: Array[int] = []
@@ -511,6 +514,7 @@ func _gen_fallback_texture(terrain_id: int) -> ImageTexture:
 			var idx := row * ATLAS_COLS + col
 			var c := base if idx < 47 else Color(0, 0, 0, 0)
 			# 用轻微明度变化区分各 tile，方便无美术时目视调试
+			@warning_ignore("integer_division")
 			c = c.lightened(float(idx % 8) * 0.02).darkened(float(idx / 8) * 0.03)
 			for py in CELL:
 				for px in CELL:

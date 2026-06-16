@@ -55,6 +55,7 @@ func _apply_data(data: ResourceNodeData) -> void:
 	visual.position.y = data.visual_offset_y
 	visual.region_enabled = true
 	_frame_height = data.frame_height
+	@warning_ignore("integer_division")
 	_frame_count = maxi(1, tex.get_height() / maxi(_frame_height, 1))
 	_show_frame(0)
 
@@ -93,6 +94,7 @@ func _make_fallback_texture(data: ResourceNodeData) -> ImageTexture:
 	# 帧 2：破坏（整体偏暗 + 裂纹）
 	img.fill_rect(Rect2i(0, fh * 2, w, fh), dark)
 	for x in w:
+		@warning_ignore("integer_division")
 		img.set_pixel(x, fh * 2 + fh / 2, edge)
 	# 三帧统一加边
 	for f in 3:

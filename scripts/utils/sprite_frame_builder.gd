@@ -7,7 +7,9 @@ static func build_4way(tex: Texture2D, fps: float = 6.0, cols: int = 4, rows: in
 	var frames := SpriteFrames.new()
 	if frames.has_animation("default"):
 		frames.remove_animation("default")
+	@warning_ignore("integer_division")
 	var fw := tex.get_width() / cols
+	@warning_ignore("integer_division")
 	var fh := tex.get_height() / rows
 	var names := ["walk_down", "walk_up", "walk_left", "walk_right"]
 	for i in 4:

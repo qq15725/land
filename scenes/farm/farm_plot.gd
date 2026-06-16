@@ -142,5 +142,5 @@ func load_save_state(data: Dictionary) -> void:
 	var crop_id: String = data.get("crop_id", "")
 	_grow_timer = data.get("grow_timer", 0.0)
 	_current_crop = ItemDatabase.get_crop_by_id(crop_id) if crop_id != "" else null
-	_state = s
+	_state = s as State
 	_apply_state_visual()
