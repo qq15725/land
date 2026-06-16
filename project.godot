@@ -1,11 +1,3 @@
-; Engine configuration file.
-; It's best edited using the editor UI and not directly,
-; since the parameters that go here are not all obvious.
-;
-; Format:
-;   [section] ; section goes between []
-;   param=value ; assign values to parameters
-
 config_version=5
 
 [application]
@@ -45,6 +37,7 @@ VFXEventRouter="*res://scripts/systems/vfx_event_router.gd"
 ComboSystem="*res://scripts/systems/combo_system.gd"
 QuestSystem="*res://scripts/systems/quest_system.gd"
 AutomationSystem="*res://scripts/systems/automation_system.gd"
+MCPRuntime="*res://addons/godot_mcp_runtime/mcp_runtime_autoload.gd"
 
 [display]
 
