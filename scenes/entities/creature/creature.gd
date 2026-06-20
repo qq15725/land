@@ -214,9 +214,12 @@ func _on_died() -> void:
 	set_physics_process(false)
 	_spawn_drops()
 	EventBus.creature_killed.emit(data, NetworkRegistry.get_id(_last_damager) if _last_damager else 0)
-	visual.modulate = Color(0.4, 0.4, 0.4, 0.5)
-	await get_tree().create_timer(1.5).timeout
-	queue_free()
+	# 死亡反馈：碎裂粒子 + 缩小淡出（比静止变灰 1.5s 更有"被消灭"的爽感）
+	HitParticles.spawn(get_parent(), global_position, Color(0.7, 0.2, 0.2, 0.9))
+	var tw := create_tween().set_parallel(true)
+	tw.tween_property(visual, "modulate:a", 0.0, 0.45)
+	tw.tween_property(visual, "scale", visual.scale * 0.55, 0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+	tw.chain().tween_callback(queue_free)
 
 func _spawn_drops() -> void:
 	if not data:
