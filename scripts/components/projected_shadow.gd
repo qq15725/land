@@ -49,6 +49,44 @@ static func _add_foot_occluder(entity: Node) -> void:
 	entity.add_child(occ)
 
 
+static var _blob_tex: Texture2D = null
+
+# 共享羽化椭圆纹理（白色 + 径向 alpha 二次衰减），所有静态物件 blob 阴影复用。
+static func _blob_texture() -> Texture2D:
+	if _blob_tex != null:
+		return _blob_tex
+	var sz := 64
+	var img := Image.create(sz, sz, false, Image.FORMAT_RGBA8)
+	var c := float(sz) * 0.5
+	for y in sz:
+		for x in sz:
+			var dx := (float(x) - c) / c
+			var dy := (float(y) - c) / c
+			var d := sqrt(dx * dx + dy * dy)
+			var a := clampf(1.0 - d, 0.0, 1.0)
+			img.set_pixel(x, y, Color(1, 1, 1, a * a))
+	_blob_tex = ImageTexture.create_from_image(img)
+	return _blob_tex
+
+
+# 给静态物件（资源/建筑）挂便宜的软边 blob 阴影：共享纹理、无 _process、不随太阳。
+# 已有则跳过（_apply_visual 可能多次调用）。
+static func attach_blob(entity: Node, world_w: float, foot_y: float = 0.0, alpha: float = 0.32) -> void:
+	if entity.has_node("BlobShadow"):
+		return
+	var spr := Sprite2D.new()
+	spr.name = "BlobShadow"
+	spr.texture = _blob_texture()
+	spr.z_index = ZLayer.SHADOW
+	spr.modulate = Color(0, 0, 0, alpha)
+	spr.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	var sx := maxf(world_w, 4.0) / 64.0
+	spr.scale = Vector2(sx, sx * 0.42)
+	spr.position = Vector2(0, foot_y)
+	entity.add_child(spr)
+	entity.move_child(spr, 0)
+
+
 func setup(src_visual: CanvasItem, follow_frame: bool = true) -> void:
 	_src = src_visual
 	_spr = Sprite2D.new()

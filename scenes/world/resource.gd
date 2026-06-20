@@ -59,6 +59,7 @@ func _apply_data(data: ResourceNodeData) -> void:
 	@warning_ignore("integer_division")
 	_frame_count = maxi(1, tex.get_height() / maxi(_frame_height, 1))
 	_show_frame(0)
+	ProjectedShadow.attach_blob(self, data.collision_size.x * 1.3, data.collision_offset_y + data.collision_size.y * 0.4)
 
 func _show_frame(idx: int) -> void:
 	var clamped := clampi(idx, 0, _frame_count - 1)

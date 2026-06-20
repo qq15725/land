@@ -44,6 +44,7 @@ func _apply_visual() -> void:
 		visual.texture = load(building_data.sprite_path)
 	if visual.texture == null:
 		visual.texture = _make_placeholder_texture()
+	ProjectedShadow.attach_blob(self, visual.texture.get_width() * ArtProfile.BUILDING_SCALE * 0.7, 0.0)
 
 func _make_placeholder_texture() -> ImageTexture:
 	var w := 192
