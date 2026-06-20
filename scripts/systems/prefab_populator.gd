@@ -249,4 +249,4 @@ func _spawn_resource(data: ResourceNodeData, wx: int, wy: int) -> void:
 	var node: ResourceNode = resource_scene.instantiate()
 	node.resource_id = data.id
 	node.position = pos
-	y_sort_layer.add_child(node)
+	y_sort_layer.add_child(node, true)  # force_readable_name：整图资源经多人 spawner 需稳定节点名

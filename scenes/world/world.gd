@@ -612,7 +612,7 @@ func _spawn_season_boss() -> void:
 	var boss: Creature = CreatureScene.instantiate()
 	boss.data = data
 	boss.position = pos
-	y_sort_layer.add_child(boss)
+	y_sort_layer.add_child(boss, true)  # force_readable_name：多人 MultiplayerSpawner 需稳定节点名
 	if _hud and _hud.has_method("show_toast"):
 		_hud.show_toast("⚔ %s 出现了！" % data.display_name, 4.0)
 
@@ -657,7 +657,7 @@ func _restore_world_from_snapshot() -> void:
 		var node: ResourceNode = ResourceNodeScene.instantiate()
 		node.resource_id = entry.get("id", "")
 		node.position = Vector2(entry.get("x", 0.0), entry.get("y", 0.0))
-		y_sort_layer.add_child(node)
+		y_sort_layer.add_child(node, true)  # force_readable_name：与多人 spawner 节点名一致
 		if entry.get("depleted", false):
 			node.call_deferred("restore_from_save", 0.0)
 		ChunkManager.register_entity(node)
@@ -688,7 +688,7 @@ func _spawn_night_creatures() -> void:
 		var creature: Creature = CreatureScene.instantiate()
 		creature.data = chosen
 		creature.position = pos
-		y_sort_layer.add_child(creature)
+		y_sort_layer.add_child(creature, true)  # force_readable_name：夜晚刷怪经 spawner 同步
 
 func _pick_creature_for_pos(rng: RandomNumberGenerator, all_creatures: Array, pos: Vector2) -> CreatureData:
 	var biome := WorldGenerator.get_biome_at(pos)
