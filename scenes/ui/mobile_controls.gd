@@ -14,7 +14,8 @@ var _pressed_moves: Array[String] = []
 
 func _ready() -> void:
 	layer = 8
-	if OS.get_name() != "Android":
+	# 移动端才启用（Android + iOS），桌面/web 移除。原来只判 Android 漏了 iOS。
+	if not OS.has_feature("mobile"):
 		queue_free()
 		return
 	_build_joystick()
