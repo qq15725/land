@@ -307,6 +307,15 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if _is_dead:
 		return
+	# 鼠标滚轮切 hotbar（9 槽循环）
+	if event is InputEventMouseButton and event.pressed:
+		var mb := event as InputEventMouseButton
+		if mb.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			_cycle_hotbar(1)
+			return
+		elif mb.button_index == MOUSE_BUTTON_WHEEL_UP:
+			_cycle_hotbar(-1)
+			return
 	# 数字键 1-9 直接选 hotbar 槽位
 	if event is InputEventKey and event.pressed and not event.echo:
 		var key := event as InputEventKey
@@ -350,6 +359,12 @@ func _cast_equipped(slot: int) -> void:
 	if sid.is_empty():
 		return
 	PlayerActions.request_cast_skill(sid, get_global_mouse_position())
+
+func _cycle_hotbar(dir: int) -> void:
+	var cur := inventory.selected_slot
+	if cur < 0 or cur > 8:
+		cur = -1 if dir > 0 else 9
+	PlayerActions.request_select_hotbar(wrapi(cur + dir, 0, 9))
 
 # 由 PlayerActions 在 server 上调用（单机时也走相同路径）。
 func do_interact() -> void:
