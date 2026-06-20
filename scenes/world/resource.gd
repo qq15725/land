@@ -132,7 +132,8 @@ func interact(player: Player) -> void:
 		_spawn_drops(leftover)
 	HitParticles.spawn(get_parent(), global_position, item.color)
 	var gained := drop_amount + bonus - leftover
-	if gained > 0:
+	# 仅采集者本地端飘字（interact 在 server 为所有玩家执行，避免 server 显示他人飘字）
+	if gained > 0 and player.is_multiplayer_authority():
 		PickupFloat.spawn(get_parent(), global_position + Vector2(0, -12), item, gained)
 	_shake_visual()
 	_play_break_and_deplete(player)
@@ -176,10 +177,7 @@ func _respawn() -> void:
 	_show_frame(0)
 	_collision.set_deferred("disabled", false)
 	respawned.emit()
-	# 重生淡入（平滑出现，而非突然弹出）
-	visual.modulate = Color(1, 1, 1, 0)
-	var tw := create_tween()
-	tw.tween_property(visual, "modulate:a", 1.0, 0.4)
+	VisualEffects.fade_in(visual, 0.4)  # 重生平滑出现
 
 # 自动化采集（抽取器调用）：无视工具需求，采一次并触发再生周期
 func auto_harvest() -> Dictionary:

@@ -25,3 +25,11 @@ static func flash_hit(visual: CanvasItem, duration: float = HIT_FLASH_DURATION) 
 		var m2 := visual.material as ShaderMaterial
 		if m2:
 			m2.set_shader_parameter("flash_amount", 0.0)
+
+# 淡入：置 alpha=0 再 tween 到 1（资源重生 / 建筑放置等平滑出现）
+static func fade_in(node: CanvasItem, dur: float = 0.3) -> void:
+	if node == null:
+		return
+	var c := node.modulate
+	node.modulate = Color(c.r, c.g, c.b, 0.0)
+	node.create_tween().tween_property(node, "modulate:a", 1.0, dur)
