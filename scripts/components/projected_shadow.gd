@@ -15,6 +15,7 @@ const DAY_ALPHA := 0.42
 const NIGHT_ALPHA := 0.16       # 夜晚仅月光，淡而长
 const NIGHT_SKEW := -0.3
 const FOLLOW_FRAME := true      # 是否每帧跟随源动画帧（角色用 true，静态物件可关）
+const SOFT_SHADOW_SHADER := preload("res://scenes/effects/soft_shadow.gdshader")
 
 var _src: CanvasItem            # 源 visual（AnimatedSprite2D 或 Sprite2D）
 var _spr: Sprite2D
@@ -37,6 +38,11 @@ func setup(src_visual: CanvasItem, follow_frame: bool = true) -> void:
 	_spr = Sprite2D.new()
 	_spr.centered = true
 	_spr.z_index = 0
+	# linear filter 让缩放后边缘平滑；soft shadow shader 做 alpha 羽化
+	_spr.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	var mat := ShaderMaterial.new()
+	mat.shader = SOFT_SHADOW_SHADER
+	_spr.material = mat
 	add_child(_spr)
 	z_index = ZLayer.SHADOW
 	set_meta("follow_frame", follow_frame)
