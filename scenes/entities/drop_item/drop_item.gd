@@ -12,6 +12,7 @@ const MAGNET_RADIUS := 52.0
 const MAGNET_SPEED := 200.0
 var _spawn_time: float = 0.0
 var _magnet_target: Node2D = null
+var _float_t: float = 0.0
 
 func _ready() -> void:
 	NetworkRegistry.attach(self)
@@ -43,6 +44,9 @@ func _on_magnet_body_exited(body: Node2D) -> void:
 		_magnet_target = null
 
 func _physics_process(delta: float) -> void:
+	# 轻微上下浮动（纯视觉，每端都跑）
+	_float_t += delta
+	visual.position.y = sin(_float_t * 3.0) * 1.5
 	# 吸附只在权威端（单机即 server）计算；多人下客户端通过同步接收位置
 	if not Network.is_server():
 		return
