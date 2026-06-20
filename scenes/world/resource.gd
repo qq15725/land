@@ -131,6 +131,9 @@ func interact(player: Player) -> void:
 	if leftover > 0:
 		_spawn_drops(leftover)
 	HitParticles.spawn(get_parent(), global_position, item.color)
+	var gained := drop_amount + bonus - leftover
+	if gained > 0:
+		PickupFloat.spawn(get_parent(), global_position + Vector2(0, -12), item, gained)
 	_play_break_and_deplete(player)
 
 func _tool_label(tool: String) -> String:
