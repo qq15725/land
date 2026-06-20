@@ -483,6 +483,9 @@ func _process(delta: float) -> void:
 		if BuildingSystem.current_building and BuildingSystem.current_building.connects:
 			mpos = mpos.snapped(Vector2(TILE_SIZE, TILE_SIZE))
 		_build_preview.global_position = mpos
+		# 合法性颜色：材料够=绿，不够=红（放置前一眼知道能不能建）
+		var can_build: bool = BuildingSystem.current_building != null and BuildingSystem.can_afford(BuildingSystem.current_building, player)
+		_build_preview.modulate = Color(0.4, 1.0, 0.4, 0.55) if can_build else Color(1.0, 0.4, 0.4, 0.55)
 	_update_day_overlay()
 	FogSystem.update_visibility()
 	_update_fog_overlay()
