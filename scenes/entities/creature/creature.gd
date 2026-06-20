@@ -25,11 +25,15 @@ var _last_damager: Player = null
 var _hp_bar_root: Node2D = null
 var _hp_bar_fg: ColorRect = null
 var _hp_bar_timer: float = 0.0
+var _knockback: Vector2 = Vector2.ZERO
 
 # 由攻击者（Player）调用。记录归属，再走 HealthComponent 扣血。
 func take_damage_from(player: Player, amount: float) -> void:
 	_last_damager = player
 	health.take_damage(amount)
+	# 受击击退（朝远离攻击者方向后退），增强打击反馈
+	if _state != State.DEAD and is_instance_valid(player):
+		_knockback = (global_position - player.global_position).normalized() * 90.0
 	# passive 生物受击转 FLEE
 	if data and data.passive and _state != State.DEAD:
 		_target = player
@@ -111,6 +115,11 @@ func _physics_process(delta: float) -> void:
 		if _hp_bar_timer <= 0.0 and _hp_bar_root:
 			_hp_bar_root.visible = false
 	if _state == State.DEAD:
+		return
+	if _knockback.length() > 2.0:
+		velocity = _knockback
+		move_and_slide()
+		_knockback = _knockback.move_toward(Vector2.ZERO, 450.0 * delta)
 		return
 	_attack_timer = maxf(0.0, _attack_timer - delta)
 
