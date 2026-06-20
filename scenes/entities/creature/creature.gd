@@ -22,6 +22,9 @@ var _attack_timer: float = 0.0
 var _wander_timer: float = 0.0
 var _flee_timer: float = 0.0
 var _last_damager: Player = null
+var _hp_bar_root: Node2D = null
+var _hp_bar_fg: ColorRect = null
+var _hp_bar_timer: float = 0.0
 
 # 由攻击者（Player）调用。记录归属，再走 HealthComponent 扣血。
 func take_damage_from(player: Player, amount: float) -> void:
@@ -65,12 +68,48 @@ func _ready() -> void:
 	VisualEffects.setup_hit_flash(visual)
 	detection_area.body_entered.connect(_on_body_entered)
 	detection_area.body_exited.connect(_on_body_exited)
+	_setup_health_bar()
 
 
 func _on_damaged_flash(_amount: float) -> void:
 	VisualEffects.flash_hit(visual)
 
+# 头顶血条：受击时显示并更新，3 秒无受击后隐藏（战斗 QoL，看怪剩余血量）。
+func _setup_health_bar() -> void:
+	if health == null:
+		return
+	_hp_bar_root = Node2D.new()
+	_hp_bar_root.name = "HealthBar"
+	_hp_bar_root.position = Vector2(0, -24)
+	_hp_bar_root.z_index = 50
+	add_child(_hp_bar_root)
+	var bg := ColorRect.new()
+	bg.size = Vector2(22, 3)
+	bg.position = Vector2(-11, 0)
+	bg.color = Color(0.12, 0.0, 0.0, 0.85)
+	_hp_bar_root.add_child(bg)
+	_hp_bar_fg = ColorRect.new()
+	_hp_bar_fg.size = Vector2(22, 3)
+	_hp_bar_fg.position = Vector2(-11, 0)
+	_hp_bar_fg.color = Color(0.25, 0.85, 0.25, 0.95)
+	_hp_bar_root.add_child(_hp_bar_fg)
+	_hp_bar_root.visible = false
+	health.health_changed.connect(_on_health_changed)
+
+func _on_health_changed(current: float, maximum: float) -> void:
+	if _hp_bar_fg == null:
+		return
+	var ratio := clampf(current / maxf(maximum, 1.0), 0.0, 1.0)
+	_hp_bar_fg.size.x = 22.0 * ratio
+	_hp_bar_fg.color = Color(0.85, 0.2, 0.2, 0.95) if ratio < 0.3 else Color(0.25, 0.85, 0.25, 0.95)
+	_hp_bar_root.visible = true
+	_hp_bar_timer = 3.0
+
 func _physics_process(delta: float) -> void:
+	if _hp_bar_timer > 0.0:
+		_hp_bar_timer -= delta
+		if _hp_bar_timer <= 0.0 and _hp_bar_root:
+			_hp_bar_root.visible = false
 	if _state == State.DEAD:
 		return
 	_attack_timer = maxf(0.0, _attack_timer - delta)
