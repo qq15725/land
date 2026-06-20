@@ -104,7 +104,8 @@ func _on_health_changed(current: float, maximum: float) -> void:
 	if _hp_bar_fg == null:
 		return
 	var ratio := clampf(current / maxf(maximum, 1.0), 0.0, 1.0)
-	_hp_bar_fg.size.x = 22.0 * ratio
+	# 血条宽度平滑过渡（看到血量被扣的动画，而非瞬间跳变）
+	create_tween().tween_property(_hp_bar_fg, "size:x", 22.0 * ratio, 0.15)
 	_hp_bar_fg.color = Color(0.85, 0.2, 0.2, 0.95) if ratio < 0.3 else Color(0.25, 0.85, 0.25, 0.95)
 	_hp_bar_root.visible = true
 	_hp_bar_timer = 3.0
