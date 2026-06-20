@@ -26,4 +26,16 @@ func interact(player: Player) -> void:
 		player.mana.restore(player.mana.max_mana)
 	if player.focus:
 		player.focus.restore(player.focus.max_focus)
+	_disperse_hostiles()
 	UINotify.toast(get_tree(), "睡了一觉，神清气爽 ☀")
+
+# 睡觉天亮后驱散场上的敌对夜晚怪（安全过夜，避免醒来被怪围）。passive 野生动物 / Boss 保留。
+func _disperse_hostiles() -> void:
+	var layer := get_parent()
+	if layer == null:
+		return
+	for c in layer.get_children():
+		if c is Creature:
+			var cr := c as Creature
+			if cr.data and not cr.data.passive and not cr.data.is_boss:
+				cr.queue_free()
