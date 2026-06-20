@@ -13,7 +13,12 @@ var data: AnimalData = null
 var _pen_center: Vector2 = Vector2.ZERO
 var _wander_target: Vector2 = Vector2.ZERO
 var _wander_timer: float = 0.0
-var _is_fed: bool = false
+var _feed_marker: Label = null
+var _is_fed: bool = false:
+	set(value):
+		_is_fed = value
+		if _feed_marker:
+			_feed_marker.visible = not value
 var _produce_timer: float = 0.0
 
 func _ready() -> void:
@@ -27,6 +32,12 @@ func _ready() -> void:
 		hint_label.text = "[E] 喂食"
 		_setup_sprite_frames()
 		ProjectedShadow.attach_to(self, visual)
+		_feed_marker = _make_feed_marker()
+		_feed_marker.visible = not _is_fed
+
+# 可喂食提示：未喂食时头顶跳动的黄色「!」，远处一眼看到哪些动物待喂（与作物成熟 ✦ 一致）。
+func _make_feed_marker() -> Label:
+	return BounceMarker.create(self, "!", Color(1.0, 0.8, 0.2), -26.0, 16)
 
 
 func _setup_sprite_frames() -> void:

@@ -81,19 +81,7 @@ func _apply_state_visual() -> void:
 # 成熟提示：READY 时农田上方跳动的金色 ✦，远处也能一眼看到可收的作物。
 func _set_ready_marker(show_it: bool) -> void:
 	if show_it and _ready_marker == null:
-		_ready_marker = Label.new()
-		_ready_marker.text = "✦"
-		_ready_marker.add_theme_font_size_override("font_size", 14)
-		_ready_marker.add_theme_color_override("font_color", Color(1.0, 0.95, 0.3))
-		_ready_marker.add_theme_color_override("font_shadow_color", Color(0.3, 0.2, 0.0, 0.9))
-		_ready_marker.add_theme_constant_override("shadow_offset_x", 1)
-		_ready_marker.add_theme_constant_override("shadow_offset_y", 1)
-		_ready_marker.position = Vector2(-6, -30)
-		_ready_marker.z_index = 40
-		add_child(_ready_marker)
-		var tw := create_tween().set_loops()
-		tw.tween_property(_ready_marker, "position:y", -36.0, 0.5).set_trans(Tween.TRANS_SINE)
-		tw.tween_property(_ready_marker, "position:y", -30.0, 0.5).set_trans(Tween.TRANS_SINE)
+		_ready_marker = BounceMarker.create(self, "✦", Color(1.0, 0.95, 0.3), -30.0)
 	if _ready_marker:
 		_ready_marker.visible = show_it
 
