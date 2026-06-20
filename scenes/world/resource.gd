@@ -134,7 +134,16 @@ func interact(player: Player) -> void:
 	var gained := drop_amount + bonus - leftover
 	if gained > 0:
 		PickupFloat.spawn(get_parent(), global_position + Vector2(0, -12), item, gained)
+	_shake_visual()
 	_play_break_and_deplete(player)
+
+# 采集时横向快速抖动，增强打击感（与战斗击退对称；改 position 不与受击帧/fade 冲突）。
+func _shake_visual() -> void:
+	var orig := visual.position
+	var tw := create_tween()
+	tw.tween_property(visual, "position", orig + Vector2(2.5, 0), 0.04)
+	tw.tween_property(visual, "position", orig + Vector2(-2.0, 0), 0.04)
+	tw.tween_property(visual, "position", orig, 0.05)
 
 func _tool_label(tool: String) -> String:
 	match tool:
