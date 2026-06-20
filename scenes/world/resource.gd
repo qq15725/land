@@ -173,10 +173,13 @@ func _on_break_fade_done() -> void:
 
 func _respawn() -> void:
 	depleted_flag = false
-	visual.modulate = Color.WHITE
 	_show_frame(0)
 	_collision.set_deferred("disabled", false)
 	respawned.emit()
+	# 重生淡入（平滑出现，而非突然弹出）
+	visual.modulate = Color(1, 1, 1, 0)
+	var tw := create_tween()
+	tw.tween_property(visual, "modulate:a", 1.0, 0.4)
 
 # 自动化采集（抽取器调用）：无视工具需求，采一次并触发再生周期
 func auto_harvest() -> Dictionary:
