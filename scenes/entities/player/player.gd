@@ -16,7 +16,6 @@ const WALK_BOB_AMP := 1.2        # 走路 Y 轴起伏振幅
 const WALK_BOB_FREQ := 12.0      # 走路起伏频率
 const IDLE_FLOAT_AMP := 0.5
 const IDLE_FLOAT_FREQ := 2.5
-const SHADOW_ALPHA := 0.55
 const CAM_SHAKE_DECAY := 8.0     # 攻击命中屏幕震动衰减速度
 
 @onready var inventory: InventoryComponent = $InventoryComponent
@@ -25,7 +24,7 @@ const CAM_SHAKE_DECAY := 8.0     # 攻击命中屏幕震动衰减速度
 @onready var visual: AnimatedSprite2D = $Visual
 @onready var camera: Camera2D = $Camera2D
 
-var _shadow: Node2D
+var _shadow: ProjectedShadow
 var _hat_sprite: Sprite2D
 var _cape_sprite: Sprite2D
 var _bob_time: float = 0.0
@@ -112,26 +111,9 @@ func _ready() -> void:
 	VisualEffects.setup_hit_flash(visual)
 	_on_equipment_changed("")
 
-# 脚下椭圆软阴影：Y-sort 不参与，z_index 低于 visual
+# 方向性投影阴影：复制 visual 当前帧翻折到地面，随 TimeSystem 太阳方位倾倒
 func _setup_shadow() -> void:
-	_shadow = Node2D.new()
-	_shadow.name = "Shadow"
-	_shadow.z_index = ZLayer.SHADOW
-	_shadow.position = Vector2(0, -2)
-	add_child(_shadow)
-	move_child(_shadow, 0)
-	# 用 Polygon2D 画椭圆（足够顺滑的近似多边形）
-	var poly := Polygon2D.new()
-	var pts := PackedVector2Array()
-	var rx := 11.0
-	var ry := 4.5
-	var n := 20
-	for i in n:
-		var a := float(i) / n * TAU
-		pts.append(Vector2(cos(a) * rx, sin(a) * ry))
-	poly.polygon = pts
-	poly.color = Color(0, 0, 0, SHADOW_ALPHA)
-	_shadow.add_child(poly)
+	_shadow = ProjectedShadow.attach_to(self, visual)
 
 func _setup_cosmetics() -> void:
 	_hat_sprite = Sprite2D.new()

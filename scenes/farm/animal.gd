@@ -26,6 +26,7 @@ func _ready() -> void:
 	if data:
 		hint_label.text = "[E] 喂食"
 		_setup_sprite_frames()
+		ProjectedShadow.attach_to(self, visual)
 
 
 func _setup_sprite_frames() -> void:

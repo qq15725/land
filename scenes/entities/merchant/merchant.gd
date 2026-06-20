@@ -15,6 +15,7 @@ var _stay_timer: float = 0.0
 func _ready() -> void:
 	hint_label.hide()
 	_setup_sprite_frames()
+	ProjectedShadow.attach_to(self, visual)
 	interact_area.body_entered.connect(func(b): if b is Player: hint_label.show())
 	interact_area.body_exited.connect(func(b): if b is Player: hint_label.hide())
 

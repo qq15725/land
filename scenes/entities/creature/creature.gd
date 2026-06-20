@@ -48,6 +48,7 @@ func _ready() -> void:
 	if data.is_boss:
 		add_to_group("boss")
 	_setup_sprite_frames()
+	ProjectedShadow.attach_to(self, visual)
 
 	var det_circle := detection_shape.shape as CircleShape2D
 	if det_circle:
