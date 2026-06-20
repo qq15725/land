@@ -25,12 +25,28 @@ var _last_frame := -1
 
 # 便捷接入：创建影子节点挂到实体子节点最前（z 在 visual 之下），返回实例。
 static func attach_to(entity: Node, src_visual: CanvasItem, follow_frame: bool = true) -> ProjectedShadow:
+	_add_foot_occluder(entity)
 	var s := ProjectedShadow.new()
 	s.name = "Shadow"
 	entity.add_child(s)
 	entity.move_child(s, 0)
 	s.setup(src_visual, follow_frame)
 	return s
+
+
+# 脚下立足遮挡体：夜晚路灯等点光源照射时投出真实方向几何阴影（与投影阴影叠加）。
+static func _add_foot_occluder(entity: Node) -> void:
+	var occ := LightOccluder2D.new()
+	occ.name = "FootOccluder"
+	var poly := OccluderPolygon2D.new()
+	var pts := PackedVector2Array()
+	for i in 12:
+		var a := float(i) / 12.0 * TAU
+		pts.append(Vector2(cos(a) * 6.0, sin(a) * 3.0 - 2.0))
+	poly.polygon = pts
+	poly.cull_mode = OccluderPolygon2D.CULL_DISABLED
+	occ.occluder = poly
+	entity.add_child(occ)
 
 
 func setup(src_visual: CanvasItem, follow_frame: bool = true) -> void:

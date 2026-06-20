@@ -30,3 +30,7 @@ texture = SubResource("GradientTexture2D_1")
 texture_scale = 1.5
 color = Color(1, 0.85, 0.5, 1)
 energy = 0.0
+shadow_enabled = true
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_filter = 1
+shadow_filter_smooth = 3.0
