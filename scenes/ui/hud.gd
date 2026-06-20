@@ -18,6 +18,7 @@ const ART := "res://assets/sprites/ui/"
 # ─── 状态引用 ────────────────────────────────────────────────────────────
 
 var _player: Node = null
+var _vignette: ColorRect = null
 var _inventory: InventoryComponent
 var _health: HealthComponent
 
@@ -95,6 +96,25 @@ func _ready() -> void:
 	_build_hotbar()
 	_build_center_overlay()
 
+func _setup_low_hp_vignette() -> void:
+	_vignette = ColorRect.new()
+	_vignette.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_vignette.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var mat := ShaderMaterial.new()
+	mat.shader = preload("res://scenes/effects/low_hp_vignette.gdshader")
+	_vignette.material = mat
+	add_child(_vignette)
+	move_child(_vignette, 0)
+
+func _update_low_hp_vignette(cur: float, maximum: float) -> void:
+	if _vignette == null:
+		return
+	var ratio := cur / maxf(maximum, 1.0)
+	var intensity := 0.0
+	if ratio < 0.3:
+		intensity = clampf((0.3 - ratio) / 0.3, 0.0, 1.0) * 0.65
+	(_vignette.material as ShaderMaterial).set_shader_parameter("intensity", intensity)
+
 func setup(health: HealthComponent, inventory: InventoryComponent) -> void:
 	_health = health
 	_inventory = inventory
@@ -102,6 +122,9 @@ func setup(health: HealthComponent, inventory: InventoryComponent) -> void:
 
 	_set_bar(_hp_bar, health.current_health, health.max_health)
 	health.health_changed.connect(func(cur, m): _set_bar(_hp_bar, cur, m))
+	_setup_low_hp_vignette()
+	health.health_changed.connect(_update_low_hp_vignette)
+	_update_low_hp_vignette(health.current_health, health.max_health)
 
 	# MP 接通 ManaComponent
 	if _player and _player is Player and (_player as Player).mana:
