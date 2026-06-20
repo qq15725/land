@@ -25,6 +25,7 @@ const CAM_SHAKE_DECAY := 8.0     # 攻击命中屏幕震动衰减速度
 @onready var camera: Camera2D = $Camera2D
 
 var _shadow: ProjectedShadow
+var _night_light: PointLight2D
 var _hat_sprite: Sprite2D
 var _cape_sprite: Sprite2D
 var _bob_time: float = 0.0
@@ -94,6 +95,7 @@ func _ready() -> void:
 	add_child(anim_state)
 	_setup_synchronizer()
 	_setup_shadow()
+	_setup_night_light()
 	_setup_cosmetics()
 	_setup_camera()
 	health.died.connect(_on_died)
@@ -114,6 +116,26 @@ func _ready() -> void:
 # 方向性投影阴影：复制 visual 当前帧翻折到地面，随 TimeSystem 太阳方位倾倒
 func _setup_shadow() -> void:
 	_shadow = ProjectedShadow.attach_to(self, visual)
+
+# 夜晚玩家自带微弱光圈，提供基础可见性（不破坏夜晚氛围/路灯价值）。
+func _setup_night_light() -> void:
+	_night_light = PointLight2D.new()
+	_night_light.name = "NightLight"
+	var grad := Gradient.new()
+	grad.offsets = PackedFloat32Array([0.0, 1.0])
+	grad.colors = PackedColorArray([Color(1, 1, 1, 1), Color(1, 1, 1, 0)])
+	var tex := GradientTexture2D.new()
+	tex.gradient = grad
+	tex.fill = GradientTexture2D.FILL_RADIAL
+	tex.fill_from = Vector2(0.5, 0.5)
+	tex.fill_to = Vector2(1.0, 0.5)
+	tex.width = 256
+	tex.height = 256
+	_night_light.texture = tex
+	_night_light.texture_scale = 1.3
+	_night_light.color = Color(1.0, 0.95, 0.82)
+	_night_light.energy = 0.0
+	add_child(_night_light)
 
 func _setup_cosmetics() -> void:
 	_hat_sprite = Sprite2D.new()
@@ -242,6 +264,10 @@ func _update_animation(move_dir: Vector2) -> void:
 
 # 远程同步动画 + 摄像机震动衰减（每帧跑）
 func _process(delta: float) -> void:
+	# 夜晚光圈渐变（所有玩家含远程；白天灭）
+	if _night_light:
+		var light_target := 0.85 if TimeSystem.is_night() else 0.0
+		_night_light.energy = lerpf(_night_light.energy, light_target, 0.05)
 	# 钓鱼计时（仅本地玩家）
 	if is_multiplayer_authority():
 		_process_fishing(delta)
