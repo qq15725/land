@@ -53,6 +53,15 @@ func is_night() -> bool:
 func get_phase_ratio() -> float:
 	return phase_elapsed / _phase_duration
 
+# 睡觉跳过夜晚到次日清晨（仅夜晚有效，复用 _advance_phase 的 NIGHT→DAY 逻辑）。
+# 返回是否成功（白天调用返回 false）。
+func sleep_to_morning() -> bool:
+	if current_phase != Phase.NIGHT:
+		return false
+	phase_elapsed = 0.0
+	_advance_phase()
+	return true
+
 # ─── 季节 ────────────────────────────────────────────────────────────────────
 
 func current_season() -> String:
