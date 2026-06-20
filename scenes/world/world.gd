@@ -636,7 +636,18 @@ func _spawn_season_boss() -> void:
 		_hud.show_toast("⚔ %s 出现了！" % data.display_name, 4.0)
 
 func _on_day_started(_day: int) -> void:
-	pass
+	_disperse_night_creatures()
+
+# 天亮清除敌对夜晚怪（白天安全；passive 野生动物 / Boss 保留）。
+# 正常天亮与睡觉跳天（都触发 day_started）统一在此清，避免白天残留夜晚怪。
+func _disperse_night_creatures() -> void:
+	if not Network.is_server():
+		return
+	for c in y_sort_layer.get_children():
+		if c is Creature:
+			var cr := c as Creature
+			if cr.data and not cr.data.passive and not cr.data.is_boss:
+				cr.queue_free()
 
 # 整图一次性生成：Voronoi room → count/distribute/setpiece 三 pass 撒 prefab。
 func _populate_world(seed_val: int) -> void:
