@@ -110,12 +110,14 @@ func set_class(new_class_id: String) -> void:
 		var mp: ManaComponent = (pl as Player).mana
 		if hp:
 			hp.max_health = 100.0 + cls.hp_bonus
-			hp.current_health = minf(hp.current_health, hp.max_health)
+			# 职业一次锁定（只新游戏调一次）= 开局，回满血。
+			# 原来的 minf 会因 current_health 时序未初始化(0)导致开局 0/max 残血。
+			hp.current_health = hp.max_health
 			hp.health_changed.emit(hp.current_health, hp.max_health)
 		if mp:
 			mp.max_mana = 100.0 + cls.mp_bonus
 			mp.regen_per_sec = 0.5 + cls.mp_regen_bonus
-			mp.current_mana = minf(mp.current_mana, mp.max_mana)
+			mp.current_mana = mp.max_mana
 			mp.mana_changed.emit(mp.current_mana, mp.max_mana)
 	EventBus.player_class_changed.emit(_player_id(), new_class_id)
 
