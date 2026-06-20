@@ -9,6 +9,7 @@ extends Node
 func _ready() -> void:
 	EventBus.skill_leveled_up.connect(_on_leveled_up)
 	EventBus.crop_harvested.connect(_on_crop_harvested)
+	EventBus.item_picked_up.connect(_on_item_picked_up)
 	# BuildingSystem 是 autoload，确保它已加载（项目 autoload 顺序里在 VFXLibrary 之前）
 	if Engine.has_singleton("BuildingSystem") or get_node_or_null("/root/BuildingSystem") != null:
 		BuildingSystem.building_placed.connect(_on_building_placed)
@@ -24,6 +25,12 @@ func _on_crop_harvested(_crop: CropData, player_id: int) -> void:
 	if p == null:
 		return
 	VFXLibrary.spawn("harvest_pop", p.get_parent(), p.global_position + Vector2(0, -8), 0.0, Color(0.5, 0.9, 0.4, 0.85))
+
+func _on_item_picked_up(item: ItemData, amount: int) -> void:
+	var p := _local_player()
+	if p == null:
+		return
+	PickupFloat.spawn(p.get_parent(), p.global_position + Vector2(0, -18), item, amount)
 
 func _on_building_placed(_building: BuildingData, pos: Vector2) -> void:
 	# 找一个合适 parent：world 节点（与建筑同层）
