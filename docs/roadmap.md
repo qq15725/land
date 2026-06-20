@@ -198,8 +198,8 @@
 - [x] C1 `trading_post._activated` 存档（加 get_save_state/load_save_state，读档自动重激活）
 - [x] C2 `animal._is_fed` / `_produce_timer` 存档（由 animal_pen 收集子 animal 状态，读档延迟一帧喂回）
 - [x] C3 UI 按钮音效（SoundSystem 监听 SceneTree.node_added，所有 Button.pressed 自动播 ui_click）
-- [ ] C4 性能 stress test（高密度资源/怪物 + chunk 边界）
-- [ ] C5 移动端控制完整性（`mobile_controls.gd` 验证 + 适配）
+- [x] C4 性能 stress test（真机压测：1600 静态资源 + ~90 怪 fps 110–145，blob 阴影零渲染负担、draw calls 恒 153；瓶颈仅怪物 `move_and_slide` 物理，正常密度[每晚 3–6 怪]无忧。注：chunk 流式已废弃，改饥荒式整图常驻）
+- [ ] C5 移动端控制完整性（已修 iOS 支持 `OS.has_feature("mobile")`、摇杆逻辑 OK；按钮仍不全[缺面板/技能/hotbar/用物品]，需真机调布局）
 - [x] C6 升级 / 装备变更 / 收获 / 放置粒子反馈（VFXEventRouter autoload 监听全局事件 + 4 个新 VFX）
 - [x] C7 面板细节对齐（DraggablePanel 标题栏 MOVE cursor + make_close_button() helper + 7 个面板统一接入）
 - [ ] **C8 正式美术接入** —— 适配层已就绪（`ArtProfile` + `SpriteFrameBuilder` 行序/scale 可配），按 [`docs/art/asset_pack_integration.md`](art/asset_pack_integration.md) 接入正式美术包（推荐 Cute Fantasy RPG $2.99 / Sprout Lands 免费）。**待用户操作**
@@ -297,7 +297,17 @@
 
 ## 当前进度
 
-**已完成**：Phase 0–8 + 路线 A（QoL）+ B（全部 B1–B7）+ C（除 C4/C5）+ D（全部 D1–D5）+ E（除 E6）+ 路线 G 阶段 A 全部（G1–G7 多人架构改造）+ 阶段 B 基础设施（G8–G13）+ 战斗系统抽象（见下）
+**已完成**：Phase 0–8 + 路线 A（QoL）+ B（全部 B1–B7）+ C（C4 已压测；除 C5 按钮补全/C8 美术）+ D（全部 D1–D5）+ E（除 E6）+ 路线 G 阶段 A 全部（G1–G7 多人架构改造）+ 阶段 B 基础设施（G8–G13）+ 战斗系统抽象（见下）
+
+**2026-06-21 夜间自主推进（阴影系统 / QoL / 性能 / bug）**：
+- 阴影系统三层叠加：方向投影（`TimeSystem` 太阳驱动 skew）+ 软边羽化（`soft_shadow.gdshader` 9 点高斯模糊）+ 夜晚路灯几何阴影（`LightOccluder2D` + 路灯 PointLight2D shadow）；共享 `ProjectedShadow` 组件，player/creature/animal/merchant 接入
+- 静态物件 blob 阴影：资源/建筑共享羽化椭圆纹理（无 _process），消除"只有角色有影"的不一致
+- 默认营地：新游戏开局出生点放床/工作台/储物箱/烹饪锅（真机验证布局合理）
+- 床睡觉：夜晚 E 跳次日清晨 + 回满 HP/MP/FP（真机验证：19:25→次日 08:31，HP 回满）
+- 智能工具：采集时手持工具不对自动从背包切换（免手动切槽）
+- 拾取飘字：捡物品飘「图标 + N」（`PickupFloat` + VFXEventRouter），补齐采集反馈一致性
+- C4 压测完成；C5 iOS 修复；G14 整图资源/刷怪/Boss spawn 补 `force_readable_name`；drop_item 吸附改信号驱动消除每帧轮询
+- 地砖正式美术接入（移除临时 hack）；修复新游戏选职业开局残血（`set_class` minf→回满）
 
 **2026-06-11 游戏性优化（手感 / 开局 / 操作 / 平衡）**：
 - 手感：玩家受击闪白（复用 hit_flash shader，与怪物对称）/ 暴击命中金色双向火花
