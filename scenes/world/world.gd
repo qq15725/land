@@ -90,6 +90,7 @@ func _ready() -> void:
 		_restore_world_from_snapshot()
 	elif Network.is_server():
 		await _populate_world(terrain_seed)
+		_spawn_default_camp()
 	_set_loading("完成", 1.0)
 	_hide_loading()
 	_maybe_show_class_select()
@@ -591,6 +592,21 @@ func _on_building_placed(building: BuildingData, pos: Vector2) -> void:
 		node.on_placed(building)
 	if node.has_method("set_facing"):
 		node.set_facing(BuildingSystem.current_facing)
+
+# 新游戏开局在出生点周围放置默认营地：床(重生点)+ 工作台 + 储物箱 + 烹饪锅。
+# 只在全新存档调用（读档分支不调，已有建筑由存档恢复）。营地建筑会随后被存档持久化。
+func _spawn_default_camp() -> void:
+	var base := player.global_position
+	var layout := [
+		["bed", Vector2(-48, -16)],
+		["workbench", Vector2(48, -16)],
+		["storage_chest", Vector2(-48, 48)],
+		["cooking_pot", Vector2(48, 48)],
+	]
+	for entry in layout:
+		var bd: BuildingData = ItemDatabase.get_building(entry[0])
+		if bd:
+			_on_building_placed(bd, base + entry[1])
 
 func _on_night_started(_day: int) -> void:
 	_spawn_night_creatures()
