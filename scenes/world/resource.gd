@@ -115,8 +115,13 @@ func interact(player: Player) -> void:
 	if not tool_required.is_empty():
 		var held := player.inventory.get_selected_item()
 		if held == null or held.tool_type != tool_required:
-			hint_label.text = "需要 %s" % _tool_label(tool_required)
-			return
+			# 智能工具：背包里有对应工具就自动切到手，省去手动切槽
+			var slot := player.inventory.find_tool_slot(tool_required)
+			if slot >= 0:
+				player.inventory.set_selected_slot(slot)
+			else:
+				hint_label.text = "需要 %s" % _tool_label(tool_required)
+				return
 	# 等级额外掉落概率（按资源对应技能，使用采集者的技能等级）
 	var bonus := 0
 	var skill_id: String = SkillSystem.RESOURCE_TO_SKILL.get(resource_id, "")

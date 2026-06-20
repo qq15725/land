@@ -114,6 +114,14 @@ func get_selected_item() -> ItemData:
 		return null
 	return slots[selected_slot].item
 
+# 找背包中第一个指定工具类型的槽位（智能工具自动切换用），无则返回 -1。
+func find_tool_slot(tool_type: String) -> int:
+	for i in slots.size():
+		var it: ItemData = slots[i].item
+		if it != null and it.tool_type == tool_type:
+			return i
+	return -1
+
 # ─── 装备 ────────────────────────────────────────────────────────────────────
 
 func equip_from_slot(slot_index: int) -> bool:
