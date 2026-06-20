@@ -46,6 +46,8 @@ func _spawn_merchant() -> void:
 	_current_merchant_node = node
 	merchant_arriving.emit(data)
 	node.departed.connect(_on_merchant_departed)
+	# 到访提示，避免玩家错过周期来访的商人
+	UINotify.toast(get_tree(), "🛒 商人来访，前往贸易站交易！", 3.0)
 
 func _on_merchant_departed() -> void:
 	_current_merchant_node = null
