@@ -595,6 +595,10 @@ func _on_building_placed(building: BuildingData, pos: Vector2) -> void:
 		node.on_placed(building)
 	if node.has_method("set_facing"):
 		node.set_facing(BuildingSystem.current_facing)
+	# 放置淡入（平滑出现，而非突然弹出）
+	node.modulate = Color(1, 1, 1, 0)
+	var fade := create_tween()
+	fade.tween_property(node, "modulate:a", 1.0, 0.3)
 
 # 新游戏开局在出生点周围放置默认营地：床(重生点)+ 工作台 + 储物箱 + 烹饪锅。
 # 只在全新存档调用（读档分支不调，已有建筑由存档恢复）。营地建筑会随后被存档持久化。
