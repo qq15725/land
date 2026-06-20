@@ -11,12 +11,36 @@ var amount: int = 1
 const MAGNET_RADIUS := 52.0
 const MAGNET_SPEED := 200.0
 var _spawn_time: float = 0.0
+var _magnet_target: Node2D = null
 
 func _ready() -> void:
 	NetworkRegistry.attach(self)
 	FogSystem.register_dynamic(self)
 	body_entered.connect(_on_body_entered)
+	_setup_magnet_area()
 	_refresh_visual()
+
+# 吸附检测区：玩家进入 MAGNET_RADIUS 才激活吸附，避免每个掉落物每帧轮询全场玩家
+# （自动化产线末端会堆大量地面掉落物，轮询是 O(drops×players)/帧的纯浪费）
+func _setup_magnet_area() -> void:
+	var area := Area2D.new()
+	area.collision_mask = collision_mask
+	var shape := CollisionShape2D.new()
+	var circle := CircleShape2D.new()
+	circle.radius = MAGNET_RADIUS
+	shape.shape = circle
+	area.add_child(shape)
+	add_child(area)
+	area.body_entered.connect(_on_magnet_body_entered)
+	area.body_exited.connect(_on_magnet_body_exited)
+
+func _on_magnet_body_entered(body: Node2D) -> void:
+	if body is Player:
+		_magnet_target = body
+
+func _on_magnet_body_exited(body: Node2D) -> void:
+	if body == _magnet_target:
+		_magnet_target = null
 
 func _physics_process(delta: float) -> void:
 	# 吸附只在权威端（单机即 server）计算；多人下客户端通过同步接收位置
@@ -26,18 +50,9 @@ func _physics_process(delta: float) -> void:
 	_spawn_time += delta
 	if _spawn_time < 0.4:
 		return
-	var players := get_tree().get_nodes_in_group("player")
-	var nearest: Node2D = null
-	var nearest_d := MAGNET_RADIUS
-	for pl in players:
-		if not pl is Node2D:
-			continue
-		var d := global_position.distance_to((pl as Node2D).global_position)
-		if d < nearest_d:
-			nearest_d = d
-			nearest = pl as Node2D
-	if nearest:
-		global_position = global_position.move_toward(nearest.global_position, MAGNET_SPEED * delta)
+	if _magnet_target == null or not is_instance_valid(_magnet_target):
+		return
+	global_position = global_position.move_toward(_magnet_target.global_position, MAGNET_SPEED * delta)
 
 func setup(p_item: ItemData, p_amount: int) -> void:
 	item = p_item
