@@ -30,6 +30,13 @@ func setup_preview(data: BuildingData) -> void:
 func on_placed(data: BuildingData = null) -> void:
 	setup_preview(data)
 	_register_footprint()
+	_register_vision()
+
+# 建筑作为视野源揭开周围圆形迷雾（消除建筑后方黑暗）；栅栏不提供（数量多）。
+func _register_vision() -> void:
+	if building_data == null or building_data.category == "fence":
+		return
+	FogSystem.register_vision_source(self)
 
 # 放置/读档时向 world 注册占用的格子（防重叠）。
 func _register_footprint() -> void:

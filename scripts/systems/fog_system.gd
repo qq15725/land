@@ -9,6 +9,7 @@ extends Node
 
 const CELL := 16          # 迷雾格边长 = 1 tile
 const VIEW_RADIUS := 9    # 视野半径（格）
+const BUILDING_VIEW_RADIUS := 6  # 建筑视野半径（揭开自身周围迷雾的圆形范围）
 const EXPLORED_ALPHA := 140  # 已探索半暗的目标 alpha（≈0.55×255）
 const SIGHT_BLOCK_MIN_H := 8.0  # 碰撞框高度≥此值才挡视线（滤掉花/蘑菇/小灌木等矮物）
 
@@ -24,6 +25,7 @@ var _prev_cell := Vector2i(0x7fffffff, 0x7fffffff)
 
 var _observer: Node2D = null
 var _dynamic: Array[Node2D] = []     # 受可见性控制的动态实体
+var _vision_sources: Array[Node2D] = []  # 额外视野源（建筑），揭开自身周围圆形迷雾
 
 var _fog_img: Image = null           # 三态网格纹理（r 通道存目标 alpha）
 var _fog_tex: ImageTexture = null
@@ -68,6 +70,19 @@ func register_dynamic(node: Node2D) -> void:
 
 func _on_dynamic_exited(node: Node2D) -> void:
 	_dynamic.erase(node)
+
+# 视野源注册（建筑）：揭开自身周围圆形迷雾，消除建筑后方未探索的黑暗。
+func register_vision_source(node: Node2D) -> void:
+	if node in _vision_sources:
+		return
+	_vision_sources.append(node)
+	if not node.tree_exited.is_connected(_on_vision_source_exited):
+		node.tree_exited.connect(_on_vision_source_exited.bind(node))
+	_prev_cell = Vector2i(0x7fffffff, 0x7fffffff)  # 强制下帧重算，立即揭开新建筑视野
+
+func _on_vision_source_exited(node: Node2D) -> void:
+	_vision_sources.erase(node)
+	_prev_cell = Vector2i(0x7fffffff, 0x7fffffff)
 
 
 # ── 坐标换算 ──
@@ -138,9 +153,16 @@ func update_visibility() -> void:
 
 func _recompute(center: Vector2i) -> void:
 	_visible.clear()
-	var r2 := VIEW_RADIUS * VIEW_RADIUS
-	for gy in range(center.y - VIEW_RADIUS, center.y + VIEW_RADIUS + 1):
-		for gx in range(center.x - VIEW_RADIUS, center.x + VIEW_RADIUS + 1):
+	_reveal_around(center, VIEW_RADIUS)
+	# 建筑视野源各自揭开周围圆形
+	for src in _vision_sources:
+		if is_instance_valid(src):
+			_reveal_around(world_to_cell(src.global_position), BUILDING_VIEW_RADIUS)
+
+func _reveal_around(center: Vector2i, radius: int) -> void:
+	var r2 := radius * radius
+	for gy in range(center.y - radius, center.y + radius + 1):
+		for gx in range(center.x - radius, center.x + radius + 1):
 			var dx := gx - center.x
 			var dy := gy - center.y
 			if dx * dx + dy * dy > r2:
