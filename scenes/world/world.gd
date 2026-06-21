@@ -640,10 +640,10 @@ func free_area(center_pos: Vector2, footprint: Vector2i) -> void:
 func _spawn_default_camp() -> void:
 	var base := player.global_position
 	var layout := [
-		["bed", Vector2(-48, -16)],
-		["workbench", Vector2(48, -16)],
-		["storage_chest", Vector2(-48, 48)],
-		["cooking_pot", Vector2(48, 48)],
+		["bed", Vector2(-32, -16)],
+		["workbench", Vector2(32, -16)],
+		["storage_chest", Vector2(-32, 16)],
+		["cooking_pot", Vector2(32, 16)],
 	]
 	for entry in layout:
 		var bd: BuildingData = ItemDatabase.get_building(entry[0])

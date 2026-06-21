@@ -27,8 +27,8 @@ const ANIMAL_FPS := 6.0
 const MERCHANT_FPS := 6.0
 
 # ── 建筑/环境物件 scale（源 ÷ 4 = 世界单位，当前约定）──
-# 建筑视觉调小，更贴近占用格子（不那么笨重）
-const BUILDING_SCALE := 0.19
+# 建筑视觉缩到约 1 格（一个建筑占一个格子）
+const BUILDING_SCALE := 0.1
 const OBJECT_SCALE := 0.25
 
 # 按贴图自动算 scale，使世界显示高度恒为 target_h（换包后源帧高变，显示不变）
