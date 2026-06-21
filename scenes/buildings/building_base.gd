@@ -52,9 +52,10 @@ func _apply_visual() -> void:
 	if visual == null:
 		visual = Sprite2D.new()
 		visual.name = "Visual"
-		visual.scale = Vector2.ONE * ArtProfile.BUILDING_SCALE
-		visual.position = Vector2(0, -20)
 		add_child(visual)
+	# 强制统一 scale + position（覆盖各 .tscn 预设的 0.25，让所有建筑一致缩到约 1 格）
+	visual.scale = Vector2.ONE * ArtProfile.BUILDING_SCALE
+	visual.position = Vector2(0, -24.0) * (ArtProfile.BUILDING_SCALE / 0.25)
 	visual.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	if visual.texture == null and not building_data.sprite_path.is_empty() and ResourceLoader.exists(building_data.sprite_path):
 		visual.texture = load(building_data.sprite_path)
