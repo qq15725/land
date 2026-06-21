@@ -126,8 +126,11 @@ func rebuild_blockers(y_sort_layer: Node) -> void:
 
 
 func _occluder_rect(e: Node) -> Variant:
-	# 只有高大静态物体挡视线：树/石/矿/灌木丛/建筑。矮物（花/蘑菇/小灌木）放行。
+	# 高大静态物体挡视线：树/石/矿/灌木丛。矮物（花/蘑菇/小灌木）放行。
 	if not (e is StaticBody2D):
+		return null
+	# 自己建造的建筑不挡视线（反而作为视野源揭开周围，玩家能看到建筑后方）
+	if e is BuildingBase:
 		return null
 	var col := e.get_node_or_null("CollisionShape2D") as CollisionShape2D
 	if col == null or not (col.shape is RectangleShape2D):
