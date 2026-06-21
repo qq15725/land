@@ -30,6 +30,15 @@ func setup_preview(data: BuildingData) -> void:
 func on_placed(data: BuildingData = null) -> void:
 	setup_preview(data)
 	_setup_building_light()
+	_register_footprint()
+
+# 放置/读档时向 world 注册占用的格子（防重叠）。
+func _register_footprint() -> void:
+	if building_data == null:
+		return
+	var world := get_tree().get_first_node_in_group("world")
+	if world and world.has_method("occupy_area"):
+		world.occupy_area(global_position, building_data.footprint)
 
 # 功能建筑（building/farm）夜晚自带柔和暖光照亮基地；装饰/栅栏/自动化不发光。
 # 自己建造的建筑提供照明而非阴影。

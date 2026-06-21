@@ -73,9 +73,16 @@ func place_building(pos: Vector2, player: Player) -> bool:
 		return false
 	if not can_afford(current_building, player):
 		return false
+	# 网格对齐 + 占用检测：格子被占则不能放置
+	var place_pos := pos
+	var world := player.get_tree().get_first_node_in_group("world")
+	if world and world.has_method("snap_building_pos"):
+		place_pos = world.snap_building_pos(pos, current_building.footprint)
+		if not world.is_area_free(place_pos, current_building.footprint):
+			return false
 	for cost in current_building.cost:
 		player.inventory.remove_item(cost["item"], cost["amount"])
-	building_placed.emit(current_building, pos)
+	building_placed.emit(current_building, place_pos)
 	# 连续建造：材料仍足够再造一个就保持建造模式，否则自动退出
 	if not can_afford(current_building, player):
 		exit_build_mode()

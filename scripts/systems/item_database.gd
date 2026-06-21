@@ -76,6 +76,8 @@ func _load_buildings() -> void:
 		b.connects = d.get("connects", false)
 		b.is_gate = d.get("is_gate", false)
 		b.custom_render = d.get("custom_render", false)
+		var fp: Array = d.get("footprint", [2, 2])
+		b.footprint = Vector2i(int(fp[0]), int(fp[1]))
 		for c in d.get("cost", []):
 			b.cost.append({"item_id": c["item_id"], "amount": c["amount"], "item": null})
 		_buildings.append(b)

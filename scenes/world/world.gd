@@ -480,11 +480,12 @@ func _setup_ui() -> void:
 func _process(delta: float) -> void:
 	if _build_preview:
 		var mpos := get_global_mouse_position()
-		if BuildingSystem.current_building and BuildingSystem.current_building.connects:
-			mpos = mpos.snapped(Vector2(TILE_SIZE, TILE_SIZE))
+		var bd: BuildingData = BuildingSystem.current_building
+		if bd:
+			mpos = snap_building_pos(mpos, bd.footprint)
 		_build_preview.global_position = mpos
-		# 合法性颜色：材料够=绿，不够=红（放置前一眼知道能不能建）
-		var can_build: bool = BuildingSystem.current_building != null and BuildingSystem.can_afford(BuildingSystem.current_building, player)
+		# 合法性颜色：材料够 + 格子空 = 绿，否则红
+		var can_build: bool = bd != null and BuildingSystem.can_afford(bd, player) and is_area_free(mpos, bd.footprint)
 		_build_preview.modulate = Color(0.4, 1.0, 0.4, 0.55) if can_build else Color(1.0, 0.4, 0.4, 0.55)
 	_update_day_overlay()
 	FogSystem.update_visibility()
@@ -588,6 +589,7 @@ func _on_build_mode_exited() -> void:
 		_build_preview = null
 
 func _on_building_placed(building: BuildingData, pos: Vector2) -> void:
+	pos = snap_building_pos(pos, building.footprint)  # 统一对齐网格（营地+玩家放置）
 	var node := (load(building.scene_path) as PackedScene).instantiate() as Node2D
 	node.global_position = pos
 	y_sort_layer.add_child(node)
@@ -596,6 +598,42 @@ func _on_building_placed(building: BuildingData, pos: Vector2) -> void:
 	if node.has_method("set_facing"):
 		node.set_facing(BuildingSystem.current_facing)
 	VisualEffects.fade_in(node, 0.3)  # 放置平滑出现
+
+# ─── 建筑格子占用（网格对齐 + 不可重叠）─────────────────────────────
+var _occupied_cells: Dictionary = {}
+
+func _building_cells(center_pos: Vector2, footprint: Vector2i) -> Array:
+	var c := Vector2i(floori(center_pos.x / TILE_SIZE), floori(center_pos.y / TILE_SIZE))
+	var tl := c - footprint / 2
+	var cells: Array = []
+	for dx in footprint.x:
+		for dy in footprint.y:
+			cells.append(tl + Vector2i(dx, dy))
+	return cells
+
+# 网格对齐：把任意位置吸附到 footprint 居中的格子中心
+func snap_building_pos(pos: Vector2, footprint: Vector2i) -> Vector2:
+	var c := Vector2i(floori(pos.x / TILE_SIZE), floori(pos.y / TILE_SIZE))
+	# 偶数 footprint 落在格交界，奇数落格中心
+	var off := Vector2(
+		0.0 if footprint.x % 2 == 1 else TILE_SIZE * 0.5,
+		0.0 if footprint.y % 2 == 1 else TILE_SIZE * 0.5
+	)
+	return Vector2((c.x + 0.5) * TILE_SIZE, (c.y + 0.5) * TILE_SIZE) - off
+
+func is_area_free(center_pos: Vector2, footprint: Vector2i) -> bool:
+	for cell in _building_cells(center_pos, footprint):
+		if _occupied_cells.has(cell):
+			return false
+	return true
+
+func occupy_area(center_pos: Vector2, footprint: Vector2i) -> void:
+	for cell in _building_cells(center_pos, footprint):
+		_occupied_cells[cell] = true
+
+func free_area(center_pos: Vector2, footprint: Vector2i) -> void:
+	for cell in _building_cells(center_pos, footprint):
+		_occupied_cells.erase(cell)
 
 # 新游戏开局在出生点周围放置默认营地：床(重生点)+ 工作台 + 储物箱 + 烹饪锅。
 # 只在全新存档调用（读档分支不调，已有建筑由存档恢复）。营地建筑会随后被存档持久化。

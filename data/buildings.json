@@ -5,9 +5,16 @@
     "category": "building",
     "scene_path": "res://scenes/buildings/workbench.tscn",
     "cost": [
-      {"item_id": "wood", "amount": 5}
+      {
+        "item_id": "wood",
+        "amount": 5
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      2,
+      2
+    ]
   },
   {
     "id": "storage_chest",
@@ -15,10 +22,20 @@
     "category": "building",
     "scene_path": "res://scenes/buildings/storage_chest.tscn",
     "cost": [
-      {"item_id": "wood", "amount": 4},
-      {"item_id": "wooden_plank", "amount": 2}
+      {
+        "item_id": "wood",
+        "amount": 4
+      },
+      {
+        "item_id": "wooden_plank",
+        "amount": 2
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      2,
+      2
+    ]
   },
   {
     "id": "cooking_pot",
@@ -26,10 +43,20 @@
     "category": "building",
     "scene_path": "res://scenes/buildings/cooking_pot.tscn",
     "cost": [
-      {"item_id": "stone", "amount": 5},
-      {"item_id": "wood", "amount": 2}
+      {
+        "item_id": "stone",
+        "amount": 5
+      },
+      {
+        "item_id": "wood",
+        "amount": 2
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      2,
+      2
+    ]
   },
   {
     "id": "trading_post",
@@ -37,10 +64,20 @@
     "category": "building",
     "scene_path": "res://scenes/buildings/trading_post.tscn",
     "cost": [
-      {"item_id": "wood", "amount": 12},
-      {"item_id": "stone", "amount": 8}
+      {
+        "item_id": "wood",
+        "amount": 12
+      },
+      {
+        "item_id": "stone",
+        "amount": 8
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      2,
+      2
+    ]
   },
   {
     "id": "barn",
@@ -48,11 +85,24 @@
     "category": "building",
     "scene_path": "res://scenes/buildings/barn.tscn",
     "cost": [
-      {"item_id": "wood", "amount": 20},
-      {"item_id": "wooden_plank", "amount": 8},
-      {"item_id": "stone", "amount": 6}
+      {
+        "item_id": "wood",
+        "amount": 20
+      },
+      {
+        "item_id": "wooden_plank",
+        "amount": 8
+      },
+      {
+        "item_id": "stone",
+        "amount": 6
+      }
     ],
-    "animal_id": "cow"
+    "animal_id": "cow",
+    "footprint": [
+      3,
+      3
+    ]
   },
   {
     "id": "farm_plot",
@@ -60,10 +110,20 @@
     "category": "farm",
     "scene_path": "res://scenes/farm/farm_plot.tscn",
     "cost": [
-      {"item_id": "wood", "amount": 2},
-      {"item_id": "stone", "amount": 1}
+      {
+        "item_id": "wood",
+        "amount": 2
+      },
+      {
+        "item_id": "stone",
+        "amount": 1
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      2,
+      2
+    ]
   },
   {
     "id": "animal_pen",
@@ -71,11 +131,21 @@
     "category": "farm",
     "scene_path": "res://scenes/farm/animal_pen.tscn",
     "cost": [
-      {"item_id": "wood", "amount": 6},
-      {"item_id": "stone", "amount": 2}
+      {
+        "item_id": "wood",
+        "amount": 6
+      },
+      {
+        "item_id": "stone",
+        "amount": 2
+      }
     ],
     "animal_id": "chicken",
-    "custom_render": true
+    "custom_render": true,
+    "footprint": [
+      3,
+      3
+    ]
   },
   {
     "id": "silo",
@@ -83,13 +153,26 @@
     "category": "farm",
     "scene_path": "res://scenes/buildings/silo.tscn",
     "cost": [
-      {"item_id": "stone", "amount": 10},
-      {"item_id": "iron_bar", "amount": 4},
-      {"item_id": "wooden_plank", "amount": 5}
+      {
+        "item_id": "stone",
+        "amount": 10
+      },
+      {
+        "item_id": "iron_bar",
+        "amount": 4
+      },
+      {
+        "item_id": "wooden_plank",
+        "amount": 5
+      }
     ],
     "animal_id": "",
     "storage_item_id": "hay",
-    "storage_capacity": 200
+    "storage_capacity": 200,
+    "footprint": [
+      2,
+      2
+    ]
   },
   {
     "id": "wood_fence",
@@ -97,13 +180,23 @@
     "category": "fence",
     "scene_path": "res://scenes/buildings/fence_wood.tscn",
     "cost": [
-      {"item_id": "wood", "amount": 1},
-      {"item_id": "rope", "amount": 1}
+      {
+        "item_id": "wood",
+        "amount": 1
+      },
+      {
+        "item_id": "rope",
+        "amount": 1
+      }
     ],
     "animal_id": "",
     "connects": true,
     "is_gate": false,
-    "custom_render": true
+    "custom_render": true,
+    "footprint": [
+      1,
+      1
+    ]
   },
   {
     "id": "wood_fence_gate",
@@ -111,13 +204,23 @@
     "category": "fence",
     "scene_path": "res://scenes/buildings/fence_wood_gate.tscn",
     "cost": [
-      {"item_id": "wood", "amount": 2},
-      {"item_id": "rope", "amount": 1}
+      {
+        "item_id": "wood",
+        "amount": 2
+      },
+      {
+        "item_id": "rope",
+        "amount": 1
+      }
     ],
     "animal_id": "",
     "connects": true,
     "is_gate": true,
-    "custom_render": true
+    "custom_render": true,
+    "footprint": [
+      1,
+      1
+    ]
   },
   {
     "id": "iron_fence",
@@ -125,12 +228,19 @@
     "category": "fence",
     "scene_path": "res://scenes/buildings/fence_iron.tscn",
     "cost": [
-      {"item_id": "iron_bar", "amount": 1}
+      {
+        "item_id": "iron_bar",
+        "amount": 1
+      }
     ],
     "animal_id": "",
     "connects": true,
     "is_gate": false,
-    "custom_render": true
+    "custom_render": true,
+    "footprint": [
+      1,
+      1
+    ]
   },
   {
     "id": "mailbox",
@@ -138,10 +248,20 @@
     "category": "decoration",
     "scene_path": "res://scenes/buildings/mailbox.tscn",
     "cost": [
-      {"item_id": "wood", "amount": 3},
-      {"item_id": "iron_bar", "amount": 1}
+      {
+        "item_id": "wood",
+        "amount": 3
+      },
+      {
+        "item_id": "iron_bar",
+        "amount": 1
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      1,
+      1
+    ]
   },
   {
     "id": "bed",
@@ -149,10 +269,20 @@
     "category": "building",
     "scene_path": "res://scenes/buildings/bed.tscn",
     "cost": [
-      {"item_id": "wood", "amount": 10},
-      {"item_id": "wool", "amount": 2}
+      {
+        "item_id": "wood",
+        "amount": 10
+      },
+      {
+        "item_id": "wool",
+        "amount": 2
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      2,
+      2
+    ]
   },
   {
     "id": "flowerpot",
@@ -160,10 +290,20 @@
     "category": "decoration",
     "scene_path": "res://scenes/buildings/decoration.tscn",
     "cost": [
-      {"item_id": "stone", "amount": 2},
-      {"item_id": "wood", "amount": 1}
+      {
+        "item_id": "stone",
+        "amount": 2
+      },
+      {
+        "item_id": "wood",
+        "amount": 1
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      1,
+      1
+    ]
   },
   {
     "id": "chair",
@@ -171,10 +311,20 @@
     "category": "decoration",
     "scene_path": "res://scenes/buildings/decoration.tscn",
     "cost": [
-      {"item_id": "wood", "amount": 4},
-      {"item_id": "wool", "amount": 1}
+      {
+        "item_id": "wood",
+        "amount": 4
+      },
+      {
+        "item_id": "wool",
+        "amount": 1
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      1,
+      1
+    ]
   },
   {
     "id": "lamppost",
@@ -182,10 +332,20 @@
     "category": "decoration",
     "scene_path": "res://scenes/buildings/lamppost.tscn",
     "cost": [
-      {"item_id": "iron_bar", "amount": 2},
-      {"item_id": "wood", "amount": 3}
+      {
+        "item_id": "iron_bar",
+        "amount": 2
+      },
+      {
+        "item_id": "wood",
+        "amount": 3
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      1,
+      1
+    ]
   },
   {
     "id": "flag",
@@ -193,10 +353,20 @@
     "category": "decoration",
     "scene_path": "res://scenes/buildings/decoration.tscn",
     "cost": [
-      {"item_id": "wood", "amount": 2},
-      {"item_id": "wool", "amount": 2}
+      {
+        "item_id": "wood",
+        "amount": 2
+      },
+      {
+        "item_id": "wool",
+        "amount": 2
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      1,
+      1
+    ]
   },
   {
     "id": "fountain",
@@ -204,10 +374,20 @@
     "category": "decoration",
     "scene_path": "res://scenes/buildings/decoration.tscn",
     "cost": [
-      {"item_id": "stone", "amount": 20},
-      {"item_id": "iron_bar", "amount": 3}
+      {
+        "item_id": "stone",
+        "amount": 20
+      },
+      {
+        "item_id": "iron_bar",
+        "amount": 3
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      1,
+      1
+    ]
   },
   {
     "id": "well",
@@ -215,10 +395,20 @@
     "category": "farm",
     "scene_path": "res://scenes/buildings/well.tscn",
     "cost": [
-      {"item_id": "stone", "amount": 12},
-      {"item_id": "wooden_plank", "amount": 3}
+      {
+        "item_id": "stone",
+        "amount": 12
+      },
+      {
+        "item_id": "wooden_plank",
+        "amount": 3
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      1,
+      1
+    ]
   },
   {
     "id": "oven",
@@ -226,10 +416,20 @@
     "category": "building",
     "scene_path": "res://scenes/buildings/oven.tscn",
     "cost": [
-      {"item_id": "stone", "amount": 16},
-      {"item_id": "iron_bar", "amount": 2}
+      {
+        "item_id": "stone",
+        "amount": 16
+      },
+      {
+        "item_id": "iron_bar",
+        "amount": 2
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      2,
+      2
+    ]
   },
   {
     "id": "anvil",
@@ -237,10 +437,20 @@
     "category": "building",
     "scene_path": "res://scenes/buildings/anvil.tscn",
     "cost": [
-      {"item_id": "iron_bar", "amount": 8},
-      {"item_id": "wood", "amount": 4}
+      {
+        "item_id": "iron_bar",
+        "amount": 8
+      },
+      {
+        "item_id": "wood",
+        "amount": 4
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      2,
+      2
+    ]
   },
   {
     "id": "mill",
@@ -248,11 +458,24 @@
     "category": "farm",
     "scene_path": "res://scenes/buildings/mill.tscn",
     "cost": [
-      {"item_id": "wood", "amount": 12},
-      {"item_id": "stone", "amount": 8},
-      {"item_id": "wooden_plank", "amount": 6}
+      {
+        "item_id": "wood",
+        "amount": 12
+      },
+      {
+        "item_id": "stone",
+        "amount": 8
+      },
+      {
+        "item_id": "wooden_plank",
+        "amount": 6
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      3,
+      3
+    ]
   },
   {
     "id": "smelter",
@@ -260,10 +483,20 @@
     "category": "building",
     "scene_path": "res://scenes/buildings/decoration.tscn",
     "cost": [
-      {"item_id": "stone", "amount": 8},
-      {"item_id": "wood", "amount": 4}
+      {
+        "item_id": "stone",
+        "amount": 8
+      },
+      {
+        "item_id": "wood",
+        "amount": 4
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      2,
+      2
+    ]
   },
   {
     "id": "fishing_dock",
@@ -271,10 +504,20 @@
     "category": "building",
     "scene_path": "res://scenes/buildings/decoration.tscn",
     "cost": [
-      {"item_id": "wood", "amount": 6},
-      {"item_id": "wooden_plank", "amount": 2}
+      {
+        "item_id": "wood",
+        "amount": 6
+      },
+      {
+        "item_id": "wooden_plank",
+        "amount": 2
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      2,
+      2
+    ]
   },
   {
     "id": "loom",
@@ -282,10 +525,20 @@
     "category": "building",
     "scene_path": "res://scenes/buildings/decoration.tscn",
     "cost": [
-      {"item_id": "wood", "amount": 5},
-      {"item_id": "wool", "amount": 2}
+      {
+        "item_id": "wood",
+        "amount": 5
+      },
+      {
+        "item_id": "wool",
+        "amount": 2
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      2,
+      2
+    ]
   },
   {
     "id": "dye_vat",
@@ -293,10 +546,20 @@
     "category": "building",
     "scene_path": "res://scenes/buildings/decoration.tscn",
     "cost": [
-      {"item_id": "wood", "amount": 3},
-      {"item_id": "clay", "amount": 2}
+      {
+        "item_id": "wood",
+        "amount": 3
+      },
+      {
+        "item_id": "clay",
+        "amount": 2
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      2,
+      2
+    ]
   },
   {
     "id": "coop",
@@ -304,10 +567,20 @@
     "category": "farm",
     "scene_path": "res://scenes/buildings/decoration.tscn",
     "cost": [
-      {"item_id": "wood", "amount": 8},
-      {"item_id": "hay", "amount": 4}
+      {
+        "item_id": "wood",
+        "amount": 8
+      },
+      {
+        "item_id": "hay",
+        "amount": 4
+      }
     ],
-    "animal_id": "chicken"
+    "animal_id": "chicken",
+    "footprint": [
+      3,
+      3
+    ]
   },
   {
     "id": "brewing_keg",
@@ -315,10 +588,20 @@
     "category": "building",
     "scene_path": "res://scenes/buildings/decoration.tscn",
     "cost": [
-      {"item_id": "wood", "amount": 6},
-      {"item_id": "iron_bar", "amount": 1}
+      {
+        "item_id": "wood",
+        "amount": 6
+      },
+      {
+        "item_id": "iron_bar",
+        "amount": 1
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      2,
+      2
+    ]
   },
   {
     "id": "scarecrow",
@@ -326,10 +609,20 @@
     "category": "farm",
     "scene_path": "res://scenes/buildings/decoration.tscn",
     "cost": [
-      {"item_id": "wood", "amount": 2},
-      {"item_id": "hay", "amount": 3}
+      {
+        "item_id": "wood",
+        "amount": 2
+      },
+      {
+        "item_id": "hay",
+        "amount": 3
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      1,
+      1
+    ]
   },
   {
     "id": "sign_post",
@@ -337,10 +630,20 @@
     "category": "building",
     "scene_path": "res://scenes/buildings/decoration.tscn",
     "cost": [
-      {"item_id": "wood", "amount": 2},
-      {"item_id": "wooden_plank", "amount": 1}
+      {
+        "item_id": "wood",
+        "amount": 2
+      },
+      {
+        "item_id": "wooden_plank",
+        "amount": 1
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      1,
+      1
+    ]
   },
   {
     "id": "conveyor",
@@ -350,9 +653,16 @@
     "custom_render": true,
     "connects": true,
     "cost": [
-      {"item_id": "iron_bar", "amount": 1}
+      {
+        "item_id": "iron_bar",
+        "amount": 1
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      2,
+      2
+    ]
   },
   {
     "id": "extractor",
@@ -362,10 +672,20 @@
     "custom_render": true,
     "connects": true,
     "cost": [
-      {"item_id": "iron_bar", "amount": 2},
-      {"item_id": "wood", "amount": 2}
+      {
+        "item_id": "iron_bar",
+        "amount": 2
+      },
+      {
+        "item_id": "wood",
+        "amount": 2
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      2,
+      2
+    ]
   },
   {
     "id": "inserter",
@@ -375,10 +695,20 @@
     "custom_render": true,
     "connects": true,
     "cost": [
-      {"item_id": "iron_bar", "amount": 2},
-      {"item_id": "wood", "amount": 2}
+      {
+        "item_id": "iron_bar",
+        "amount": 2
+      },
+      {
+        "item_id": "wood",
+        "amount": 2
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      2,
+      2
+    ]
   },
   {
     "id": "auto_crafter",
@@ -388,10 +718,20 @@
     "custom_render": true,
     "connects": true,
     "cost": [
-      {"item_id": "iron_bar", "amount": 4},
-      {"item_id": "wooden_plank", "amount": 4}
+      {
+        "item_id": "iron_bar",
+        "amount": 4
+      },
+      {
+        "item_id": "wooden_plank",
+        "amount": 4
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      2,
+      2
+    ]
   },
   {
     "id": "splitter",
@@ -401,9 +741,16 @@
     "custom_render": true,
     "connects": true,
     "cost": [
-      {"item_id": "iron_bar", "amount": 2}
+      {
+        "item_id": "iron_bar",
+        "amount": 2
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      2,
+      2
+    ]
   },
   {
     "id": "filter_conveyor",
@@ -413,8 +760,15 @@
     "custom_render": true,
     "connects": true,
     "cost": [
-      {"item_id": "iron_bar", "amount": 2}
+      {
+        "item_id": "iron_bar",
+        "amount": 2
+      }
     ],
-    "animal_id": ""
+    "animal_id": "",
+    "footprint": [
+      2,
+      2
+    ]
   }
 ]
