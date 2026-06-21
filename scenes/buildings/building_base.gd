@@ -29,7 +29,6 @@ func setup_preview(data: BuildingData) -> void:
 # 放置/读档时调用。基类只负责 sprite，子类覆盖以添加副作用（生鸡、注册到系统等）。
 func on_placed(data: BuildingData = null) -> void:
 	setup_preview(data)
-	_setup_building_light()
 	_register_footprint()
 
 # 放置/读档时向 world 注册占用的格子（防重叠）。
@@ -39,28 +38,6 @@ func _register_footprint() -> void:
 	var world := get_tree().get_first_node_in_group("world")
 	if world and world.has_method("occupy_area"):
 		world.occupy_area(global_position, building_data.footprint)
-
-# 功能建筑（building/farm）夜晚自带柔和暖光照亮基地；装饰/栅栏/自动化不发光。
-# 自己建造的建筑提供照明而非阴影。
-func _setup_building_light() -> void:
-	if building_data == null or building_data.custom_render:
-		return
-	if building_data.category != "building" and building_data.category != "farm":
-		return
-	var light := PointLight2D.new()
-	light.name = "BuildingLight"
-	light.texture = ProjectedShadow._blob_texture()
-	light.texture_scale = 3.0
-	light.color = Color(1.0, 0.88, 0.62)
-	light.position = Vector2(0, -10)
-	light.energy = 0.55 if TimeSystem.is_night() else 0.0
-	add_child(light)
-	TimeSystem.night_started.connect(func(_d): _fade_building_light(light, 0.55))
-	TimeSystem.day_started.connect(func(_d): _fade_building_light(light, 0.0))
-
-func _fade_building_light(light: PointLight2D, target: float) -> void:
-	if is_instance_valid(light):
-		light.create_tween().tween_property(light, "energy", target, 1.5)
 
 func _apply_visual() -> void:
 	if building_data == null or building_data.custom_render:
